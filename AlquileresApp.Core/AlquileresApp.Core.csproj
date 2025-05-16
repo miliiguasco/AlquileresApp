@@ -4,16 +4,6 @@
     <ProjectReference Include="..\AlquileresApp.Data\AlquileresApp.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Casos de Uso\" />
-    <Folder Include="Entidades\" />
-    <Folder Include="Enumerativos\" />
-    <Folder Include="Excepciones\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="Servicios\" />
-    <Folder Include="Validadores\" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
