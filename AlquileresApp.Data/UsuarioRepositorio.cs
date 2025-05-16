@@ -1,7 +1,6 @@
-using System;
-using alquileresapp.data;
-
+using AlquileresApp.Core;
 namespace AlquileresApp.Data;
+
 
 public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
 {

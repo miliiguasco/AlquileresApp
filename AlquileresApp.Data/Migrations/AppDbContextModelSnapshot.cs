@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using alquileresapp.data;
+using AlquileresApp.Data;
 
 #nullable disable
 
@@ -17,7 +17,7 @@ namespace AlquileresApp.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Imagen", b =>
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Imagen", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -37,7 +37,7 @@ namespace AlquileresApp.Data.Migrations
                     b.ToTable("Imagenes");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Persona", b =>
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Persona", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,7 +78,7 @@ namespace AlquileresApp.Data.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Propiedad", b =>
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Propiedad", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -109,7 +109,7 @@ namespace AlquileresApp.Data.Migrations
                     b.ToTable("Propiedades");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Reserva", b =>
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Reserva", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -136,7 +136,7 @@ namespace AlquileresApp.Data.Migrations
                     b.ToTable("Reservas");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Tarjeta", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.Tarjeta", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -168,9 +168,9 @@ namespace AlquileresApp.Data.Migrations
                     b.ToTable("Tarjetas");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Trabajador", b =>
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Trabajador", b =>
                 {
-                    b.HasBaseType("alquileresapp.core.Entidades.Persona");
+                    b.HasBaseType("AlquilereApp.Core.Entidades.Persona");
 
                     b.Property<DateTime>("FechaAlta")
                         .HasColumnType("TEXT");
@@ -178,9 +178,9 @@ namespace AlquileresApp.Data.Migrations
                     b.HasDiscriminator().HasValue("Trabajador");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Usuario", b =>
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Usuario", b =>
                 {
-                    b.HasBaseType("alquileresapp.core.Entidades.Persona");
+                    b.HasBaseType("Alquileresapp.Core.Entidades.Persona");
 
                     b.Property<string>("Contraseña")
                         .IsRequired()
@@ -193,30 +193,30 @@ namespace AlquileresApp.Data.Migrations
                     b.HasDiscriminator().HasValue("Usuario");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.UsuarioNoRegistrado", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.UsuarioNoRegistrado", b =>
                 {
-                    b.HasBaseType("alquileresapp.core.Entidades.Persona");
+                    b.HasBaseType("Alquileresapp.Core.Entidades.Persona");
 
                     b.HasDiscriminator().HasValue("UsuarioNoRegistrado");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Administrador", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.Administrador", b =>
                 {
-                    b.HasBaseType("alquileresapp.core.Entidades.Trabajador");
+                    b.HasBaseType("Alquileresapp.Core.Entidades.Trabajador");
 
                     b.HasDiscriminator().HasValue("Administrador");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Encargado", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.Encargado", b =>
                 {
-                    b.HasBaseType("alquileresapp.core.Entidades.Trabajador");
+                    b.HasBaseType("Alquileresapp.Core.Entidades.Trabajador");
 
                     b.HasDiscriminator().HasValue("Encargado");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.UsuarioRegistrado", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.UsuarioRegistrado", b =>
                 {
-                    b.HasBaseType("alquileresapp.core.Entidades.Usuario");
+                    b.HasBaseType("Alquileresapp.Core.Entidades.Usuario");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -224,9 +224,9 @@ namespace AlquileresApp.Data.Migrations
                     b.HasDiscriminator().HasValue("UsuarioRegistrado");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Imagen", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.Imagen", b =>
                 {
-                    b.HasOne("alquileresapp.core.Entidades.Propiedad", "Propiedad")
+                    b.HasOne("Alquileresapp.Core.Entidades.Propiedad", "Propiedad")
                         .WithMany("Imagenes")
                         .HasForeignKey("PropiedadId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -235,9 +235,9 @@ namespace AlquileresApp.Data.Migrations
                     b.Navigation("Propiedad");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Propiedad", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.Propiedad", b =>
                 {
-                    b.HasOne("alquileresapp.core.Entidades.Encargado", "Encargado")
+                    b.HasOne("Alquileresapp.Core.Entidades.Encargado", "Encargado")
                         .WithMany("Propiedades")
                         .HasForeignKey("EncargadoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -246,15 +246,15 @@ namespace AlquileresApp.Data.Migrations
                     b.Navigation("Encargado");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Reserva", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.Reserva", b =>
                 {
-                    b.HasOne("alquileresapp.core.Entidades.Propiedad", "Propiedad")
+                    b.HasOne("Alquileresapp.Core.Entidades.Propiedad", "Propiedad")
                         .WithMany()
                         .HasForeignKey("PropiedadId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("alquileresapp.core.Entidades.UsuarioRegistrado", "Usuario")
+                    b.HasOne("Alquileresapp.Core.Entidades.UsuarioRegistrado", "Usuario")
                         .WithMany("Reservas")
                         .HasForeignKey("UsuarioRegistradoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -265,34 +265,34 @@ namespace AlquileresApp.Data.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Tarjeta", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.Tarjeta", b =>
                 {
-                    b.HasOne("alquileresapp.core.Entidades.Reserva", "Reserva")
+                    b.HasOne("Alquileresapp.Core.Entidades.Reserva", "Reserva")
                         .WithOne("Tarjeta")
-                        .HasForeignKey("alquileresapp.core.Entidades.Tarjeta", "ReservaId")
+                        .HasForeignKey("Alquileresapp.Core.Entidades.Tarjeta", "ReservaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Reserva");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Propiedad", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.Propiedad", b =>
                 {
                     b.Navigation("Imagenes");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Reserva", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.Reserva", b =>
                 {
                     b.Navigation("Tarjeta")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.Encargado", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.Encargado", b =>
                 {
                     b.Navigation("Propiedades");
                 });
 
-            modelBuilder.Entity("alquileresapp.core.Entidades.UsuarioRegistrado", b =>
+            modelBuilder.Entity("Alquileresapp.Core.Entidades.UsuarioRegistrado", b =>
                 {
                     b.Navigation("Reservas");
                 });
