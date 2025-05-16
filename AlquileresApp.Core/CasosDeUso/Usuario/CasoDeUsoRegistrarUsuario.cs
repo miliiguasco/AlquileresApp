@@ -1,4 +1,4 @@
-namespace AlquileresApp.Core;
+namespace AlquileresApp.Core.CasosDeUso.Usuario;
 using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
 

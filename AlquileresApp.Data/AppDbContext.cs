@@ -1,13 +1,16 @@
 using AlquileresApp.Core.Entidades;
+using AlquileresApp.Core.Enumerativos; 
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace AlquileresApp.Data
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<Usuario> Usuarios { get; set; }
+        private static string DbPath => 
+            Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "AlquileresApp.Data", "Alquilando.db"));
+
         public DbSet<UsuarioRegistrado> UsuariosRegistrados { get; set; }
-        public DbSet<UsuarioNoRegistrado> UsuariosNoRegistrados { get; set; }
         public DbSet<Administrador> Administradores { get; set; }
         public DbSet<Encargado> Encargados { get; set; }
         public DbSet<Reserva> Reservas { get; set; }
@@ -17,52 +20,60 @@ namespace AlquileresApp.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Esto crea o usa la base de datos SQLite en el proyecto
-            optionsBuilder.UseSqlite("Data Source=Alquilando.db");
+            var path = DbPath;
+            Console.WriteLine($"Configurando base de datos en: {path}");
+            optionsBuilder.UseSqlite($"Data Source={path}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Relación 1 UsuarioRegistrado - muchas Reservas
-            modelBuilder.Entity<Reserva>()
-                .HasOne(r => r.Usuario)
-                .WithMany(u => u.Reservas)
-                .HasForeignKey(r => r.UsuarioRegistradoId)
-                .OnDelete(DeleteBehavior.Cascade);
+            // Configuración de la herencia TPH (Table Per Hierarchy)
+            modelBuilder.Entity<Usuario>()
+                .HasDiscriminator<string>("TipoUsuario")
+                .HasValue<UsuarioRegistrado>("UsuarioRegistrado")
+                .HasValue<Administrador>("Administrador")
+                .HasValue<Encargado>("Encargado");
 
-            // Relación 1 Propiedad - muchas Imagenes
-            modelBuilder.Entity<Imagen>()
-                .HasOne(i => i.Propiedad)
-                .WithMany(p => p.Imagenes)
-                .HasForeignKey(i => i.PropiedadId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Relación 1 Propiedad - 1 Encargado
-            modelBuilder.Entity<Propiedad>()
-                .HasOne(p => p.Encargado)
-                .WithMany(e => e.Propiedades)
-                .HasForeignKey(p => p.EncargadoId);
-
-            // Relación 1 Reserva - 1 Tarjeta (Opcional)
-            modelBuilder.Entity<Reserva>()
-                .HasOne(r => r.Tarjeta)
-                .WithOne(t => t.Reserva)
-                .HasForeignKey<Tarjeta>(t => t.ReservaId);
-
-            // Si querés mapear enums como string en la base (más legible)
-            modelBuilder.Entity<Propiedad>()
-                .Property(p => p.ServiciosDisponibles)
-                .HasConversion(
-                    v => string.Join(',', v),
-                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                          .Select(s => Enum.Parse<ServiciosDisponibles>(s))
-                          .ToList()
-                );
-            modelBuilder.Entity<UsuarioRegistrado>()
+            // Email único para usuarios
+            modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+        }
+
+        public void EnsureDatabaseCreated()
+        {
+            try
+            {
+                var path = DbPath;
+                Console.WriteLine($"Intentando crear/verificar base de datos en: {path}");
+                Console.WriteLine($"Directorio actual: {Directory.GetCurrentDirectory()}");
+                
+                var directory = Path.GetDirectoryName(path);
+                if (!Directory.Exists(directory))
+                {
+                    Console.WriteLine($"Creando directorio: {directory}");
+                    Directory.CreateDirectory(directory!);
+                }
+
+                var created = Database.EnsureCreated();
+                Console.WriteLine($"Base de datos {(created ? "creada" : "ya existía")} en {path}");
+
+                // Verificar las tablas creadas
+                var tables = Database.SqlQuery<string>($"SELECT name FROM sqlite_master WHERE type='table';").ToList();
+                Console.WriteLine("\nTablas creadas:");
+                foreach (var table in tables)
+                {
+                    Console.WriteLine($"- {table}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al crear/verificar la base de datos: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw;
+            }
         }
     }
 }
