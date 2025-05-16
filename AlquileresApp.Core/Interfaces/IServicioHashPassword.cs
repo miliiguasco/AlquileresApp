@@ -1,4 +1,4 @@
-namespace AlquileresApp.Core;
+namespace AlquileresApp.Core.Interfaces;
 
 public interface IServicioHashPassword
 {

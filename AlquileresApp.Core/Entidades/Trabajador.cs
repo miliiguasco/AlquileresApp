@@ -1,4 +1,4 @@
-namespace AlquileresApp.Core;
+namespace AlquileresApp.Core.Entidades;
 
 public abstract class Trabajador : Usuario
 {

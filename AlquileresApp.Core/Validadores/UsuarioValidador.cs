@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
-
+using AlquileresApp.Core.Interfaces;
+using AlquileresApp.Core.Entidades;
 namespace AlquileresApp.Core;
 
 public class UsuarioValidador : IUsuarioValidador

@@ -1,4 +1,4 @@
-namespace AlquileresApp.Core;
+namespace AlquileresApp.Core.Entidades;
 
 public class UsuarioRegistrado : Usuario
 {

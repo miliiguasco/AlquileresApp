@@ -1,4 +1,4 @@
-namespace AlquileresApp.Core;
+namespace AlquileresApp.Core.Enumerativos;
 
 public enum ServiciosPropiedad
 {

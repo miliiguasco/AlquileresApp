@@ -1,4 +1,6 @@
 namespace AlquileresApp.Core;
+using AlquileresApp.Core.Interfaces;
+using AlquileresApp.Core.Entidades;
 
 public class CasoDeUsoRegistrarUsuario (IUsuarioRepositorio usuarioRepositorio, IUsuarioValidador usuarioValidador, IServicioHashPassword servicioHashPassword)
 {

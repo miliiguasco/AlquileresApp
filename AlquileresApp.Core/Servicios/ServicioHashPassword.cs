@@ -1,7 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
+using AlquileresApp.Core.Interfaces;
 
-namespace AlquileresApp.Core;
+namespace AlquileresApp.Core.Servicios;
 
 public class ServicioHashPassword : IServicioHashPassword
 {
