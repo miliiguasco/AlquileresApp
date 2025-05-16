@@ -1,8 +1,4 @@
-using System;
-using AlquileresApp.Core.Interfaces;
-using AlquileresApp.Core.Models;
-
-namespace AlquileresApp.Core.Casos_de_Uso;
+namespace AlquileresApp.Core;
 
 public class CasoDeUsoRegistrarUsuario (IUsuarioRepositorio usuarioRepositorio, IUsuarioValidador usuarioValidador, IServicioHashPassword servicioHashPassword)
 {

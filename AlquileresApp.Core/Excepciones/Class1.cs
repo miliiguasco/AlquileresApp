@@ -1,6 +1,4 @@
-using System;
-
-namespace AlquileresApp.Core.Excepciones;
+namespace AlquileresApp.Core;
 
 public class Class1
 {

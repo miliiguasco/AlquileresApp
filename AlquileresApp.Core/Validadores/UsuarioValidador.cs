@@ -1,15 +1,12 @@
-using System;
 using System.Text.RegularExpressions;
-using AlquileresApp.Core.Interfaces;
-using AlquileresApp.Core.Models;
 
-namespace AlquileresApp.Core.Validadores;
+namespace AlquileresApp.Core;
 
 public class UsuarioValidador : IUsuarioValidador
 {
     public void ValidarDatos(Usuario usuario) 
     {
-        ValidarCorreo(usuario.Correo);
+        ValidarCorreo(usuario.Email);
         ValidarPassword(usuario.Password);
         VerificarFechaDeNacimiento(usuario.FechaNacimiento);
     }

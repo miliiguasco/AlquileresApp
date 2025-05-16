@@ -1,6 +1,6 @@
-namespace AlquileresApp.Core.Entidades;
+namespace AlquileresApp.Core;
 
-public class Administrador : Trabajador
+public class Administrador : Usuario
 {
     public string Departamento { get; set; } = string.Empty;
     public string Cargo { get; set; } = string.Empty;

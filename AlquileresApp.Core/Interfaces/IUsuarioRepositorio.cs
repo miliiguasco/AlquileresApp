@@ -1,11 +1,9 @@
-using System;
-
-namespace AlquileresApp.Core.Interfaces;
+namespace AlquileresApp.Core;
 
 public interface IUsuarioRepositorio
 {
-    public void RegistrarUsuario(Usuario usuario);
-    public void ModificarUsuario(Usuario usuario);
+    void RegistrarUsuario(Usuario usuario, string hashedPassword);
+    void ModificarUsuario(Usuario usuario);
     public Usuario ObtenerUsuarioPorId(int id);
     public List<Usuario> ListarUsuarios();
 }

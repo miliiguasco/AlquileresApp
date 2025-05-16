@@ -1,12 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using alquileresapp.core.Entidades;
+using AlquileresApp.Core;
 
-namespace alquileresapp.data
+namespace AlquileresApp.Data
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<Persona> Personas { get; set; }
-        public DbSet<Trabajador> Trabajadores { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<UsuarioRegistrado> UsuariosRegistrados { get; set; }
         public DbSet<UsuarioNoRegistrado> UsuariosNoRegistrados { get; set; }
@@ -53,12 +51,6 @@ namespace alquileresapp.data
         .WithOne(t => t.Reserva)
         .HasForeignKey<Tarjeta>(t => t.ReservaId);
 
-    // Ejemplo: Configurar propiedad como requerida y con tamaño máximo
-    modelBuilder.Entity<Persona>()
-        .Property(p => p.Email)
-        .IsRequired()
-        .HasMaxLength(100);
-
     // Si querés mapear enums como string en la base (más legible)
     modelBuilder.Entity<Propiedad>()
         .Property(p => p.ServiciosDisponibles)
@@ -71,7 +63,7 @@ namespace alquileresapp.data
         modelBuilder.Entity<UsuarioRegistrado>()
         .HasIndex(u => u.Email)
         .IsUnique();
-}
+    }
 
     }
 }

@@ -1,6 +1,6 @@
-namespace AlquileresApp.Core.Enumerativos;
+namespace AlquileresApp.Core;
 
-public enum Servicios
+public enum ServiciosPropiedad
 {
     Wifi,
     AireAcondicionado,
