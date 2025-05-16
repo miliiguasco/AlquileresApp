@@ -1,32 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Data\\AlquileresApp.Data.csproj": {}
+    "D:\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj": {}
   },
   "projects": {
-    "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
+    "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+        "projectUniqueName": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
         "projectName": "AlquileresApp.Core",
-        "projectPath": "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
-        "packagesPath": "C:\\Users\\milag\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Core\\obj\\",
+        "projectPath": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+        "packagesPath": "C:\\Users\\valen\\.nuget\\packages\\",
+        "outputPath": "D:\\AlquileresApp\\AlquileresApp.Core\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\milag\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\valen\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -70,37 +63,30 @@
         }
       }
     },
-    "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Data\\AlquileresApp.Data.csproj": {
+    "D:\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
+        "projectUniqueName": "D:\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
         "projectName": "AlquileresApp.Data",
-        "projectPath": "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
-        "packagesPath": "C:\\Users\\milag\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Data\\obj\\",
+        "projectPath": "D:\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
+        "packagesPath": "C:\\Users\\valen\\.nuget\\packages\\",
+        "outputPath": "D:\\AlquileresApp\\AlquileresApp.Data\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\milag\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\valen\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
-                "projectPath": "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Core\\AlquileresApp.Core.csproj"
+              "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
+                "projectPath": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj"
               }
             }
           }
