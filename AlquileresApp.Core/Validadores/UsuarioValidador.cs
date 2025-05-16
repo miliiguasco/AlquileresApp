@@ -33,7 +33,7 @@ public class UsuarioValidador : IUsuarioValidador
 
     private void VerificarFechaDeNacimiento(DateTime fechaNacimiento)
     {
-        if (fechaNacimiento < DateTime.Now.AddYears(-18))
+        if (fechaNacimiento >= DateTime.Now.AddYears(-18))
             throw new Exception("Debes tener al menos 18 años para registrarte");
     }
 }
