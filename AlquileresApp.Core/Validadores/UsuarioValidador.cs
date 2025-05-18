@@ -1,15 +1,13 @@
-using System;
 using System.Text.RegularExpressions;
 using AlquileresApp.Core.Interfaces;
-using AlquileresApp.Core.Models;
-
-namespace AlquileresApp.Core.Validadores;
+using AlquileresApp.Core.Entidades;
+namespace AlquileresApp.Core;
 
 public class UsuarioValidador : IUsuarioValidador
 {
     public void ValidarDatos(Usuario usuario) 
     {
-        ValidarCorreo(usuario.Correo);
+        ValidarCorreo(usuario.Email);
         ValidarPassword(usuario.Password);
         VerificarFechaDeNacimiento(usuario.FechaNacimiento);
     }
@@ -35,7 +33,7 @@ public class UsuarioValidador : IUsuarioValidador
 
     private void VerificarFechaDeNacimiento(DateTime fechaNacimiento)
     {
-        if (fechaNacimiento < DateTime.Now.AddYears(-18))
+        if (fechaNacimiento >= DateTime.Now.AddYears(-18))
             throw new Exception("Debes tener al menos 18 años para registrarte");
     }
 }

@@ -1,8 +1,8 @@
 namespace AlquileresApp.Core.Entidades;
+using AlquileresApp.Core.Interfaces;
 
-public class Encargado : Trabajador
+public class Encargado : Usuario
 {
-    public List<Propiedad> Propiedades { get; set; } = new();
     public string Zona { get; set; } = string.Empty;
 
     public void AgregarPropiedad(Propiedad propiedad)
