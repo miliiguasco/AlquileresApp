@@ -11,3 +11,4 @@ public class CasoDeUsoRegistrarUsuario (IUsuarioRepositorio usuarioRepositorio, 
         usuarioRepositorio.RegistrarUsuario(usuario, hashedPassword);
     }
 }
+                                                            
