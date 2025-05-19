@@ -1,6 +1,6 @@
 namespace AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
-public interface IUPropiedad{
+public interface IPropiedadValidador{
     
    public void validarPropiedad(Propiedad propiedad);
     

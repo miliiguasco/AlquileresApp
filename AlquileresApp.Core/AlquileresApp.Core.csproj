@@ -9,6 +9,7 @@
   <ItemGroup>
     <Folder Include="CasosDeUso\Administrador\" />
     <Folder Include="CasosDeUso\Encargado\" />
+    <Folder Include="CasosDeUso\Propiedad\" />
   </ItemGroup>
 
 </Project>

@@ -1,12 +1,12 @@
-using AlquileresApp.Core.Entidades;
-using AlquileresApp.Core.Enumerativos;
-
 namespace AlquileresApp.Core.CasosDeUso.Propiedad;
+using AlquileresApp.Core.Entidades;
+using AlquileresApp.Core.Interfaces;
 
-public class CasoDeUsoAgregarPropiedad(IPropiedadesRepositorio propiedadesRepositorio, IPropiedadValidador propiedadValidador)
+
+public class CasoDeUsoAgregarPropiedad(IPropiedadRepositorio propiedadesRepositorio,  IPropiedadValidador propiedadValidador)
 {
     public void Ejecutar(Propiedad propiedad){
-        propiedadValidador.ValidarPropiedad(propiedad);
+        propiedadValidador.validarPropiedad(propiedad);
         propiedadesRepositorio.CargarPropiedad(propiedad);
     }
 }

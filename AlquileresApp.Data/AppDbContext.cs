@@ -40,6 +40,10 @@ namespace AlquileresApp.Data
             modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+
+            // Clave primaria personalizada para Propiedad
+            modelBuilder.Entity<Propiedad>()
+                .HasKey(p => p.Titulo);
         }
 
         public void EnsureDatabaseCreated()
