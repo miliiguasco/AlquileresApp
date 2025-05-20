@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "3y4A2qd64/8=",
+  "dgSpecHash": "vzGeIuWMYJ8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\milag\\proyectosDotnet\\Alquileresapp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
+  "projectFilePath": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\milag\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\milag\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",

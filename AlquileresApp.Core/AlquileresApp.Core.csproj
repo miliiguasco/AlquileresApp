@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\AlquileresApp.Data\AlquileresApp.Data.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -1,0 +1,40 @@
+@page "/buscar"
+@using AlquileresApp.UI.Components.Search
+@using AlquileresApp.UI.Components.Property
+
+@inject IPropiedadService PropiedadService
+
+@using AlquileresApp.Core.DTOs
+@using AlquileresApp.Core.Entidades
+
+<PageTitle>Buscar propiedades</PageTitle>
+
+<div class="search-container">
+    <div class="search-item">
+        <LocationInput @bind-Localidad="filtros.Localidad" />
+    </div>
+    <div class="search-item">
+        <DateRangePicker @bind-FechaInicio="filtros.FechaInicio" @bind-FechaFin="filtros.FechaFin" />
+    </div>
+    <div class="search-item">
+        <GuestPicker @bind-Cantidad="filtros.CantidadHuespedes" />
+    </div>
+    <div class="search-item">
+        <button @onclick="BuscarPropiedades">Buscar</button>
+    </div>
+</div>
+
+@if (propiedadesFiltradas is not null)
+{
+    <PropertyList Propiedades="propiedadesFiltradas" />
+}
+
+@code {
+    private SearchFilters filtros = new();
+    private List<Propiedad> propiedadesFiltradas;
+
+    private async Task BuscarPropiedades()
+    {
+        propiedadesFiltradas = await PropiedadService.BuscarDisponiblesAsync(filtros);
+    }
+}

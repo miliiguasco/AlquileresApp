@@ -1,10 +1,15 @@
 using Microsoft.EntityFrameworkCore;
-using alquileresapp.core.Entidades;
+using AlquileresApp.Core.Entidades;
 
-namespace alquileresapp.data
+namespace AlquileresApp.Data
 {
     public class AppDbContext : DbContext
     {
+
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
+        {
+        }
+
         public DbSet<Persona> Personas { get; set; }
         public DbSet<Trabajador> Trabajadores { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
