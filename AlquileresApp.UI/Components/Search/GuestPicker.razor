@@ -1,0 +1,14 @@
+<div class="search-field">
+    <label for="guests">Huéspedes</label>
+    <input id="guests" type="number" min="1" class="input" placeholder="¿Cuántos?"
+           @bind="Cantidad" />
+</div>
+
+@code {
+    [Parameter]
+public int? Cantidad { get; set; }
+
+[Parameter]
+public EventCallback<int?> CantidadChanged { get; set; }
+}
+

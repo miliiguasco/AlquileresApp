@@ -1,0 +1,18 @@
+
+
+<div class="search-button">
+    <button class="btn-primary" @onclick="HandleClick">Buscar</button>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(null);
+        }
+    }
+}

@@ -1,0 +1,21 @@
+<div class="search-field">
+    <label>Fechas</label>
+    <input type="date" class="input" @bind="FechaInicio" />
+    <span class="separator">→</span>
+    <input type="date" class="input" @bind="FechaFin" />
+</div>
+
+@code {
+    [Parameter]
+public DateTime? FechaInicio { get; set; }
+
+[Parameter]
+public EventCallback<DateTime?> FechaInicioChanged { get; set; }
+
+[Parameter]
+public DateTime? FechaFin { get; set; }
+
+[Parameter]
+public EventCallback<DateTime?> FechaFinChanged { get; set; }
+
+}

@@ -1,6 +1,12 @@
-﻿<Router AppAssembly="typeof(Program).Assembly">
+﻿@using AlquileresApp.UI.Shared
+<Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
     </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p>Página no encontrada.</p>
+        </LayoutView>
+    </NotFound>
+    
 </Router>

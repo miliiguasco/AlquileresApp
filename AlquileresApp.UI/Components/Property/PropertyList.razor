@@ -1,0 +1,24 @@
+<!-- PropertyList.razor -->
+@using AlquileresApp.Core.Entidades
+
+@if (Propiedades?.Any() == true)
+{
+    
+    foreach (var propiedad in Propiedades)
+    {
+        <div class="propiedad-card">
+            <h4>@propiedad.Direccion - @propiedad.Localidad</h4>
+            <p>@propiedad.Descripcion</p>
+            <p><strong>Precio:</strong> $@propiedad.PrecioPorNoche</p>
+        </div>
+    }
+}
+else
+{
+    <p>No se encontraron propiedades para los filtros seleccionados.</p>
+}
+
+@code {
+    [Parameter]
+public List<Propiedad> Propiedades { get; set; } = new List<Propiedad>();
+}

@@ -1,25 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {}
+    "C:\\Users\\milag\\proyectosDotnet\\nuevo\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
+    "C:\\Users\\milag\\proyectosDotnet\\nuevo\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+        "projectUniqueName": "C:\\Users\\milag\\proyectosDotnet\\nuevo\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
         "projectName": "AlquileresApp.Core",
-        "projectPath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
-        "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\obj\\",
+        "projectPath": "C:\\Users\\milag\\proyectosDotnet\\nuevo\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+        "packagesPath": "C:\\Users\\milag\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\milag\\proyectosDotnet\\nuevo\\AlquileresApp\\AlquileresApp.Core\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\milag\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
