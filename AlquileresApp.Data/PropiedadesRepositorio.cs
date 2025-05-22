@@ -1,6 +1,7 @@
 using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Data;
+
 public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadRepositorio
 {
     public void CargarPropiedad(Propiedad propiedad){
@@ -26,7 +27,8 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
     }
 
     public List<Propiedad> ListarPropiedades(){
-        var propiedades = dbContext.Propiedades.ToList();
+        List<Propiedad> propiedades = dbContext.Propiedades.ToList();
+        //var propiedades = dbContext.Propiedades.ToList();
         if (propiedades.Count == 0)
             throw new Exception("No se encontraron propiedades.");
         return propiedades;

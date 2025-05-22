@@ -3,11 +3,10 @@
 @using AlquileresApp.UI.Components.Property
 @using AlquileresApp.Core.Interfaces
 @using Microsoft.AspNetCore.Components.Web
-
-
+@using AlquileresApp.Core.CasosDeUso.Propiedad
 
 @inject IPropiedadService PropiedadService
-
+@inject CasoDeUsoListarPropiedades CUListar
 @using AlquileresApp.Core.Entidades
 
 <HeadContent>
@@ -25,21 +24,47 @@
         <GuestPicker @bind-Cantidad="filtros.CantidadHuespedes" />
     </div>
     <div class="search-item">
-        <SearchButton OnClick="BuscarPropiedades" />
+        <SearchButton OnClick="ListarPropiedades" />
     </div>
 </div>
 
-@if (propiedadesFiltradas is not null)
+@if (propiedades is not null)
 {
-    <PropertyList Propiedades="propiedadesFiltradas" />
+    <div class="propiedades-container">
+        @if (propiedades.Any())
+        {
+            <PropertyList Propiedades="propiedades" />
+        }
+        else
+        {
+            <p>No se encontraron propiedades en la base de datos.</p>
+        }
+    </div>
 }
 
 @code {
     private SearchFilters filtros = new();
-    private List<Propiedad> propiedadesFiltradas = new();
+    private List<Propiedad> propiedades = new();
 
-    private async Task BuscarPropiedades()
-{
-    propiedadesFiltradas = await PropiedadService.BuscarDisponiblesAsync(filtros);
-}
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("🚀 Inicializando página de búsqueda...");
+        ListarPropiedades();
+    }
+
+    private void ListarPropiedades()
+    {
+        Console.WriteLine("🔍 Iniciando búsqueda de propiedades...");
+        try
+        {
+            propiedades = CUListar.Ejecutar();
+            Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
+            StateHasChanged(); // Forzar actualización de la UI
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error al listar propiedades: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        }
+    }
 }

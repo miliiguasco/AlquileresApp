@@ -3,22 +3,104 @@
 
 @if (Propiedades?.Any() == true)
 {
-    
-    foreach (var propiedad in Propiedades)
-    {
-        <div class="propiedad-card">
-            <h4>@propiedad.Direccion - @propiedad.Localidad</h4>
-            <p>@propiedad.Descripcion</p>
-            <p><strong>Precio:</strong> $@propiedad.PrecioPorNoche</p>
-        </div>
-    }
+   <div class="propiedades-grid">
+        @foreach (var propiedad in Propiedades)
+        {
+            <div class="propiedad-card">
+                <h3>@propiedad.Titulo</h3>
+                <p class="ubicacion">📍 @propiedad.Direccion, @propiedad.Localidad</p>
+                <p class="descripcion">@propiedad.Descripcion</p>
+                <div class="detalles">
+                    <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
+                    <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
+                    @if (propiedad.ServiciosDisponibles?.Any() == true)
+                    {
+                        <div class="servicios">
+                            <strong>Servicios:</strong>
+                            <ul>
+                                @foreach (var servicio in propiedad.ServiciosDisponibles)
+                                {
+                                    <li>@servicio</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
 }
 else
 {
-    <p>No se encontraron propiedades para los filtros seleccionados.</p>
+    <div class="no-propiedades">
+        <p>No se encontraron propiedades para los filtros seleccionados.</p>
+    </div>
 }
+
+<style>
+    .propiedades-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .propiedad-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .propiedad-card h3 {
+        margin: 0 0 10px 0;
+        color: #333;
+    }
+
+    .ubicacion {
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+    }
+
+    .descripcion {
+        margin-bottom: 15px;
+        line-height: 1.4;
+    }
+
+    .detalles {
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+    }
+
+    .servicios {
+        margin-top: 10px;
+    }
+
+    .servicios ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 5px 0;
+    }
+
+    .servicios li {
+        display: inline-block;
+        background-color: #f0f0f0;
+        padding: 3px 8px;
+        border-radius: 4px;
+        margin: 2px;
+        font-size: 0.9em;
+    }
+
+    .no-propiedades {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+</style>
 
 @code {
     [Parameter]
-public List<Propiedad> Propiedades { get; set; } = new List<Propiedad>();
+    public List<Propiedad> Propiedades { get; set; } = new List<Propiedad>();
 }

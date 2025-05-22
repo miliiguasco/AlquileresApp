@@ -8,7 +8,7 @@ namespace AlquileresApp.Data
     public class AppDbContext : DbContext
     {
         private static string DbPath => 
-            Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "AlquileresApp.Data", "Alquilando.db"));
+            Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Alquilando.db"));
 
         // Constructor requerido para inyección de dependencias y AddDbContext
         public AppDbContext(DbContextOptions<AppDbContext> options) 

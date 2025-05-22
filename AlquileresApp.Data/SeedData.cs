@@ -2,6 +2,7 @@ using AlquileresApp.Core.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AlquileresApp.Core.Enumerativos;
 
 namespace AlquileresApp.Data
 {
@@ -40,28 +41,41 @@ namespace AlquileresApp.Data
             context.UsuariosRegistrados.AddRange(usuarios);
             context.SaveChanges();
 
-            // Crear propiedades
+            // Crear propiedades de prueba
             var propiedades = new List<Propiedad>
             {
                 new Propiedad
                 {
                     Titulo = "Casa de Playa",
                     Descripcion = "Hermosa casa frente al mar",
+                    Direccion = "Calle Principal 123",
                     Localidad = "Mar del Plata",
-                    Direccion = "Av. del Mar 123",
-                    PrecioPorNoche = 1500m,
-                    Capacidad = 6,
+                    PrecioPorNoche = 150.00m,
+                    Capacidad = 4,
+                    ServiciosDisponibles = new List<ServiciosPropiedad> 
+                    { 
+                        ServiciosPropiedad.Wifi,
+                        ServiciosPropiedad.AireAcondicionado,
+                        ServiciosPropiedad.Piscina
+                    }
                 },
                 new Propiedad
                 {
                     Titulo = "Departamento Centro",
-                    Descripcion = "Cómodo departamento en el centro de la ciudad",
+                    Descripcion = "Moderno departamento en el centro",
+                    Direccion = "Av. Central 456",
                     Localidad = "Buenos Aires",
-                    Direccion = "Calle Falsa 456",
-                    PrecioPorNoche = 2000m,
-                    Capacidad = 4,
+                    PrecioPorNoche = 100.00m,
+                    Capacidad = 2,
+                    ServiciosDisponibles = new List<ServiciosPropiedad>
+                    {
+                        ServiciosPropiedad.Wifi,
+                        ServiciosPropiedad.Calefaccion,
+                        ServiciosPropiedad.Estacionamiento
+                    }
                 }
             };
+
             context.Propiedades.AddRange(propiedades);
             context.SaveChanges();
 
