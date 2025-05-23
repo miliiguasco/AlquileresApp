@@ -1,3 +1,6 @@
+header {
+    width: 95%;
+}
 .navbar-toggler {
     appearance: none;
     cursor: pointer;
@@ -102,4 +105,9 @@
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
     }
+}
+.rounded-circle {
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
