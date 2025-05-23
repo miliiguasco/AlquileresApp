@@ -10,6 +10,17 @@ namespace AlquileresApp.Data
         private static string DbPath => 
             Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "AlquileresApp.Data", "Alquilando.db"));
 
+        // Constructor por defecto para pruebas y consola
+        public AppDbContext() : base()
+        {
+        }
+
+        // Constructor requerido para inyección de dependencias y AddDbContext
+        public AppDbContext(DbContextOptions<AppDbContext> options) 
+            : base(options)
+        {
+        }
+
         public DbSet<UsuarioRegistrado> UsuariosRegistrados { get; set; }
         public DbSet<Administrador> Administradores { get; set; }
         public DbSet<Encargado> Encargados { get; set; }
@@ -20,9 +31,10 @@ namespace AlquileresApp.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var path = DbPath;
-            Console.WriteLine($"Configurando base de datos en: {path}");
-            optionsBuilder.UseSqlite($"Data Source={path}");
+            // Solo configurar si no está configurado desde afuera (evitar conflicto con AddDbContext)
+                var path = DbPath;
+                Console.WriteLine($"Configurando base de datos en: {path}");
+                optionsBuilder.UseSqlite($"Data Source={path}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -40,10 +52,6 @@ namespace AlquileresApp.Data
             modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
-
-            // Clave primaria personalizada para Propiedad
-            modelBuilder.Entity<Propiedad>()
-                .HasKey(p => p.Titulo);
         }
 
         public void EnsureDatabaseCreated()
@@ -63,14 +71,6 @@ namespace AlquileresApp.Data
 
                 var created = Database.EnsureCreated();
                 Console.WriteLine($"Base de datos {(created ? "creada" : "ya existía")} en {path}");
-
-                // Verificar las tablas creadas
-                var tables = Database.SqlQuery<string>($"SELECT name FROM sqlite_master WHERE type='table';").ToList();
-                Console.WriteLine("\nTablas creadas:");
-                foreach (var table in tables)
-                {
-                    Console.WriteLine($"- {table}");
-                }
             }
             catch (Exception ex)
             {

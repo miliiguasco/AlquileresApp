@@ -1,6 +1,8 @@
 using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Data;
+using Microsoft.EntityFrameworkCore;
+
 public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadRepositorio
 {
     public void CargarPropiedad(Propiedad propiedad){
@@ -26,7 +28,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
     }
 
     public List<Propiedad> ListarPropiedades(){
-        var propiedades = dbContext.Propiedades.ToList();
+        List<Propiedad> propiedades = dbContext.Propiedades.ToList();
         if (propiedades.Count == 0)
             throw new Exception("No se encontraron propiedades.");
         return propiedades;
@@ -51,4 +53,43 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             throw new Exception("La propiedad ya existe");
         }   
     }
+
+     public List<Propiedad> BuscarDisponiblesAsync(SearchFilters filtros)
+    {
+        Console.WriteLine("📡 Llamado a BuscarDisponiblesAsync");
+        Console.WriteLine($"📍 Localidad buscada: {filtros.Localidad}");
+        
+        var query = dbContext.Propiedades.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filtros.Localidad))
+        {
+            query = query.Where(p => string.Equals(p.Localidad, filtros.Localidad, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (filtros.CantidadHuespedes > 0)
+        {
+            query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes);
+        }
+
+        var propiedades = query.ToList();
+        Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
+        return propiedades;
+    }
 }
+/*
+    public List<Propiedad> ListarPropiedadesConReservas()
+    {
+        var propiedadesConReservas = dbContext.Propiedades
+            .Where(p => dbContext.Reservas.Any(r => r.PropiedadId == p.Id))
+            .ToList();
+
+        Console.WriteLine($"📊 Se encontraron {propiedadesConReservas.Count} propiedades con reservas");
+        
+        if (!propiedadesConReservas.Any())
+        {
+            throw new Exception("No se encontraron propiedades con reservas.");
+        }
+
+        return propiedadesConReservas;
+    }
+*/
