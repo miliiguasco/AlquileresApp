@@ -8,7 +8,12 @@ namespace AlquileresApp.Data
     public class AppDbContext : DbContext
     {
         private static string DbPath => 
-            Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "Alquilando.db"));
+            Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "AlquileresApp.Data", "Alquilando.db"));
+
+        // Constructor por defecto para pruebas y consola
+        public AppDbContext() : base()
+        {
+        }
 
         // Constructor requerido para inyección de dependencias y AddDbContext
         public AppDbContext(DbContextOptions<AppDbContext> options) 
@@ -27,12 +32,9 @@ namespace AlquileresApp.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // Solo configurar si no está configurado desde afuera (evitar conflicto con AddDbContext)
-            if (!optionsBuilder.IsConfigured)
-            {
                 var path = DbPath;
                 Console.WriteLine($"Configurando base de datos en: {path}");
                 optionsBuilder.UseSqlite($"Data Source={path}");
-            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -69,15 +71,6 @@ namespace AlquileresApp.Data
 
                 var created = Database.EnsureCreated();
                 Console.WriteLine($"Base de datos {(created ? "creada" : "ya existía")} en {path}");
-
-                // Verificar las tablas creadas
-                // Nota: En EF Core no existe SqlQuery, aquí deberías usar RawSql o no usar esta parte
-                // var tables = Database.SqlQuery<string>($"SELECT name FROM sqlite_master WHERE type='table';").ToList();
-                // Console.WriteLine("\nTablas creadas:");
-                // foreach (var table in tables)
-                // {
-                //     Console.WriteLine($"- {table}");
-                // }
             }
             catch (Exception ex)
             {
