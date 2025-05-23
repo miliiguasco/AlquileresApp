@@ -6,10 +6,9 @@ namespace AlquileresApp.Data;
 
 public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
 {
-    public void RegistrarUsuario(Usuario usuario, String hashedPassword)
+    public void RegistrarUsuario(Usuario usuario)
     {
         verificarCorreoExistente(usuario.Email);
-        usuario.Password = hashedPassword;
         
         if (usuario is UsuarioRegistrado usuarioRegistrado)
             dbContext.UsuariosRegistrados.Add(usuarioRegistrado);
@@ -57,7 +56,7 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
 
         if (existe)
         {
-            throw new Exception("El correo ya está en uso");
+            throw new Exception("El correo ya se encuentra registrado");
         }
     }
 }

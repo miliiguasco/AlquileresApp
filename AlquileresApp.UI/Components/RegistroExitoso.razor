@@ -1,0 +1,47 @@
+@if (Visible)
+{
+    <div class="alert alert-success mt-3 mb-3 text-center" role="alert">
+        <div class="message-container">
+            <svg class="bi flex-shrink-0 me-2" width="30" height="30" role="img" aria-label="Success:">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+            <span>Usuario registrado correctamente.</span>
+        </div>
+    </div>
+    <div class="mt-2 mb-3 message-container">
+        <span>Serás redirigido al login en breve...</span>
+        <div class="spinner-border spinner-border-sm ms-2" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool Visible { get; set; }
+}
+
+<style>
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .bi {
+        fill: #28a745;
+    }
+
+    .message-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .spinner-border {
+        color: #155724;
+        width: 1rem;
+        height: 1rem;
+    }
+</style> 

@@ -1,0 +1,210 @@
+﻿@page "/Registro"
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using AlquileresApp.Core.CasosDeUso.Usuario
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.Servicios
+@using AlquileresApp.Core.Validadores
+@using AlquileresApp.UI.Components
+@using System.Collections.Generic
+@using System.Threading.Tasks
+@using Microsoft.AspNetCore.Components
+@inject CasoDeUsoRegistrarUsuario CURegistrarUsuario
+@inject NavigationManager NavigationManager
+
+
+<h1>Registrarse</h1>
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <EditForm Model="Input" method="post" OnValidSubmit="RegistrarUsuario" OnInvalidSubmit="ManejarInvalidSubmit" FormName="Registro">
+                <DataAnnotationsValidator />
+                <hr />
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.Nombre" class="form-control" aria-required="true" @oninput="@(() => { errorNombre = null; StateHasChanged(); })" />
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <Error Mensaje="@errorNombre" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.Apellido" class="form-control" aria-required="true" @oninput="@(() => { errorApellido = null; StateHasChanged(); })" />
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <Error Mensaje="@errorApellido" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.Email" class="form-control" aria-required="true" @oninput="@(() => { errorEmail = null; StateHasChanged(); })" />
+                    <label for="email" class="form-label">Email</label>
+                    <Error Mensaje="@errorEmail" />
+                </div>
+                 <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.Telefono" 
+                             class="form-control" 
+                             aria-required="true" 
+                             @oninput="@(() => { errorTelefono = null; StateHasChanged(); })"
+                             type="tel"
+                             pattern="[0-9]*"
+                             maxlength="15"
+                             onkeypress="return event.charCode >= 48 && event.charCode <= 57" />
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <small class="text-muted d-block pt-2 ps-2">Solo números, sin espacios ni guiones</small>
+                    <Error Mensaje="@errorTelefono" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputDate TValue="DateTime?" 
+                             @bind-Value="Input.FechaDeNacimiento" 
+                             class="form-control" 
+                             aria-required="true" 
+                             @oninput="@(() => { errorFechaNacimiento = null; StateHasChanged(); })"
+                             min="1920-01-01"
+                             max="@DateTime.Today.AddYears(-18).ToString("yyyy-MM-dd")" />
+                    <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                    <small class="text-muted d-block pt-2 ps-2">Debes tener al menos 18 años</small>
+                    <Error Mensaje="@errorFechaNacimiento" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText type="password" @bind-Value="Input.Password" class="form-control" aria-required="true" @oninput="@(() => { errorPassword = null; StateHasChanged(); })" />
+                    <label for="password" class="form-label">Contraseña</label>
+                    <Error Mensaje="@errorPassword" />
+                </div>
+                <RegistroExitoso Visible="@registroExitoso" />
+                <div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Registrar</button>
+                </div>
+            </EditForm>
+            <Aviso @ref="aviso" />
+        </section>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+    private Aviso aviso = new();
+
+    private string? errorNombre;
+    private string? errorApellido;
+    private string? errorEmail;
+    private string? errorTelefono;
+    private string? errorFechaNacimiento;
+    private string? errorPassword;
+    private bool registroExitoso = false;
+
+    private void LimpiarErrores()
+    {
+        errorNombre = null;
+        errorApellido = null;
+        errorEmail = null;
+        errorTelefono = null;
+        errorFechaNacimiento = null;
+        errorPassword = null;
+        StateHasChanged();
+    }
+
+    private void ManejarInvalidSubmit()
+    {
+        ValidarCampos();
+        StateHasChanged();
+    }
+
+    private void ValidarCampos()
+    {
+        var context = new ValidationContext(Input);
+        var results = new List<ValidationResult>();
+        
+        if (!Validator.TryValidateObject(Input, context, results, true))
+        {
+            foreach (var result in results)
+            {
+                if (result.MemberNames.Contains(nameof(Input.Nombre)))
+                    errorNombre = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.Apellido)))
+                    errorApellido = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.Email)))
+                    errorEmail = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.Telefono)))
+                    errorTelefono = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.FechaDeNacimiento)))
+                    errorFechaNacimiento = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.Password)))
+                    errorPassword = result.ErrorMessage;
+            }
+        }
+    }
+
+    public void RegistrarUsuario()
+    {
+        try {
+            ValidarCampos();
+            if (errorNombre != null || errorApellido != null || errorEmail != null || 
+                errorTelefono != null || errorFechaNacimiento != null || errorPassword != null)
+                return;
+
+            if (!Input.FechaDeNacimiento.HasValue)
+            {
+                errorFechaNacimiento = "La fecha de nacimiento es requerida";
+                return;
+            }
+
+            var usuario = new UsuarioRegistrado(Input.Nombre, Input.Apellido, Input.Email, Input.Telefono, Input.Password, Input.FechaDeNacimiento.Value);
+            CURegistrarUsuario.Ejecutar(usuario);
+            registroExitoso = true;
+            StateHasChanged();
+            
+            // Esperar 4,5 segundos antes de redirigir
+            Task.Delay(4500).ContinueWith(_ => {
+                registroExitoso = false;
+                vaciarCampos();
+                NavigationManager.NavigateTo("/Login");
+            }, TaskScheduler.Current);
+        } catch (Exception ex) {
+            if (ex.Message.Contains("correo")) {
+                errorEmail = ex.Message;
+            } else if (ex.Message.Contains("contraseña")) {
+                errorPassword = ex.Message;
+            } else {
+                aviso.Mostrar(ex.Message);
+            }
+            StateHasChanged();
+        }
+    }
+
+    private sealed class InputModel
+    {
+        [Required(ErrorMessage = "El nombre es requerido")]
+        [DataType(DataType.Text)]
+        public string Nombre { get; set; } = "";
+
+        [Required(ErrorMessage = "El apellido es requerido")]
+        [DataType(DataType.Text)]
+        public string Apellido { get; set; } = "";
+
+        [Required(ErrorMessage = "El correo es requerido")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "El correo ingresado no es válido")]
+        [DataType(DataType.Text)]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "El teléfono es requerido")]
+        [RegularExpression(@"^[0-9]{8,15}$", ErrorMessage = "El teléfono debe tener entre 8 y 15 dígitos")]
+        [DataType(DataType.PhoneNumber)]
+        public string Telefono { get; set; } = "";
+
+        [Required(ErrorMessage = "La fecha de nacimiento es requerida")]
+        [DataType(DataType.Date)]
+        public DateTime? FechaDeNacimiento { get; set; }
+
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        [StringLength(30, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+    }
+
+    private void vaciarCampos() {
+        Input.Nombre = "";
+        Input.Apellido = "";
+        Input.Email = "";
+        Input.Telefono = "";
+        Input.FechaDeNacimiento = null;
+        Input.Password = "";
+    }
+}
