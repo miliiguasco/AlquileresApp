@@ -52,16 +52,10 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
         return dbContext.Usuarios.OfType<Encargado>().ToList();
     }
 
-    public bool AutenticarUsuario(Usuario usuario, String hashContraseña)
+    public Usuario? AutenticarUsuario(string correo, string hashedContraseña)
     {
-        var usuarioComparar = dbContext.Usuarios
-            .SingleOrDefault(u => u.Email == usuario.Email && u.Password == hashContraseña);
-
-        if (usuarioComparar != null)
-        {
-            return true;
-        }
-        throw new Exception("Correo o contraseña invalido.");
+        return dbContext.Usuarios
+            .SingleOrDefault(u => u.Email.Equals(correo, StringComparison.InvariantCultureIgnoreCase) && u.Contraseña == hashedContraseña);
     }
 
     public Usuario? ObtenerUsuarioPorEmail(string email)

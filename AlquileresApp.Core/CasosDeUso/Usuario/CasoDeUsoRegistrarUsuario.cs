@@ -8,8 +8,8 @@ public class CasoDeUsoRegistrarUsuario (IUsuarioRepositorio usuarioRepositorio, 
     {
         try {
             usuarioValidador.ValidarDatos(usuario);
-            String hashedPassword = servicioHashPassword.HashPassword(usuario.Password);   
-            usuario.Password = hashedPassword;
+            String hashedPassword = servicioHashPassword.HashPassword(usuario.Contraseña);   
+            usuario.Contraseña = hashedPassword;
             usuarioRepositorio.RegistrarUsuario(usuario);
         } catch (Exception ex) {
             throw new Exception(ex.Message);

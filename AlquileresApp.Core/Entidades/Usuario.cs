@@ -9,10 +9,9 @@ public abstract class Usuario
     public string Apellido { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Telefono { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
+    public string Contraseña { get; set; } = string.Empty;
     public DateTime? FechaNacimiento { get; set; }
     public RolUsuario Rol { get; protected set; }
-    public List<Reserva> Reservas { get; set; } = new();
 
     protected Usuario(string nombre, string apellido, string email, string telefono, string password, DateTime fechaNacimiento, RolUsuario rol)
     {
@@ -20,7 +19,7 @@ public abstract class Usuario
         Apellido = apellido;
         Email = email;
         Telefono = telefono;       
-        Password = password;
+        Contraseña = password;
         FechaNacimiento = fechaNacimiento;
         Rol = rol;
     }
@@ -31,7 +30,7 @@ public abstract class Usuario
         Apellido = "";
         Email = "";
         Telefono = "";
-        Password = "";
+        Contraseña = "";
         FechaNacimiento = null;
     }
 }

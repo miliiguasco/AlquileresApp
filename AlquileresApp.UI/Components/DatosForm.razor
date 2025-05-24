@@ -46,9 +46,9 @@
         <Error Mensaje="@errorFechaNacimiento" />
     </div>
     <div class="form-floating mb-3">
-        <InputText type="password" @bind-Value="Input.Password" class="form-control" aria-required="true" @oninput="@(() => { errorPassword = null; StateHasChanged(); })" />
+        <InputText type="password" @bind-Value="Input.Contraseña" class="form-control" aria-required="true" @oninput="@(() => { errorContraseña = null; StateHasChanged(); })" />
         <label for="password" class="form-label">Contraseña</label>
-        <Error Mensaje="@errorPassword" />
+        <Error Mensaje="@errorContraseña" />
     </div>
     
     <div>
@@ -74,7 +74,7 @@
     private string? errorEmail;
     private string? errorTelefono;
     private string? errorFechaNacimiento;
-    private string? errorPassword;
+    private string? errorContraseña;
 
     public void LimpiarErrores()
     {
@@ -83,7 +83,7 @@
         errorEmail = null;
         errorTelefono = null;
         errorFechaNacimiento = null;
-        errorPassword = null;
+        errorContraseña = null;
         StateHasChanged();
     }
 
@@ -112,8 +112,8 @@
                     errorTelefono = result.ErrorMessage;
                 else if (result.MemberNames.Contains(nameof(Input.FechaDeNacimiento)))
                     errorFechaNacimiento = result.ErrorMessage;
-                else if (result.MemberNames.Contains(nameof(Input.Password)))
-                    errorPassword = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.Contraseña)))
+                    errorContraseña = result.ErrorMessage;
             }
         }
     }
@@ -145,6 +145,6 @@
         [Required(ErrorMessage = "La contraseña es requerida")]
         [StringLength(30, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
         [DataType(DataType.Password)]
-        public string Password { get; set; } = "";
+        public string Contraseña { get; set; } = "";
     }
 } 

@@ -1,5 +1,63 @@
-﻿<h3>Login</h3>
+﻿@page "/Login"
+@using System.ComponentModel.DataAnnotations
+@using AlquileresApp.Core.Servicios
+@using System.Security.Claims
+@using AlquileresApp.Core.CasosDeUso.Usuario
+@inject NavigationManager Navigation
+@inject ServicioIniciarSesion ServicioIniciarSesion
+
+
+<h1>Login</h1>
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <EditForm Model="Input" method="post" OnValidSubmit="OnLogin" FormName="Login">
+                <DataAnnotationsValidator />
+                <hr />
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.Email" class="form-control" aria-required="true" />
+                    <label for="email" class="form-label">Email</label>
+                    <ValidationMessage For="() => Input.Email" class="text-danger" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText type="password" @bind-Value="Input.Contraseña" class="form-control" aria-required="true" />
+                    <label for="password" class="form-label">Contraseña</label>
+                    <ValidationMessage For="() => Input.Contraseña" class="text-danger" />
+                </div>
+                <div class="alert alert-danger" role="alert" style="display: @(errorMessage == null ? "none" : "block")">
+                    @errorMessage
+                </div>
+                <div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Login</button>
+                </div>
+            </EditForm>
+        </section>
+    </div>
+</div>
 
 @code {
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+    private string? errorMessage;
 
+    public void OnLogin()
+    {
+        var key = Guid.NewGuid();
+        var claimsPrincipal = ServicioIniciarSesion.IniciarSesion(Input.Email, Input.Contraseña);
+        ServicioSesion.Logins[key] = claimsPrincipal;
+        Navigation.NavigateTo($"/Login?key={key}", true);
+    }
+
+    private sealed class InputModel
+    {
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "El email no es valido")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        [StringLength(30, ErrorMessage = "La contraseña debe tener al menos 8 caracteres", MinimumLength = 8)]
+        [DataType(DataType.Password)]
+        public string Contraseña { get; set; } = "";
+    }
 }
+

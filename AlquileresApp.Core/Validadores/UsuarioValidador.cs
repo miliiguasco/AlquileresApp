@@ -9,7 +9,7 @@ public class UsuarioValidador : IUsuarioValidador
     public void ValidarDatos(Usuario usuario) 
     {
         ValidarCorreo(usuario.Email);
-        ValidarPassword(usuario.Password);
+        ValidarContraseña(usuario.Contraseña);
     }
     private void ValidarCorreo(String correo)
     {
@@ -19,11 +19,11 @@ public class UsuarioValidador : IUsuarioValidador
         }
     }
 
-    private void ValidarPassword(String password)
+    private void ValidarContraseña(String contraseña)
     {
-        if (String.IsNullOrEmpty(password))
+        if (String.IsNullOrEmpty(contraseña))
             throw new Exception("La contraseña es requerida");
-        if (password.Length < 8)
+        if (contraseña.Length < 8)
             throw new Exception("La contraseña debe tener al menos 8 caracteres"); 
     }
 }
