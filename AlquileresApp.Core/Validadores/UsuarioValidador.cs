@@ -24,6 +24,6 @@ public class UsuarioValidador : IUsuarioValidador
         if (String.IsNullOrEmpty(password))
             throw new Exception("La contraseña es requerida");
         if (password.Length < 8)
-            throw new Exception("La contraseña debe tener al menos 8 caracteres");
+            throw new Exception("La contraseña debe tener al menos 8 caracteres"); 
     }
 }

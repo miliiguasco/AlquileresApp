@@ -26,9 +26,6 @@ namespace AlquileresApp.Data.Migrations
                     b.Property<int>("PropiedadId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("PropiedadId1")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -36,8 +33,6 @@ namespace AlquileresApp.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PropiedadId");
-
-                    b.HasIndex("PropiedadId1");
 
                     b.ToTable("Imagenes");
                 });
@@ -66,7 +61,7 @@ namespace AlquileresApp.Data.Migrations
                     b.Property<decimal>("PrecioPorNoche")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ServiciosDisponibles")
+                    b.PrimitiveCollection<string>("ServiciosDisponibles")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -85,6 +80,15 @@ namespace AlquileresApp.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("AdministradorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("EncargadoId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("FechaFin")
                         .HasColumnType("TEXT");
 
@@ -97,19 +101,15 @@ namespace AlquileresApp.Data.Migrations
                     b.Property<int>("PropiedadId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("PropiedadId1")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UsuarioRegistradoId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
+                    b.HasIndex("AdministradorId");
+
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("EncargadoId");
+
                     b.HasIndex("PropiedadId");
-
-                    b.HasIndex("PropiedadId1");
-
-                    b.HasIndex("UsuarioRegistradoId");
 
                     b.ToTable("Reservas");
                 });
@@ -161,7 +161,7 @@ namespace AlquileresApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("FechaNacimiento")
+                    b.Property<DateTime?>("FechaNacimiento")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Nombre")
@@ -172,13 +172,11 @@ namespace AlquileresApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Rol")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Telefono")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TipoUsuario")
-                        .IsRequired()
-                        .HasMaxLength(21)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -186,9 +184,9 @@ namespace AlquileresApp.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Usuario");
+                    b.ToTable("Usuarios");
 
-                    b.HasDiscriminator<string>("TipoUsuario").HasValue("Usuario");
+                    b.HasDiscriminator<int>("Rol");
 
                     b.UseTphMappingStrategy();
                 });
@@ -197,37 +195,28 @@ namespace AlquileresApp.Data.Migrations
                 {
                     b.HasBaseType("AlquileresApp.Core.Entidades.Usuario");
 
-                    b.HasDiscriminator().HasValue("Administrador");
+                    b.HasDiscriminator().HasValue(1);
+                });
+
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Cliente", b =>
+                {
+                    b.HasBaseType("AlquileresApp.Core.Entidades.Usuario");
+
+                    b.HasDiscriminator().HasValue(3);
                 });
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Encargado", b =>
                 {
                     b.HasBaseType("AlquileresApp.Core.Entidades.Usuario");
 
-                    b.HasDiscriminator().HasValue("Encargado");
-                });
-
-            modelBuilder.Entity("AlquileresApp.Core.Entidades.UsuarioRegistrado", b =>
-                {
-                    b.HasBaseType("AlquileresApp.Core.Entidades.Usuario");
-
-                    b.Property<DateTime>("FechaRegistro")
-                        .HasColumnType("TEXT");
-
-                    b.HasDiscriminator().HasValue("UsuarioRegistrado");
+                    b.HasDiscriminator().HasValue(2);
                 });
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Imagen", b =>
                 {
-                    b.HasOne("AlquileresApp.Core.Entidades.Propiedad", null)
+                    b.HasOne("AlquileresApp.Core.Entidades.Propiedad", "Propiedad")
                         .WithMany("Imagenes")
                         .HasForeignKey("PropiedadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AlquileresApp.Core.Entidades.Propiedad", "Propiedad")
-                        .WithMany()
-                        .HasForeignKey("PropiedadId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -236,21 +225,23 @@ namespace AlquileresApp.Data.Migrations
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Reserva", b =>
                 {
-                    b.HasOne("AlquileresApp.Core.Entidades.Propiedad", null)
+                    b.HasOne("AlquileresApp.Core.Entidades.Administrador", null)
                         .WithMany("Reservas")
-                        .HasForeignKey("PropiedadId")
+                        .HasForeignKey("AdministradorId");
+
+                    b.HasOne("AlquileresApp.Core.Entidades.Cliente", "Usuario")
+                        .WithMany("Reservas")
+                        .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("AlquileresApp.Core.Entidades.Encargado", null)
+                        .WithMany("Reservas")
+                        .HasForeignKey("EncargadoId");
 
                     b.HasOne("AlquileresApp.Core.Entidades.Propiedad", "Propiedad")
-                        .WithMany()
-                        .HasForeignKey("PropiedadId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AlquileresApp.Core.Entidades.UsuarioRegistrado", "Usuario")
                         .WithMany("Reservas")
-                        .HasForeignKey("UsuarioRegistradoId")
+                        .HasForeignKey("PropiedadId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -282,7 +273,17 @@ namespace AlquileresApp.Data.Migrations
                     b.Navigation("Tarjeta");
                 });
 
-            modelBuilder.Entity("AlquileresApp.Core.Entidades.UsuarioRegistrado", b =>
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Administrador", b =>
+                {
+                    b.Navigation("Reservas");
+                });
+
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Cliente", b =>
+                {
+                    b.Navigation("Reservas");
+                });
+
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Encargado", b =>
                 {
                     b.Navigation("Reservas");
                 });

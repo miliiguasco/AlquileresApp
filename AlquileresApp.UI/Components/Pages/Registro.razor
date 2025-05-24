@@ -146,7 +146,7 @@
                 return;
             }
 
-            var usuario = new UsuarioRegistrado(Input.Nombre, Input.Apellido, Input.Email, Input.Telefono, Input.Password, Input.FechaDeNacimiento.Value);
+            var usuario = new Cliente(Input.Nombre, Input.Apellido, Input.Email, Input.Telefono, Input.Password, Input.FechaDeNacimiento.Value);
             CURegistrarUsuario.Ejecutar(usuario);
             registroExitoso = true;
             StateHasChanged();

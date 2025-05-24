@@ -1,3 +1,5 @@
+using AlquileresApp.Core.Enumerativos;
+
 namespace AlquileresApp.Core.Entidades;
 
 public abstract class Usuario
@@ -9,15 +11,27 @@ public abstract class Usuario
     public string Telefono { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public DateTime? FechaNacimiento { get; set; }
+    public RolUsuario Rol { get; protected set; }
+    public List<Reserva> Reservas { get; set; } = new();
 
-    public Usuario(string nombre, string apellido, string email, string telefono, string password, DateTime fechaNacimiento)
+    protected Usuario(string nombre, string apellido, string email, string telefono, string password, DateTime fechaNacimiento, RolUsuario rol)
     {
         Nombre = nombre;
         Apellido = apellido;
         Email = email;
         Telefono = telefono;       
         Password = password;
-        FechaNacimiento = fechaNacimiento;  
+        FechaNacimiento = fechaNacimiento;
+        Rol = rol;
     }
-    
+
+    protected Usuario() 
+    {
+        Nombre = "";
+        Apellido = "";
+        Email = "";
+        Telefono = "";
+        Password = "";
+        FechaNacimiento = null;
+    }
 }
