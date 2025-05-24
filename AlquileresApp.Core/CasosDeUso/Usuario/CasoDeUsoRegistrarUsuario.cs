@@ -11,4 +11,9 @@ public class CasoDeUsoRegistrarUsuario (IUsuarioRepositorio usuarioRepositorio, 
         usuarioRepositorio.RegistrarUsuario(usuario, hashedPassword);
     }
 }
-                                                            
+          /*                                                  
+             reservaValidador.validarTarjeta(usuario)           //validador tiene 2 metodos                                       
+             reservaValidador.validarFecha(usuario)
+             reservaRepositorio.Alta(usuario)
+
+*/

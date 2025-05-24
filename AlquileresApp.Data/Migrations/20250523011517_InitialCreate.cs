@@ -12,6 +12,25 @@ namespace AlquileresApp.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Propiedades",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Titulo = table.Column<string>(type: "TEXT", nullable: false),
+                    Descripcion = table.Column<string>(type: "TEXT", nullable: false),
+                    Localidad = table.Column<string>(type: "TEXT", nullable: false),
+                    Direccion = table.Column<string>(type: "TEXT", nullable: false),
+                    PrecioPorNoche = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Capacidad = table.Column<int>(type: "INTEGER", nullable: false),
+                    ServiciosDisponibles = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Propiedades", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Usuario",
                 columns: table => new
                 {
@@ -24,37 +43,11 @@ namespace AlquileresApp.Data.Migrations
                     Password = table.Column<string>(type: "TEXT", nullable: false),
                     FechaNacimiento = table.Column<DateTime>(type: "TEXT", nullable: false),
                     TipoUsuario = table.Column<string>(type: "TEXT", maxLength: 21, nullable: false),
-                    Zona = table.Column<string>(type: "TEXT", nullable: true),
                     FechaRegistro = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Usuario", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Propiedades",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Titulo = table.Column<string>(type: "TEXT", nullable: false),
-                    Descripcion = table.Column<string>(type: "TEXT", nullable: false),
-                    Direccion = table.Column<string>(type: "TEXT", nullable: false),
-                    PrecioPorNoche = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Capacidad = table.Column<int>(type: "INTEGER", nullable: false),
-                    ServiciosDisponibles = table.Column<string>(type: "TEXT", nullable: false),
-                    EncargadoId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Propiedades", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Propiedades_Usuario_EncargadoId",
-                        column: x => x.EncargadoId,
-                        principalTable: "Usuario",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,7 +57,8 @@ namespace AlquileresApp.Data.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Url = table.Column<string>(type: "TEXT", nullable: false),
-                    PropiedadId = table.Column<int>(type: "INTEGER", nullable: false)
+                    PropiedadId = table.Column<int>(type: "INTEGER", nullable: false),
+                    PropiedadId1 = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -72,6 +66,12 @@ namespace AlquileresApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_Imagenes_Propiedades_PropiedadId",
                         column: x => x.PropiedadId,
+                        principalTable: "Propiedades",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Imagenes_Propiedades_PropiedadId1",
+                        column: x => x.PropiedadId1,
                         principalTable: "Propiedades",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -85,6 +85,7 @@ namespace AlquileresApp.Data.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     UsuarioRegistradoId = table.Column<int>(type: "INTEGER", nullable: false),
                     PropiedadId = table.Column<int>(type: "INTEGER", nullable: false),
+                    PropiedadId1 = table.Column<int>(type: "INTEGER", nullable: false),
                     FechaInicio = table.Column<DateTime>(type: "TEXT", nullable: false),
                     FechaFin = table.Column<DateTime>(type: "TEXT", nullable: false),
                     PrecioTotal = table.Column<decimal>(type: "TEXT", nullable: false)
@@ -95,6 +96,12 @@ namespace AlquileresApp.Data.Migrations
                     table.ForeignKey(
                         name: "FK_Reservas_Propiedades_PropiedadId",
                         column: x => x.PropiedadId,
+                        principalTable: "Propiedades",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Reservas_Propiedades_PropiedadId1",
+                        column: x => x.PropiedadId1,
                         principalTable: "Propiedades",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -135,14 +142,19 @@ namespace AlquileresApp.Data.Migrations
                 column: "PropiedadId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Propiedades_EncargadoId",
-                table: "Propiedades",
-                column: "EncargadoId");
+                name: "IX_Imagenes_PropiedadId1",
+                table: "Imagenes",
+                column: "PropiedadId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservas_PropiedadId",
                 table: "Reservas",
                 column: "PropiedadId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservas_PropiedadId1",
+                table: "Reservas",
+                column: "PropiedadId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservas_UsuarioRegistradoId",

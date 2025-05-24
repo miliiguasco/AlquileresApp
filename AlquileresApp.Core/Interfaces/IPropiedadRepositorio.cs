@@ -6,6 +6,7 @@ public interface IPropiedadRepositorio{
     void ModificarPropiedad(Propiedad propiedad);
     void EliminarPropiedad(Propiedad propiedad);
     public List<Propiedad> ListarPropiedades();
+    public List<Propiedad> BuscarDisponiblesAsync(SearchFilters filtros);
 }
 
 
