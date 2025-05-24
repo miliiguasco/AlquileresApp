@@ -2,6 +2,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    background-color: #264045;
 }
 
 main {
@@ -96,3 +97,5 @@ main {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+
