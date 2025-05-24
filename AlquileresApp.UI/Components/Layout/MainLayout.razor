@@ -3,12 +3,26 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using AlquileresApp.UI.Components.Layout
 
-<div class="page">
-    <NavMenu />
-    <main class="main">
-        <div class="content">
-            @Body
+<ErrorBoundary>
+    <ChildContent>
+        <div class="page">
+            <NavMenu />
+            <main class="main">
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
         </div>
-    </main>
-</div>
+    </ChildContent>
+    <ErrorContent>
+        <p class="error-message">Lo sentimos, ha ocurrido un error al cargar esta sección.</p>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+}
 

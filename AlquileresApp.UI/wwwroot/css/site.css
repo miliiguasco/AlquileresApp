@@ -1,1 +1,55 @@
-/* Este archivo se mantiene vacío intencionalmente. Los estilos se han movido a app.css */ 
+/* Este archivo se mantiene vacío intencionalmente. Los estilos se han movido a app.css */
+
+/* Global Styles */
+:root {
+    font-family: 'Roboto', sans-serif !important;
+}
+
+body {
+    font-family: 'Roboto', sans-serif !important;
+}
+
+* {
+    font-family: 'Roboto', sans-serif !important;
+}
+
+h1, h2, h3, h4, h5, h6,
+button, input, select, textarea,
+.btn, .form-control, .form-label {
+    font-family: 'Roboto', sans-serif !important;
+}
+
+/* Error Handling */
+#blazor-error-ui {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 1rem;
+    z-index: 9999;
+    background-color: #fff3cd;
+    border: 1px solid #ffecb5;
+    color: #664d03;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+}
+
+.error-message {
+    padding: 1rem;
+    margin: 1rem;
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    border-radius: 4px;
+    color: #842029;
+}
+
+.dismiss {
+    margin-left: 1rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.reload {
+    margin-right: 1rem;
+    color: #0d6efd;
+    text-decoration: none;
+} 

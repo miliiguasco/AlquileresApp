@@ -6,33 +6,46 @@
 @inject CasoDeUsoRegistrarUsuario CURegistrarUsuario
 @inject NavigationManager NavigationManager
 
-<h1>Registrarse</h1>
-<div class="row">
-    <div class="col-md-4">
+<link href="css/AltaUsuario.css" rel="stylesheet" />
+
+<div class="registro-container">
+    <h1 class="registro-title">Registrarse</h1>
+    <div class="registro-form">
         <section>
-            <hr />
             <DatosForm 
                 Input="@Input" 
                 OnSubmit="@RegistrarUsuario"
                 FormName="Registro"
-                SubmitButtonText="Registrar" />
+                SubmitButtonText="Registrar"
+                ButtonClass="registro-button"
+                OnEmailChange="@LimpiarError" />
             <RegistroExitoso Visible="@registroExitoso" />
-            <Aviso @ref="aviso" />
+            <Error Mensaje="@errorMensaje"/>
         </section>
     </div>
 </div>
 
 @code {
     private DatosForm.InputModel Input { get; set; } = new();
-    private Aviso aviso = new();
+    private Error error = new();
+    private string? errorMensaje;
     private bool registroExitoso = false;
+
+    private void LimpiarError()
+    {
+        errorMensaje = null;
+        StateHasChanged();
+    }
 
     private async Task RegistrarUsuario()
     {
         try {
+            errorMensaje = null;
+            StateHasChanged();
             if (!Input.FechaDeNacimiento.HasValue)
             {
-                aviso.Mostrar("La fecha de nacimiento es requerida");
+                errorMensaje = "La fecha de nacimiento es requerida";
+                StateHasChanged();
                 return;
             }
 
@@ -42,12 +55,12 @@
             StateHasChanged();
             
             // Esperar 4,5 segundos antes de redirigir
-            await Task.Delay(4500);
+            await Task.Delay(4000);
             registroExitoso = false;
             VaciarCampos();
             NavigationManager.NavigateTo("/Login");
         } catch (Exception ex) {
-            aviso.Mostrar(ex.Message);
+            errorMensaje = ex.Message;
             StateHasChanged();
         }
     }

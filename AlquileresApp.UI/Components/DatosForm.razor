@@ -16,7 +16,14 @@
         <Error Mensaje="@errorApellido" />
     </div>
     <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.Email" class="form-control" aria-required="true" @oninput="@(() => { errorEmail = null; StateHasChanged(); })" />
+        <InputText @bind-Value="Input.Email" 
+                  class="form-control" 
+                  aria-required="true" 
+                  @oninput="@(() => { 
+                      errorEmail = null; 
+                      OnEmailChange.InvokeAsync();
+                      StateHasChanged(); 
+                  })" />
         <label for="email" class="form-label">Email</label>
         <Error Mensaje="@errorEmail" />
     </div>
@@ -52,7 +59,7 @@
     </div>
     
     <div>
-        <button type="submit" class="w-100 btn btn-lg btn-primary">@SubmitButtonText</button>
+        <button type="submit" class="w-100 btn btn-lg @ButtonClass">@SubmitButtonText</button>
     </div>
 </EditForm>
 
@@ -64,10 +71,16 @@
     public EventCallback OnSubmit { get; set; }
 
     [Parameter]
+    public EventCallback OnEmailChange { get; set; }
+
+    [Parameter]
     public string FormName { get; set; } = "DatosForm";
 
     [Parameter]
     public string SubmitButtonText { get; set; } = "Guardar";
+
+    [Parameter]
+    public string ButtonClass { get; set; } = "";
 
     private string? errorNombre;
     private string? errorApellido;

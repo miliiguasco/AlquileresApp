@@ -1,129 +1,70 @@
 .navbar {
-    background-color: #1F3F48 !important;
-    width: 100%;
-    padding: 1.25rem 0;
-    height: 20%;
+    background-color: #1F3F48;
+    padding: 0.75rem 1rem;
     position: fixed;
     top: 0;
-    left: 0;
-    right: 0;
+    width: 100%;
     z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .container {
-    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1rem;
-    max-width: 100%;
-}
-
-.navbar-start {
-    padding-right: 0;
-    margin-left: 0;
-}
-
-.navbar-end {
-    padding-left: 0;
-    margin-right: 0;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .navbar-brand {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .logo {
-    height: 65px;
+    height: 35px;
     width: auto;
 }
 
 .brand-text {
     color: white;
-    font-size: 1.8rem;
-    font-weight: 500;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
 }
 
 .auth-buttons {
     display: flex;
-    gap: 1.2rem;
+    gap: 1rem;
 }
 
 .auth-buttons .btn {
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 1.25rem;
     border-radius: 4px;
-    font-weight: 500;
-    transition: all 0.3s ease;
     text-decoration: none;
-    cursor: pointer;
-    background-color: #ff6b00;
+    font-weight: 500;
+    background-color: #FF6B00;
     color: white;
-    white-space: nowrap;
-    font-size: 1.1rem;
+    border: none;
+    transition: background-color 0.3s ease;
 }
 
 .auth-buttons .btn:hover {
-    background-color: #f37820;
-    color: white;
+    background-color: #e65f00;
 }
 
-@media (max-width: 768px) {
-    .navbar {
-        padding: 0.75rem 0;
-    }
-
-    .container {
-        padding: 0 0.5rem;
-    }
-
-    .navbar-start {
-        padding-right: 0;
-        margin-left: 0;
-    }
-
-    .navbar-end {
-        padding-left: 0;
-        margin-right: 0;
-    }
-
-    .navbar-brand {
-        gap: 0.8rem;
+@media (max-width: 640px) {
+    .brand-text {
+        font-size: 1.2rem;
     }
 
     .logo {
-        height: 50px;
-    }
-
-    .brand-text {
-        font-size: 1.3rem;
-    }
-
-    .auth-buttons {
-        gap: 0.5rem;
+        height: 30px;
     }
 
     .auth-buttons .btn {
-        padding: 0.4rem 1rem;
-        font-size: 1rem;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
     }
-}
-
-@media (min-width: 641px) {
-    .navbar-toggler {
-        display: none;
-    }
-
-    .nav-scrollable {
-        display: block;
-        height: calc(100vh - 3.5rem);
-        overflow-y: auto;
-    }
-}
-
-.rounded-circle {
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
