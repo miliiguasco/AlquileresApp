@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "AcR/gsLI4cY=",
+  "dgSpecHash": "8iBbODjjSCQ=",
   "success": true,
   "projectFilePath": "D:\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
   "expectedPackageFiles": [
@@ -53,5 +53,15 @@
     "C:\\Users\\valen\\.nuget\\packages\\system.text.json\\9.0.5\\system.text.json.9.0.5.nupkg.sha512",
     "C:\\Users\\valen\\.nuget\\packages\\system.threading.channels\\7.0.0\\system.threading.channels.7.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "message": "Problem reading the cache file D:\\AlquileresApp\\AlquileresApp.Data\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
+      "projectPath": "D:\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

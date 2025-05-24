@@ -52,7 +52,7 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
         return dbContext.Usuarios.OfType<Encargado>().ToList();
     }
 
-    public Usuario? AutenticarUsuario(string correo, string hashedContraseña)
+    public Usuario? AutenticarUsuario(string correo, String hashedContraseña)
     {
         Console.WriteLine($"Buscando usuario con email: {correo}");
         var usuario = dbContext.Usuarios

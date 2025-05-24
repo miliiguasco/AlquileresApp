@@ -12,6 +12,7 @@ public abstract class Usuario
     public string Contraseña { get; set; } = string.Empty;
     public DateTime? FechaNacimiento { get; set; }
     public RolUsuario Rol { get; protected set; }
+    public List<Reserva> Reservas { get; set; } = new();
 
     protected Usuario(string nombre, string apellido, string email, string telefono, string password, DateTime fechaNacimiento, RolUsuario rol)
     {

@@ -1,8 +1,18 @@
 {
   "version": 2,
-  "dgSpecHash": "HESDqd6meRI=",
+  "dgSpecHash": "HbF/iQT9lrE=",
   "success": true,
   "projectFilePath": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
   "expectedPackageFiles": [],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "message": "Problem reading the cache file D:\\AlquileresApp\\AlquileresApp.Core\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
+      "projectPath": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

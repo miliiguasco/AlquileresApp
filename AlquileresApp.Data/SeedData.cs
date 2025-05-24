@@ -25,7 +25,7 @@ namespace AlquileresApp.Data
                     Apellido = "Pérez",
                     Email = "juan.perez@test.com",
                     Telefono = "123456789",
-                    Contraseña = "password123", // En producción, debe estar hasheada
+                    Password = "password123", // En producción, debe estar hasheada
                     FechaNacimiento = new DateTime(1990, 1, 1)
                 },
                 new Cliente
@@ -34,7 +34,7 @@ namespace AlquileresApp.Data
                     Apellido = "García",
                     Email = "maria.garcia@test.com",
                     Telefono = "987654321",
-                    Contraseña = "password456",
+                    Password = "password456",
                     FechaNacimiento = new DateTime(1985, 5, 15)
                 }
             };

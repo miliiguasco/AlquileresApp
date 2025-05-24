@@ -12,8 +12,4 @@
     <Folder Include="CasosDeUso\Propiedad\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
 </Project>

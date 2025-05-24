@@ -50,7 +50,6 @@ builder.Services.AddAuthorization();
 // Registrar servicios
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<CasoDeUsoRegistrarUsuario>();
-builder.Services.AddScoped<CasoDeUsoIniciarSesion>();
 builder.Services.AddScoped<IUsuarioValidador, UsuarioValidador>();
 builder.Services.AddScoped<IServicioHashPassword, ServicioHashPassword>();
 builder.Services.AddScoped<IServicioIniciarSesion, ServicioIniciarSesion>();

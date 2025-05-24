@@ -11,6 +11,6 @@ public interface IUsuarioRepositorio
     List<Cliente> ListarClientes();
     List<Administrador> ListarAdministradores();
     List<Encargado> ListarEncargados();
-    Usuario? AutenticarUsuario(string correo, string hashedContraseña);
+    bool AutenticarUsuario(Usuario usuario, string hashContraseña);
 }
 
