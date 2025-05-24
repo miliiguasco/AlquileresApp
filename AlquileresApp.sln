@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -8,8 +7,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlquileresApp.Data", "AlquileresApp.Data\AlquileresApp.Data.csproj", "{49540787-F081-4130-9925-5F9F9562D03E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlquileresApp.UI", "AlquileresApp.UI\AlquileresApp.UI.csproj", "{0160E40F-CA80-49E9-9773-06FAFFF543FA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlquilerApp.Consola", "AlquilerApp.Consola\AlquilerApp.Consola.csproj", "{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,18 +54,6 @@ Global
 		{0160E40F-CA80-49E9-9773-06FAFFF543FA}.Release|x64.Build.0 = Release|Any CPU
 		{0160E40F-CA80-49E9-9773-06FAFFF543FA}.Release|x86.ActiveCfg = Release|Any CPU
 		{0160E40F-CA80-49E9-9773-06FAFFF543FA}.Release|x86.Build.0 = Release|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Debug|x64.Build.0 = Debug|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Debug|x86.Build.0 = Debug|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Release|x64.ActiveCfg = Release|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Release|x64.Build.0 = Release|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Release|x86.ActiveCfg = Release|Any CPU
-		{FB1209D8-5775-4BDE-968F-FDB75CE19DD2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

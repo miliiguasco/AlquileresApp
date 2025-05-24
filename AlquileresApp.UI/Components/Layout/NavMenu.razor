@@ -1,20 +1,26 @@
-﻿<header class=" text-white py-3">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <img src="images/logo.png" alt="Alquilando Logo" class="me-3" style="height: 40px;" />
-                <h1 class="h3 mb-0" style="font-family: 'Ancizar Sans', sans-serif;">Alquilando.com</h1>
-            </div>
-            
-            <nav>
+﻿@namespace AlquileresApp.UI.Components.Layout
+@inherits ComponentBase
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 
-            </nav>
-        <div>
-                <a href="/login" class="btn btn-outline-light me-2" style="background-color: #ff6b00; border-color: #ff6b00; color: white;" >Iniciar Sesión</a>
-                <a href="/register" class="btn" style="background-color: #ff6b00; border-color: #ff6b00; color: white;">Registrarse</a>
+<link href="css/NavMenu.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
+
+<div class="navbar">
+    <div class="container">
+        <div class="navbar-brand navbar-start">
+            <img src="images/logo.png" alt="Alquilando Logo" class="logo" />
+            <span class="brand-text">Alquilando.com</span>
+        </div>
+        
+        <div class="auth-buttons navbar-end">
+            <a href="/Login" class="btn">Iniciar Sesión</a>
+            <a href="/Registro" class="btn">Registrarse</a>
         </div>
     </div>
-</header>
+</div>
 
 
    

@@ -1,6 +1,14 @@
 ﻿@inherits LayoutComponentBase
-<div class="container-fluid page flex intems-center ">
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using AlquileresApp.UI.Components.Layout
+
+<div class="page">
     <NavMenu />
-    <Header />
+    <main class="main">
+        <div class="content">
+            @Body
+        </div>
+    </main>
 </div>
 

@@ -1,0 +1,36 @@
+@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@using AlquileresApp.UI.Components
+@namespace AlquileresApp.UI.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <title>Alquilando</title>
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <HeadOutlet />
+</head>
+<body>
+    <component type="typeof(App)" render-mode="Server" />
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            Ha ocurrido un error. La aplicación podría no responder hasta que se recargue.
+        </environment>
+        <environment include="Development">
+            Ha ocurrido una excepción no controlada. Ver las herramientas de desarrollo del navegador para más detalles.
+        </environment>
+        <a href="" class="reload">Recargar</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

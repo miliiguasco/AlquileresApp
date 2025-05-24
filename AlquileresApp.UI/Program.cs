@@ -8,9 +8,6 @@ using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Servicios;
 using Microsoft.EntityFrameworkCore;
 using AlquileresApp.Core.Entidades;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,14 +15,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Agregar soporte para páginas Razor
 builder.Services.AddRazorPages();
+builder.Services.AddControllers();
+
 builder.Services.AddServerSideBlazor(options =>
 {
     options.DetailedErrors = true;
     options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
 });
 
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddDbContext<AppDbContext>(options => 
@@ -52,7 +51,6 @@ builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<CasoDeUsoRegistrarUsuario>();
 builder.Services.AddScoped<IUsuarioValidador, UsuarioValidador>();
 builder.Services.AddScoped<IServicioHashPassword, ServicioHashPassword>();
-builder.Services.AddScoped<IServicioIniciarSesion, ServicioIniciarSesion>();
 
 var app = builder.Build();
 
@@ -109,7 +107,7 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 else
@@ -118,6 +116,9 @@ else
 }
 
 app.UseHttpsRedirection();
+
+// Configuración de archivos estáticos
+app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -127,9 +128,9 @@ app.UseAuthorization();
 
 app.UseAntiforgery();
 
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
+// Mapear endpoints
+app.MapRazorPages();
+app.MapControllers();
 app.MapBlazorHub();
 
 // Agregar endpoints para autenticación
@@ -138,5 +139,8 @@ app.MapGet("/Logout", async (HttpContext context) =>
     await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     return Results.Redirect("/");
 });
+
+// Importante: Este debe ser el último mapeo
+app.MapFallbackToPage("/_Host");
 
 app.Run();

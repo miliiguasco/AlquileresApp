@@ -1,5 +1,141 @@
+/* Base styles */
 html, body {
+    margin: 0;
+    padding: 0;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+#blazor-error-ui {
+    display: none;
+}
+
+/* Navbar styles */
+.navbar {
+    background-color: #1F3F48 !important;
+    width: 100%;
+    padding: 0.5rem 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 64px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+}
+
+.brand-text {
+    color: white !important;
+    font-size: 1.25rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+.auth-buttons .btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.auth-buttons .btn-outline-light {
+    color: white !important;
+    border: 2px solid #ff6b00 !important;
+    background-color: transparent !important;
+}
+
+.auth-buttons .btn-outline-light:hover {
+    background-color: #ff6b00 !important;
+    border-color: #ff6b00 !important;
+    color: white !important;
+}
+
+.auth-buttons .btn:not(.btn-outline-light) {
+    background-color: #ff6b00 !important;
+    border-color: #ff6b00 !important;
+    color: white !important;
+}
+
+.auth-buttons .btn:not(.btn-outline-light):hover {
+    background-color: #e65f00 !important;
+    border-color: #e65f00 !important;
+}
+
+/* Layout styles */
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main {
+    flex: 1;
+    padding-top: 64px;
+}
+
+.content {
+    padding: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+
+    .navbar-brand {
+        gap: 0.5rem;
+    }
+
+    .logo {
+        height: 28px;
+    }
+
+    .brand-text {
+        font-size: 1.1rem;
+    }
+
+    .auth-buttons {
+        gap: 0.5rem;
+    }
+
+    .auth-buttons .btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+    }
 }
 
 a, .btn-link {
@@ -14,10 +150,6 @@ a, .btn-link {
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-.content {
-    padding-top: 1.1rem;
 }
 
 h1:focus {

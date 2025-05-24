@@ -9,7 +9,7 @@ public class UsuarioValidador : IUsuarioValidador
     public void ValidarDatos(Usuario usuario) 
     {
         ValidarCorreo(usuario.Email);
-        ValidarPassword(usuario.Password);
+        ValidarPassword(usuario.Contraseña);
     }
     private void ValidarCorreo(String correo)
     {
