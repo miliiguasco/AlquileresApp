@@ -1,0 +1,58 @@
+@page "/Registro"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.CasosDeUso.Usuario
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.UI.Components
+@inject CasoDeUsoRegistrarUsuario CURegistrarUsuario
+@inject NavigationManager NavigationManager
+
+<h1>Registrarse</h1>
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <hr />
+            <DatosForm 
+                Input="@Input" 
+                OnSubmit="@RegistrarUsuario"
+                FormName="Registro"
+                SubmitButtonText="Registrar" />
+            <RegistroExitoso Visible="@registroExitoso" />
+            <Aviso @ref="aviso" />
+        </section>
+    </div>
+</div>
+
+@code {
+    private DatosForm.InputModel Input { get; set; } = new();
+    private Aviso aviso = new();
+    private bool registroExitoso = false;
+
+    private async Task RegistrarUsuario()
+    {
+        try {
+            if (!Input.FechaDeNacimiento.HasValue)
+            {
+                aviso.Mostrar("La fecha de nacimiento es requerida");
+                return;
+            }
+
+            var usuario = new Cliente(Input.Nombre, Input.Apellido, Input.Email, Input.Telefono, Input.Password, Input.FechaDeNacimiento.Value);
+            CURegistrarUsuario.Ejecutar(usuario);
+            registroExitoso = true;
+            StateHasChanged();
+            
+            // Esperar 4,5 segundos antes de redirigir
+            await Task.Delay(4500);
+            registroExitoso = false;
+            VaciarCampos();
+            NavigationManager.NavigateTo("/Login");
+        } catch (Exception ex) {
+            aviso.Mostrar(ex.Message);
+            StateHasChanged();
+        }
+    }
+
+    private void VaciarCampos() {
+        Input = new();
+    }
+} 
