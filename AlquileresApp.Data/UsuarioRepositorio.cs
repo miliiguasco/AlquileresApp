@@ -1,63 +1,96 @@
 using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
+using AlquileresApp.Core.Enumerativos;
+using Microsoft.EntityFrameworkCore;
 
 namespace AlquileresApp.Data;
 
-
 public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
 {
-    public void RegistrarUsuario(Usuario usuario, String hashedPassword)
+    public void RegistrarUsuario(Usuario usuario)
     {
         verificarCorreoExistente(usuario.Email);
-        usuario.Password = hashedPassword;
-        
-        if (usuario is UsuarioRegistrado usuarioRegistrado)
-            dbContext.UsuariosRegistrados.Add(usuarioRegistrado);
-        else if (usuario is Administrador administrador)
-            dbContext.Administradores.Add(administrador);
-        else if (usuario is Encargado encargado)
-            dbContext.Encargados.Add(encargado);
-
+        dbContext.Usuarios.Add(usuario);
         dbContext.SaveChanges();
     }
 
     public void ModificarUsuario(Usuario usuario) 
     {
-        // Implementación pendiente
+        var usuarioExistente = dbContext.Usuarios.Find(usuario.Id);
+        if (usuarioExistente == null)
+            throw new Exception("Usuario no encontrado");
+            
+        dbContext.Entry(usuarioExistente).CurrentValues.SetValues(usuario);
+        dbContext.SaveChanges();
     }
 
     public Usuario? ObtenerUsuarioPorId(int id)
     {
-        Usuario? usuario = dbContext.UsuariosRegistrados.FirstOrDefault(u => u.Id == id);
-        if (usuario != null) return usuario;
-
-        usuario = dbContext.Administradores.FirstOrDefault(u => u.Id == id);
-        if (usuario != null) return usuario;
-
-        return dbContext.Encargados.FirstOrDefault(u => u.Id == id);
+        return dbContext.Usuarios.Find(id);
     }   
 
     public List<Usuario> ListarUsuarios()
     {
-        var usuarios = new List<Usuario>();
-        usuarios.AddRange(dbContext.UsuariosRegistrados.ToList());
-        usuarios.AddRange(dbContext.Administradores.ToList());
-        usuarios.AddRange(dbContext.Encargados.ToList());
-
+        var usuarios = dbContext.Usuarios.ToList();
         if (usuarios.Count == 0)
-            throw new Exception("ListarUsuarios: no se encontraron usuarios.");
+            throw new Exception("No se encontraron usuarios.");
         return usuarios;
+    }
+
+    public List<Cliente> ListarClientes()
+    {
+        return dbContext.Usuarios.OfType<Cliente>().ToList();
+    }
+
+    public List<Administrador> ListarAdministradores()
+    {
+        return dbContext.Usuarios.OfType<Administrador>().ToList();
+    }
+
+    public List<Encargado> ListarEncargados()
+    {
+        return dbContext.Usuarios.OfType<Encargado>().ToList();
+    }
+
+    public Usuario? AutenticarUsuario(string correo, String hashedContraseña)
+    {
+        Console.WriteLine($"Buscando usuario con email: {correo}");
+        var usuario = dbContext.Usuarios
+            .SingleOrDefault(u => u.Email.ToLower() == correo.ToLower());
+        
+        if (usuario == null)
+        {
+            Console.WriteLine("Usuario no encontrado por email");
+            return null;
+        }
+
+        Console.WriteLine($"Usuario encontrado. Comparando contraseñas:");
+        Console.WriteLine($"Hash almacenado: {usuario.Contraseña}");
+        Console.WriteLine($"Hash recibido:   {hashedContraseña}");
+
+        if (usuario.Contraseña != hashedContraseña)
+        {
+            Console.WriteLine("Las contraseñas no coinciden");
+            return null;
+        }
+
+        Console.WriteLine("Autenticación exitosa");
+        return usuario;
+    }
+
+    public Usuario? ObtenerUsuarioPorEmail(string email)
+    {
+        return dbContext.Usuarios
+            .SingleOrDefault(u => u.Email == email);
     }
 
     private void verificarCorreoExistente(String correo)
     {
-        bool existe = dbContext.UsuariosRegistrados.Any(u => u.Email == correo) ||
-                     dbContext.Administradores.Any(u => u.Email == correo) ||
-                     dbContext.Encargados.Any(u => u.Email == correo);
+        bool existe = dbContext.Usuarios.Any(u => u.Email == correo);
 
         if (existe)
         {
-            throw new Exception("El correo ya está en uso");
+            throw new Exception("El correo ya se encuentra registrado");
         }
     }
 }

@@ -6,9 +6,14 @@ public class CasoDeUsoRegistrarUsuario (IUsuarioRepositorio usuarioRepositorio, 
 {
     public void Ejecutar(Usuario usuario)
     {
-        usuarioValidador.ValidarDatos(usuario);
-        String hashedPassword = servicioHashPassword.HashPassword(usuario.Password);
-        usuarioRepositorio.RegistrarUsuario(usuario, hashedPassword);
+        try {
+            usuarioValidador.ValidarDatos(usuario);
+            String hashedPassword = servicioHashPassword.HashPassword(usuario.Contraseña);   
+            usuario.Contraseña = hashedPassword;
+            usuarioRepositorio.RegistrarUsuario(usuario);
+        } catch (Exception ex) {
+            throw new Exception(ex.Message);
+        }
     }
 }
           /*                                                  

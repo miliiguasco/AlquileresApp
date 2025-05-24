@@ -1,0 +1,13 @@
+@rendermode InteractiveServer
+
+@if (!string.IsNullOrEmpty(Mensaje))
+{
+    <div class="text-danger small mt-1">
+        @Mensaje
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? Mensaje { get; set; }
+} 
