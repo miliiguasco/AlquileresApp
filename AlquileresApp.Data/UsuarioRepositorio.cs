@@ -54,8 +54,28 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
 
     public Usuario? AutenticarUsuario(string correo, string hashedContraseña)
     {
-        return dbContext.Usuarios
-            .SingleOrDefault(u => u.Email.Equals(correo, StringComparison.InvariantCultureIgnoreCase) && u.Contraseña == hashedContraseña);
+        Console.WriteLine($"Buscando usuario con email: {correo}");
+        var usuario = dbContext.Usuarios
+            .SingleOrDefault(u => u.Email.ToLower() == correo.ToLower());
+        
+        if (usuario == null)
+        {
+            Console.WriteLine("Usuario no encontrado por email");
+            return null;
+        }
+
+        Console.WriteLine($"Usuario encontrado. Comparando contraseñas:");
+        Console.WriteLine($"Hash almacenado: {usuario.Contraseña}");
+        Console.WriteLine($"Hash recibido:   {hashedContraseña}");
+
+        if (usuario.Contraseña != hashedContraseña)
+        {
+            Console.WriteLine("Las contraseñas no coinciden");
+            return null;
+        }
+
+        Console.WriteLine("Autenticación exitosa");
+        return usuario;
     }
 
     public Usuario? ObtenerUsuarioPorEmail(string email)

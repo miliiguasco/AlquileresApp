@@ -5,7 +5,7 @@ using AlquileresApp.Core.Servicios;
 
 namespace AlquileresApp.Core.CasosDeUso.Usuario;
 
-public class CasoDeUsoIniciarSesion(IServicioIniciarSesion servicioIniciarSesion, IServicioHashPassword servicioHashPassword)
+public class CasoDeUsoIniciarSesion(IServicioIniciarSesion servicioIniciarSesion)
 {
     public ClaimsPrincipal? Ejecutar(string email, string contraseña)
     {

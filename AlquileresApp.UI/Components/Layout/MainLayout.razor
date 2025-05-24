@@ -1,4 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider auth 
+@inject NavigationManager NavigationManager
 
 <div class="page">
     <div class="sidebar">
@@ -21,3 +25,18 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    public string NombreUsuario { get; set; } = "";
+    public string RolUsuario { get; set; } = "";
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await auth.GetAuthenticationStateAsync();
+        var usuario = authState.User; 
+        if (usuario.Identity?.IsAuthenticated == true)
+        {
+            NombreUsuario = usuario.FindFirst(ClaimTypes.Name)?.Value ?? "";
+            RolUsuario = usuario.FindFirst(ClaimTypes.Role)?.Value ?? "";
+        }
+    }
+}
