@@ -1,0 +1,112 @@
+@page "/publish"
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@inject IPropiedadRepositorio PropiedadesRepositorio
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>Publicar Propiedad - Alquilando</PageTitle>
+
+<div class="container py-4">
+    <h2 class="mb-4">Publicar Nueva Propiedad</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <EditForm Model="@nuevaPropiedad" OnValidSubmit="HandleValidSubmit" FormName="publishPropertyForm">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="titulo" class="form-label">Título</label>
+                            <InputText placeholder="Título" @bind="nuevaPropiedad.Titulo" class="form-control" />
+                            <ValidationMessage For="@(() => nuevaPropiedad.Titulo)" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="precio" class="form-label">Precio por Noche</label>
+                            <Input type="number" placeholder="Precio" @bind="nuevaPropiedad.PrecioPorNoche" class="form-control" />
+                            <ValidationMessage For="@(() => nuevaPropiedad.PrecioPorNoche)" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <InputTextArea placeholder="Descripción" @bind="nuevaPropiedad.Descripcion" class="form-control" rows="4" />
+                            <ValidationMessage For="@(() => nuevaPropiedad.Descripcion)" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <InputText placeholder="Dirección" @bind="nuevaPropiedad.Direccion" class="form-control" />
+                            <ValidationMessage For="@(() => nuevaPropiedad.Direccion)" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="capacidad" class="form-label">Capacidad de Huéspedes</label>
+                            <Input type="number" placeholder="Capacidad" @bind="nuevaPropiedad.Capacidad" class="form-control" />
+                            <ValidationMessage For="@(() => nuevaPropiedad.Capacidad)" />
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn" style="background-color: #ff6b00; border-color: #ff6b00; color: white;">
+                            Publicar Propiedad
+                        </button>
+                        <button type="button" class="btn btn-secondary ms-2" @onclick="NavigateToHome">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Propiedad nuevaPropiedad = new Propiedad();
+
+    void HandleValidSubmit()
+    {
+        try
+        {
+            Console.WriteLine("=== INICIO DEL PROCESO DE PUBLICACIÓN ===");
+            Console.WriteLine($"Título: {nuevaPropiedad.Titulo}");
+            Console.WriteLine($"Precio: {nuevaPropiedad.PrecioPorNoche}");
+            Console.WriteLine($"Descripción: {nuevaPropiedad.Descripcion}");
+            Console.WriteLine($"Dirección: {nuevaPropiedad.Direccion}");
+            Console.WriteLine($"Capacidad: {nuevaPropiedad.Capacidad}");
+            Console.WriteLine($"EncargadoId: {nuevaPropiedad.EncargadoId}");
+            
+            nuevaPropiedad.EncargadoId = 1;
+            
+            Console.WriteLine("Intentando guardar en la base de datos...");
+            PropiedadesRepositorio.CargarPropiedad(nuevaPropiedad);
+            Console.WriteLine("Propiedad guardada exitosamente");
+            
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+            }
+        }
+    }
+
+    private void NavigateToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

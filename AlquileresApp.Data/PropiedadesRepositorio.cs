@@ -53,23 +53,23 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
 
      public List<Propiedad> BuscarDisponiblesAsync(SearchFilters filtros)
     {
-        Console.WriteLine("📡 Llamado a BuscarDisponiblesAsync");
-        Console.WriteLine($"📍 Localidad buscada: {filtros.Localidad}");
+        //Console.WriteLine("📡 Llamado a BuscarDisponiblesAsync");
+        //Console.WriteLine($"📍 Localidad buscada: {filtros.Localidad}");
         
         var query = dbContext.Propiedades.AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(filtros.Localidad))
-        {
-            query = query.Where(p => string.Equals(p.Localidad, filtros.Localidad, StringComparison.OrdinalIgnoreCase));
-        }
+        //if (!string.IsNullOrWhiteSpace(filtros.Localidad))
+        //{
+        //    query = query.Where(p => string.Equals(p.Localidad, filtros.Localidad, StringComparison.OrdinalIgnoreCase));
+        //}
 
-        if (filtros.CantidadHuespedes > 0)
-        {
-            query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes);
-        }
+        //if (filtros.CantidadHuespedes > 0)
+        //{
+        //    query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes);
+        //}
 
         var propiedades = query.ToList();
-        Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
+        //Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
         return propiedades;
     }
 }

@@ -1,10 +1,24 @@
 using AlquileresApp.UI.Components;
+using AlquileresApp.Core.Interfaces;
+using AlquileresApp.Data;
+using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Registrar el contexto de la base de datos
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    var dbPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "AlquileresApp.Data", "Alquilando.db"));
+    options.UseSqlite($"Data Source={dbPath}");
+});
+
+// Registrar el repositorio
+builder.Services.AddScoped<IPropiedadRepositorio, PropiedadesRepositorio>();
 
 var app = builder.Build();
 

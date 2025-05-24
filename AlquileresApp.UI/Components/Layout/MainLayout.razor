@@ -1,6 +1,35 @@
 ﻿@inherits LayoutComponentBase
-<div class="container-fluid page flex intems-center ">
+
+<div class="page-container">
     <NavMenu />
     <Header />
+    <main class="main-content">
+        <div class="container py-4">
+            @Body
+        </div>
+    </main>
+    <footer class="footer mt-auto py-3">
+        <div class="container text-center">
+            <span class="text-muted">© 2024 Alquilando.com - Todos los derechos reservados</span>
+        </div>
+    </footer>
 </div>
+
+<style>
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+
+    .main-content {
+        flex: 1;
+    }
+
+    .footer {
+        background-color: #fff;
+        border-top: 1px solid #dee2e6;
+    }
+</style>
 
