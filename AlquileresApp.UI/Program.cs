@@ -1,10 +1,4 @@
 using AlquileresApp.UI.Components;
-<<<<<<< HEAD
-using AlquileresApp.Core.Interfaces;
-using AlquileresApp.Data;
-using Microsoft.EntityFrameworkCore;
-using System.IO;
-=======
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using AlquileresApp.Data;
@@ -14,7 +8,6 @@ using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Servicios;
 using Microsoft.EntityFrameworkCore;
 using AlquileresApp.Core.Entidades;
->>>>>>> 7a02049defab08c041791872f3d075bf7648b509
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,17 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-<<<<<<< HEAD
-// Registrar el contexto de la base de datos
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    var dbPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "AlquileresApp.Data", "Alquilando.db"));
-    options.UseSqlite($"Data Source={dbPath}");
-});
-
-// Registrar el repositorio
-builder.Services.AddScoped<IPropiedadRepositorio, PropiedadesRepositorio>();
-=======
 // Agregar soporte para páginas Razor
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
@@ -69,7 +51,6 @@ builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<CasoDeUsoRegistrarUsuario>();
 builder.Services.AddScoped<IUsuarioValidador, UsuarioValidador>();
 builder.Services.AddScoped<IServicioHashPassword, ServicioHashPassword>();
->>>>>>> 7a02049defab08c041791872f3d075bf7648b509
 
 var app = builder.Build();
 
