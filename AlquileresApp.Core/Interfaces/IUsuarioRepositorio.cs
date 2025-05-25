@@ -3,9 +3,14 @@ using AlquileresApp.Core.Entidades;
 
 public interface IUsuarioRepositorio
 {
-    void RegistrarUsuario(Usuario usuario, string hashedPassword);
+    void RegistrarUsuario(Usuario usuario);
     void ModificarUsuario(Usuario usuario);
-    public Usuario? ObtenerUsuarioPorId(int id);
-    public List<Usuario> ListarUsuarios();
+    Usuario? ObtenerUsuarioPorId(int id);
+    Usuario? ObtenerUsuarioPorEmail(string email);
+    List<Usuario> ListarUsuarios();
+    List<Cliente> ListarClientes();
+    List<Administrador> ListarAdministradores();
+    List<Encargado> ListarEncargados();
+    public Usuario? AutenticarUsuario(string correo, String hashedContraseña);
 }
 

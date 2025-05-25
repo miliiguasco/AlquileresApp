@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "n2qnEC9EA9E=",
   "success": true,
   "projectFilePath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+=======
+  "dgSpecHash": "HbF/iQT9lrE=",
+  "success": true,
+  "projectFilePath": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+>>>>>>> 7a02049defab08c041791872f3d075bf7648b509
   "expectedPackageFiles": [],
   "logs": []
 }

@@ -21,12 +21,13 @@ namespace AlquileresApp.Data
         {
         }
 
-        public DbSet<UsuarioRegistrado> UsuariosRegistrados { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Administrador> Administradores { get; set; }
         public DbSet<Encargado> Encargados { get; set; }
+        public DbSet<Propiedad> Propiedades { get; set; }
         public DbSet<Reserva> Reservas { get; set; }
         public DbSet<Tarjeta> Tarjetas { get; set; }
-        public DbSet<Propiedad> Propiedades { get; set; }
         public DbSet<Imagen> Imagenes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -41,14 +42,14 @@ namespace AlquileresApp.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configuración de la herencia TPH (Table Per Hierarchy)
+            // Configuración TPH
             modelBuilder.Entity<Usuario>()
-                .HasDiscriminator<string>("TipoUsuario")
-                .HasValue<UsuarioRegistrado>("UsuarioRegistrado")
-                .HasValue<Administrador>("Administrador")
-                .HasValue<Encargado>("Encargado");
+                .HasDiscriminator(u => u.Rol)
+                .HasValue<Cliente>(RolUsuario.Cliente)
+                .HasValue<Administrador>(RolUsuario.Administrador)
+                .HasValue<Encargado>(RolUsuario.Encargado);
 
-            // Email único para usuarios
+            // Email único
             modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Email)
                 .IsUnique();

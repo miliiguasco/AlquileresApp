@@ -8,11 +8,16 @@
     "net9.0": []
   },
   "packageFolders": {
+<<<<<<< HEAD
     "C:\\Users\\Lenovo\\.nuget\\packages\\": {}
+=======
+    "C:\\Users\\valen\\.nuget\\packages\\": {}
+>>>>>>> 7a02049defab08c041791872f3d075bf7648b509
   },
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
       "projectName": "AlquileresApp.Core",
       "projectPath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
@@ -21,6 +26,16 @@
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config"
+=======
+      "projectUniqueName": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+      "projectName": "AlquileresApp.Core",
+      "projectPath": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+      "packagesPath": "C:\\Users\\valen\\.nuget\\packages\\",
+      "outputPath": "D:\\AlquileresApp\\AlquileresApp.Core\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\valen\\AppData\\Roaming\\NuGet\\NuGet.Config"
+>>>>>>> 7a02049defab08c041791872f3d075bf7648b509
       ],
       "originalTargetFrameworks": [
         "net9.0"

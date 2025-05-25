@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿<header class="text-white py-3">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
@@ -11,9 +12,31 @@
                 <a href="/login" class="btn btn-outline-light me-2" style="background-color: #ff6b00; border-color: #ff6b00; color: white;">Iniciar Sesión</a>
                 <a href="/register" class="btn" style="background-color: #ff6b00; border-color: #ff6b00; color: white;">Registrarse</a>
             </div>
+=======
+﻿@namespace AlquileresApp.UI.Components.Layout
+@inherits ComponentBase
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+<link href="css/NavMenu.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
+
+<div class="navbar">
+    <div class="container">
+        <div class="navbar-brand navbar-start">
+            <img src="images/logo.png" alt="Alquilando Logo" class="logo" />
+            <span class="brand-text">ALQUILANDO</span>
+        </div>
+        
+        <div class="auth-buttons navbar-end">
+            <a href="/Login" class="btn">Iniciar Sesión</a>
+            <a href="/Registro" class="btn">Registrarse</a>
+>>>>>>> 7a02049defab08c041791872f3d075bf7648b509
         </div>
     </div>
-</header>
+</div>
 
 
    

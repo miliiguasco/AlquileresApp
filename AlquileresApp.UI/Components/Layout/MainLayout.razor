@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+<<<<<<< HEAD
 
 <div class="page-container">
     <NavMenu />
@@ -14,6 +15,34 @@
         </div>
     </footer>
 </div>
+=======
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using AlquileresApp.UI.Components.Layout
+
+<ErrorBoundary>
+    <ChildContent>
+        <div class="page">
+            <NavMenu />
+            <main class="main">
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
+        </div>
+    </ChildContent>
+    <ErrorContent>
+        <p class="error-message">Lo sentimos, ha ocurrido un error al cargar esta sección.</p>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+}
+>>>>>>> 7a02049defab08c041791872f3d075bf7648b509
 
 <style>
     .page-container {

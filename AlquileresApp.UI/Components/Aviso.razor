@@ -1,0 +1,37 @@
+﻿@rendermode InteractiveServer
+@inject NavigationManager Navegador;
+
+@if (visible)
+{
+    <div class="dialogo-contenedor">
+        <div class="dialogo-contenido">
+            <h3>@Mensaje</h3>
+            <button class="btn btn-primary" @onclick="Cerrar">Cerrar</button>
+        </div>
+    </div>
+}
+
+@code{
+    private bool visible = false;
+    [Parameter]
+    public string Mensaje { get; set; } = "";
+    [Parameter]
+    public string urlRedirect {get; set;} = ""; 
+    public void Mostrar(string mensaje, string urlRedirect = "")
+    {
+        Mensaje = mensaje;
+        this.urlRedirect = urlRedirect;
+        visible = true;
+        StateHasChanged();
+    }
+    void Cerrar()
+    {
+        visible = false;
+        OnConfirmado.InvokeAsync();
+        if(!String.IsNullOrEmpty(urlRedirect)) {
+          Navegador.NavigateTo(urlRedirect);
+        }
+    }
+    [Parameter]
+    public EventCallback OnConfirmado { get; set; }
+}

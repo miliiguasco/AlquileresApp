@@ -1,0 +1,71 @@
+@page "/Registro"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.CasosDeUso.Usuario
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.UI.Components
+@inject CasoDeUsoRegistrarUsuario CURegistrarUsuario
+@inject NavigationManager NavigationManager
+
+<link href="css/AltaUsuario.css" rel="stylesheet" />
+
+<div class="registro-container">
+    <h1 class="registro-title">Registrarse</h1>
+    <div class="registro-form">
+        <section>
+            <DatosForm 
+                Input="@Input" 
+                OnSubmit="@RegistrarUsuario"
+                FormName="Registro"
+                SubmitButtonText="Registrar"
+                ButtonClass="registro-button"
+                OnEmailChange="@LimpiarError" />
+            <RegistroExitoso Visible="@registroExitoso" />
+            <Error Mensaje="@errorMensaje"/>
+        </section>
+    </div>
+</div>
+
+@code {
+    private DatosForm.InputModel Input { get; set; } = new();
+    private Error error = new();
+    private string? errorMensaje;
+    private bool registroExitoso = false;
+
+    private void LimpiarError()
+    {
+        errorMensaje = null;
+        StateHasChanged();
+    }
+
+    private async Task RegistrarUsuario()
+    {
+        try {
+            errorMensaje = null;
+            StateHasChanged();
+            if (!Input.FechaDeNacimiento.HasValue)
+            {
+                errorMensaje = "La fecha de nacimiento es requerida";
+                StateHasChanged();
+                return;
+            }
+
+            var usuario = new Cliente(Input.Nombre, Input.Apellido, Input.Email, Input.Telefono, Input.Password, Input.FechaDeNacimiento.Value);
+            CURegistrarUsuario.Ejecutar(usuario);
+            registroExitoso = true;
+            StateHasChanged();
+            
+            // Esperar 4,5 segundos antes de redirigir
+            await Task.Delay(4000);
+            registroExitoso = false;
+            VaciarCampos();
+            NavigationManager.NavigateTo("/Login");
+        } catch (Exception ex) {
+            errorMensaje = ex.Message;
+            StateHasChanged();
+        }
+    }
+
+    private void VaciarCampos() {
+        Input = new();
+    }
+} 
