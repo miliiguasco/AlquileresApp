@@ -9,7 +9,6 @@ public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
        Reserva reserva = new Reserva(usuario, propiedad, fechaInicio, fechaFin);
        var propiedadRepositorio = new PropiedadRepositorio(dbContext);
        var tarjetaRepositorio = new TarjetaRepositorio(dbContext);
-       var validador = new FechaReservaValidador(); //valida que las fechas sean correctas
        var tarjetaValidador = new TarjetaValidador();
        var propiedadValidador = new PropiedadValidador(); //valida que la propiedad exista
        var pagoTarjetaValidador = new PagoTarjetaValidador();
