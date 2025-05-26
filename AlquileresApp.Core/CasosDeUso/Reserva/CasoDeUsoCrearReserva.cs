@@ -11,7 +11,7 @@ public class CasoDeUsoCrearReserva(IReservaRepositorio reservasRepositorio,ITarj
     public void Ejecutar(Propiedad propiedad, Usuario usuario, DateTime fechaInicio, DateTime fechaFin){
         fechaReservaValidador.FechaValidador(fechaInicio, fechaFin);
         propiedadValidador.ValidarPropiedad(propiedad);
-        propiedadRepositorio.ComprobarDisponibilidad(propiedad, fechaInicio, fechaFin);
+        propiedad.ComprobarDisponibilidad(propiedad, fechaInicio, fechaFin);
         var tarjeta = tarjetaValidador.ObtenerTarjetaPorId(usuario.TarjetaId);
         tarjetaValidador.ValidarTarjeta(tarjeta);
 
