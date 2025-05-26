@@ -5,18 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
 {
-    public void ReservarPropiedad(Propiedad propiedad, Usuario usuario, DateTime fechaInicio, DateTime fechaFin){
-       Reserva reserva = new Reserva(usuario, propiedad, fechaInicio, fechaFin);
-       
-       propiedadRepositorio.ComprobarDisponibilidad(reserva.Propiedad, reserva.FechaInicio, reserva.FechaFin);//verificar este metodo
-       
-       //Tarjeta y pago
-       var tarjeta = tarjetaRepositorio.ObtenerTarjetaPorId(usuario.TarjetaId);
-       tarjetaValidador.ValidarTarjetaExistente(tarjeta);
-       pagoTarjetaValidador.ValidarPagoTarjeta(reserva, tarjeta);
-     
-        //confimar y guardar reserva
-       reserva.Estado = EstadoReserva.Confirmada;
+    public void CrearReserva(Cliente  cliente, Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin){
+       Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin);
        dbContext.Reservas.Add(reserva);
        dbContext.SaveChanges();
        Console.WriteLine("Reserva creada correctamente");

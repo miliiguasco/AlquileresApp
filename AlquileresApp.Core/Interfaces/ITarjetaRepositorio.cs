@@ -7,5 +7,6 @@ public interface ITarjetaRepositorio
     void ModificarTarjeta(Tarjeta tarjeta);
     Tarjeta? ObtenerTarjetaPorId(int id);
     bool Pagar(Tarjeta tarjeta, decimal monto);
+    bool ValidarSaldo(Tarjeta tarjeta, decimal monto);
 }
 

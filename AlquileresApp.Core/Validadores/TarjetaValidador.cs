@@ -5,13 +5,10 @@ namespace AlquileresApp.Core;
 public class TarjetaValidador : ITarjetaValidador
 
 {
-    public Tarjeta ObtenerTarjetaPorId(int id){
-        return dbContext.Tarjetas.Find(id);
-    }
     public void ValidarTarjeta(Tarjeta tarjeta){
-        if (String.IsNullOrWhiteSpace(tarjeta.NumeroTarjeta))
+        if (tarjeta == null)
         {
-            throw new Exception("El número de tarjeta es requerido");
+            throw new Exception("La tarjeta no existe");
         }
     }
 }

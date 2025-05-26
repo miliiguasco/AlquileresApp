@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {}
+    "C:\\Users\\Manu\\Desktop\\AlquilandoApp\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
+    "C:\\Users\\Manu\\Desktop\\AlquilandoApp\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+        "projectUniqueName": "C:\\Users\\Manu\\Desktop\\AlquilandoApp\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
         "projectName": "AlquileresApp.Core",
-        "projectPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
-        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\obj\\",
+        "projectPath": "C:\\Users\\Manu\\Desktop\\AlquilandoApp\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+        "packagesPath": "C:\\Users\\Manu\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Manu\\Desktop\\AlquilandoApp\\AlquileresApp\\AlquileresApp.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Manu\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"

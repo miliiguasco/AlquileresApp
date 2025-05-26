@@ -15,5 +15,8 @@ public class Propiedad
     public List<ServiciosPropiedad> ServiciosDisponibles { get; set; } = new();
     public List<Imagen> Imagenes { get; set; } = new();
     public List<Reserva> Reservas { get; set; } = new();
+    public decimal PorcentajeAnticipo { get; set; }
+    public decimal MontoAnticipo { get; set; }
+
 
 } 

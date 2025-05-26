@@ -15,8 +15,12 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
         dbContext.SaveChanges();
     }
     
-    public Tarjeta? ObtenerTarjetaPorId(int id){
-        return dbContext.Tarjetas.Find(id);
+    public Tarjeta ObtenerTarjetaPorId(int id){
+        var tarjeta = dbContext.Tarjetas.Find(id);
+        if (tarjeta == null)
+            throw new Exception("La tarjeta no existe");
+        return tarjeta;
+
     }
 
     public bool Pagar(Tarjeta tarjeta, decimal monto){
@@ -24,6 +28,12 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
             return false;
         tarjeta.Saldo -= monto;
         dbContext.SaveChanges();
+        return true;
+    }
+
+    public bool ValidarSaldo(Tarjeta tarjeta, decimal monto){
+        if (tarjeta.Saldo < monto)
+            throw new Exception("Saldo insuficiente");
         return true;
     }
 }
