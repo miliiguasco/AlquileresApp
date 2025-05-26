@@ -9,6 +9,7 @@ using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Servicios;
 using Microsoft.EntityFrameworkCore;
 using AlquileresApp.Core.Entidades;
+using AlquileresApp.Core.CasosDeUso.Reserva;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,8 @@ builder.Services.AddScoped<IUsuarioValidador, UsuarioValidador>();
 builder.Services.AddScoped<IServicioHashPassword, ServicioHashPassword>();
 builder.Services.AddScoped<IPropiedadRepositorio, PropiedadesRepositorio>();
 builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
+builder.Services.AddScoped<CasoDeUsoReservarPropiedad>();
+builder.Services.AddScoped<IReservaRepositorio, ReservaRepositorio>();
 
 
 var app = builder.Build();

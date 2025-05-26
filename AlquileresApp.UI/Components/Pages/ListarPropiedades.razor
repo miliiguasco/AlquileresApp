@@ -2,30 +2,35 @@
 @rendermode InteractiveServer
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.CasosDeUso.Reserva
 @inject CasoDeUsoListarPropiedadesFiltrado CUListarPropiedadesFiltrado
+@inject CasoDeUsoReservarPropiedad CUReservarPropiedad
+
 <link href="css/listarPropiedadesFiltradas.css" rel="stylesheet" />
 <div class="container_listar_propiedades mt-5">
-    <h1 class="titulo">Propiedades disponibles</h1>
+   <h2 class="tituloo">Busca tu lugar ideal</h2>
 
     <EditForm Model="Filtros" OnValidSubmit="Buscar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
         <div class="filtros">
             <div>
-                <label>Localidad:</label>
+                <label>Ubicacion:</label>
                 <InputText @bind-Value="Filtros.Localidad" class="input" />
             </div>
 
             <div>
-                <label>Huéspedes:</label>
+                <label>Cantidad de personas:</label>
                 <InputNumber @bind-Value="Filtros.CantidadHuespedes" class="input" />
             </div>
 
             <div>
-                <label>Desde:</label>
+                <label>Fecha de inicio:</label>
                 <InputDate @bind-Value="Filtros.FechaInicio" class="input" />
             </div>
 
             <div>
-                <label>Hasta:</label>
+                    <label>Fecha de fin:</label>
                 <InputDate @bind-Value="Filtros.FechaFin" class="input" />
             </div>
 
@@ -38,39 +43,95 @@
     @if (Propiedades is null)
     {
         <div class="text-center">
-            <p>Cargando propiedades...</p>
+            <p>...</p>
         </div>
     }
     else if (!Propiedades.Any())
     {
         <div class="text-center">
-            <p>No se encontraron propiedades con esos filtros.</p>
+            <p>No hay propiedades que cumplan con los requisitos disponibles.</p>
         </div>
     }
     else
     {
         <ul class="lista-propiedades">
-            @foreach (var propiedad in Propiedades)
-            {
-                <li class="propiedad-item">
-                    <h3>@propiedad.Titulo</h3>
-                    <p>@propiedad.Descripcion</p>
-                    <p><strong>Localidad:</strong> @propiedad.Localidad</p>
-                </li>
-            }
-        </ul>
+    @foreach (var propiedad in Propiedades)
+    {
+        var carouselId = $"carousel-{propiedad.Id}";
+
+        <li class="propiedad-item">
+            <h3>@propiedad.Titulo</h3>
+
+            <div id="@carouselId" class="carousel slide propiedad-carousel" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
+                    {
+                        var index = 0;
+                        foreach (var imagen in propiedad.Imagenes)
+                        {
+                            <div class="carousel-item @(index == 0 ? "active" : "")">
+                                <img src="@imagen.Url" class="d-block w-100 propiedad-img" alt="Imagen de @propiedad.Titulo" />
+                            </div>
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        <div class="carousel-item active">
+                            <img src="Imagenes/Propiedades/iconoimagen.jpg" class="d-block w-100 propiedad-img" alt="Sin imagen" />
+                        </div>
+                    }
+                </div>
+
+                @if (propiedad.Imagenes != null && propiedad.Imagenes.Count > 1)
+                {
+                    <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Siguiente</span>
+                    </button>
+                }
+            </div>
+
+            <p>@propiedad.Descripcion</p>
+            <p><strong>Dirección:</strong> @propiedad.Direccion</p>
+            <p><strong>Localidad:</strong> @propiedad.Localidad</p>
+            <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
+            <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
+            <button class="btn btn-primary" @onclick="() => Reservar(propiedad)">Reservar</button>
+        </li>
+    }
+</ul>
+
+
     }
 </div>
 
 @code {
     private SearchFilters Filtros = new();
     private List<Propiedad>? Propiedades;
+    private Usuario UsuarioActual = new Cliente { Nombre = "María", Apellido = "Gómez", Email = "maria@demo.com", Telefono = "1234567890", Contraseña = "123456", FechaNacimiento = new DateTime(1990, 1, 1) };
 
     protected override void OnInitialized()
     {
-        Buscar(); // búsqueda inicial sin filtros
     }
-
+    private void Reservar(Propiedad propiedad)
+{
+    try
+    {
+        CUReservarPropiedad.Ejecutar(propiedad, UsuarioActual);
+        // Mostrar mensaje de éxito o redirigir, como prefieras
+        Console.WriteLine("Reserva exitosa");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error al reservar: {ex.Message}");
+        // Mostrar error al usuario si lo necesitás
+    }
+}
     private void Buscar()
     {
         Propiedades = CUListarPropiedadesFiltrado.Ejecutar(Filtros);
