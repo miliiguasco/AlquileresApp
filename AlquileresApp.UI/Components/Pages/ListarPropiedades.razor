@@ -1,0 +1,78 @@
+@page "/Propiedades"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@inject CasoDeUsoListarPropiedadesFiltrado CUListarPropiedadesFiltrado
+<link href="css/listarPropiedadesFiltradas.css" rel="stylesheet" />
+<div class="container_listar_propiedades mt-5">
+    <h1 class="titulo">Propiedades disponibles</h1>
+
+    <EditForm Model="Filtros" OnValidSubmit="Buscar">
+        <div class="filtros">
+            <div>
+                <label>Localidad:</label>
+                <InputText @bind-Value="Filtros.Localidad" class="input" />
+            </div>
+
+            <div>
+                <label>Huéspedes:</label>
+                <InputNumber @bind-Value="Filtros.CantidadHuespedes" class="input" />
+            </div>
+
+            <div>
+                <label>Desde:</label>
+                <InputDate @bind-Value="Filtros.FechaInicio" class="input" />
+            </div>
+
+            <div>
+                <label>Hasta:</label>
+                <InputDate @bind-Value="Filtros.FechaFin" class="input" />
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-filtrar">Buscar</button>
+            </div>
+        </div>
+    </EditForm>
+
+    @if (Propiedades is null)
+    {
+        <div class="text-center">
+            <p>Cargando propiedades...</p>
+        </div>
+    }
+    else if (!Propiedades.Any())
+    {
+        <div class="text-center">
+            <p>No se encontraron propiedades con esos filtros.</p>
+        </div>
+    }
+    else
+    {
+        <ul class="lista-propiedades">
+            @foreach (var propiedad in Propiedades)
+            {
+                <li class="propiedad-item">
+                    <h3>@propiedad.Titulo</h3>
+                    <p>@propiedad.Descripcion</p>
+                    <p><strong>Localidad:</strong> @propiedad.Localidad</p>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    private SearchFilters Filtros = new();
+    private List<Propiedad>? Propiedades;
+
+    protected override void OnInitialized()
+    {
+        Buscar(); // búsqueda inicial sin filtros
+    }
+
+    private void Buscar()
+    {
+        Propiedades = CUListarPropiedadesFiltrado.Ejecutar(Filtros);
+    }
+}

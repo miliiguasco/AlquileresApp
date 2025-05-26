@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using AlquileresApp.Data;
 using AlquileresApp.Core.CasosDeUso.Usuario;
+using AlquileresApp.Core.CasosDeUso.Propiedad;
 using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Servicios;
@@ -51,10 +52,13 @@ builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<CasoDeUsoRegistrarUsuario>();
 builder.Services.AddScoped<IUsuarioValidador, UsuarioValidador>();
 builder.Services.AddScoped<IServicioHashPassword, ServicioHashPassword>();
+builder.Services.AddScoped<IPropiedadRepositorio, PropiedadesRepositorio>();
+builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
+
 
 var app = builder.Build();
 
-// Initialize Database
+// Initialize Database and Seed Data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -64,10 +68,14 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Asegurando que la base de datos existe...");
         dbContext.Database.EnsureCreated();
         Console.WriteLine("Base de datos creada o verificada.");
-        
+         // Inicializar datos de prueba
+        Console.WriteLine("Inicializando datos de prueba...");
+        SeedData.Initialize(dbContext);
+        Console.WriteLine("Datos de prueba inicializados correctamente.");
         // Add test user if no users exist
         if (!dbContext.Usuarios.Any())
         {
+
             Console.WriteLine("No hay usuarios en la base de datos. Creando usuario de prueba...");
             var hashService = services.GetRequiredService<IServicioHashPassword>();
             var hashedPassword = hashService.HashPassword("Password123!");
