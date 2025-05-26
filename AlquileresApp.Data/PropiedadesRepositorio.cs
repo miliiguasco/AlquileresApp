@@ -75,6 +75,20 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
         return propiedades;
     }
+
+     public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin) //REVISAR ESTO 
+    {
+        var reservasExistentes = dbContext.Set<Reserva>()
+            .Where(r => r.PropiedadId == propiedad.Id &&
+                        r.FechaInicio <= fechaFin &&
+                        r.FechaFin >= fechaInicio)
+            .ToList();
+
+        if (reservasExistentes.Any())
+        {
+            throw new Exception("La propiedad no está disponible en las fechas seleccionadas.");
+        }
+    }
 }
 /*
     public List<Propiedad> ListarPropiedadesConReservas()

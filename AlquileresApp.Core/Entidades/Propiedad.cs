@@ -11,6 +11,7 @@ public class Propiedad
     public string Direccion { get; set; } = string.Empty;
     public decimal PrecioPorNoche { get; set; }
     public int Capacidad { get; set; }
+    public TipoPagoReserva TipoPago { get; set; }
     public List<ServiciosPropiedad> ServiciosDisponibles { get; set; } = new();
     public List<Imagen> Imagenes { get; set; } = new();
     public List<Reserva> Reservas { get; set; } = new();

@@ -5,14 +5,30 @@ using Microsoft.EntityFrameworkCore;
 
 public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
 {
-    public void ReservarPropiedad(Propiedad propiedad, Usuario usuario){
-       if (usuario.hasTarjeta())
+    public void ReservarPropiedad(Propiedad propiedad, Usuario usuario, DateTime fechaInicio, DateTime fechaFin){
+       Reserva reserva = new Reserva(usuario, propiedad, fechaInicio, fechaFin);
+       var propiedadRepositorio = new PropiedadRepositorio(dbContext);
+       var tarjetaRepositorio = new TarjetaRepositorio(dbContext);
+       var validador = new FechaReservaValidador(); //valida que las fechas sean correctas
+       var tarjetaValidador = new TarjetaValidador();
+       var propiedadValidador = new PropiedadValidador(); //valida que la propiedad exista
+       var pagoTarjetaValidador = new PagoTarjetaValidador();
        
-       Reserva reserva = new Reserva();
-       reserva.Propiedad = propiedad;
-       reserva.Usuario = usuario;
+      //Validadores
+       validador.ValidarFechaReserva(reserva);
+       propiedadValidador.ValidarPropiedad(reserva.Propiedad);
+       propiedadRepositorio.ComprobarDisponibilidad(reserva.Propiedad, reserva.FechaInicio, reserva.FechaFin);//verificar este metodo
+       
+       //Tarjeta y pago
+       var tarjeta = tarjetaRepositorio.ObtenerTarjetaPorId(usuario.TarjetaId);
+       tarjetaValidador.ValidarTarjetaExistente(tarjeta);
+       pagoTarjetaValidador.ValidarPagoTarjeta(reserva, tarjeta);
+     
+        //confimar y guardar reserva
+       reserva.Estado = EstadoReserva.Confirmada;
        dbContext.Reservas.Add(reserva);
        dbContext.SaveChanges();
+       Console.WriteLine("Reserva creada correctamente");
     }
 
     public void ModificarReserva(Reserva reserva){ 
@@ -45,7 +61,7 @@ public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
     }                           
 
     public List<Reserva> ListarMisReservas(Usuario usuario){
-        var reservas = dbContext.Reservas.Where(r => r.UsuarioId == usuario.Id).ToList();
+        var reservas = dbContext.Reservas.Where(r => r.Cliente.Id == usuario.Id).ToList();  
         if (reservas.Count == 0)
             throw new Exception("No se encontraron reservas.");
         return reservas;    
