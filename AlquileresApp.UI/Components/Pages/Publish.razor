@@ -1,0 +1,87 @@
+@page "/Publish"
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@inject IPropiedadRepositorio PropiedadesRepositorio
+@inject CasoDeUsoAgregarPropiedad CUAgregarPropiedad
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Forms
+
+<link href="css/AltaUsuario.css" rel="stylesheet" />
+
+<PageTitle>Publicar Propiedad - Alquilando</PageTitle>
+
+<div class="registro-container">
+    <h1 class="registro-title">Publicar Nueva Propiedad</h1>
+    <div class="registro-form">
+        <section>
+            <EditForm Model="@nuevaPropiedad" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label for="titulo">Título</label>
+                    <InputText id="titulo" class="form-control" @bind-Value="nuevaPropiedad.Titulo" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.Titulo)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <InputTextArea id="descripcion" class="form-control" @bind-Value="nuevaPropiedad.Descripcion" rows="3" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.Descripcion)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="precio">Precio por día</label>
+                    <InputNumber id="precio" class="form-control" @bind-Value="nuevaPropiedad.PrecioPorNoche" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.PrecioPorNoche)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <InputText id="direccion" class="form-control" @bind-Value="nuevaPropiedad.Direccion" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.Direccion)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="capacidad">Capacidad de personas</label>
+                    <InputNumber id="capacidad" class="form-control" @bind-Value="nuevaPropiedad.Capacidad" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.Capacidad)" />
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="registro-button">Publicar Propiedad</button>
+                    <button type="button" class="btn btn-secondary" @onclick="NavigateToHome">Cancelar</button>
+                </div>
+            </EditForm>
+            @if (!string.IsNullOrEmpty(errorMensaje))
+            {
+                <div class="alert alert-danger mt-3">@errorMensaje</div>
+            }
+        </section>
+    </div>
+</div>
+
+@code {
+    private Propiedad nuevaPropiedad = new Propiedad();
+    private string? errorMensaje;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            errorMensaje = null;
+            await Task.Run(() => CUAgregarPropiedad.Ejecutar(nuevaPropiedad));
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al publicar la propiedad: {ex.Message}";
+        }
+    }
+
+    private void NavigateToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

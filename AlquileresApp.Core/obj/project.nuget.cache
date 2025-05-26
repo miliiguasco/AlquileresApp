@@ -1,8 +1,18 @@
 {
   "version": 2,
-  "dgSpecHash": "S7O1CU1vgmI=",
+  "dgSpecHash": "n2qnEC9EA9E=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+  "projectFilePath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
   "expectedPackageFiles": [],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "message": "Problem reading the cache file C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
+      "projectPath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+      "targetGraphs": []
+    }
+  ]
 }
