@@ -5,6 +5,11 @@ namespace AlquileresApp.Core;
 public class FechaReservaValidador : IReservaValidador
 
 {
+    public void FechaValidador(Reserva reserva) 
+        {
+            ValidarFechaReserva(reserva);
+        }
+
     public void ValidarFechaReserva(Reserva reserva){
         if (reserva.FechaInicio < DateTime.Now)
             throw new Exception("La fecha de inicio de la reserva no puede ser en el pasado");
@@ -15,5 +20,6 @@ public class FechaReservaValidador : IReservaValidador
         if (reserva.FechaInicio > reserva.FechaFin)
             throw new Exception("La fecha de inicio de la reserva no puede ser mayor a la fecha de fin");
     }
+
 
 }
