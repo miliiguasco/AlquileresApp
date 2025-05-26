@@ -1,12 +1,17 @@
 @page "/propiedad/{Id:int}"
+@using AlquileresApp.Core.CasosDeUso.Imagen
+@using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
 @using Microsoft.JSInterop
 @inject IPropiedadRepositorio PropiedadesRepo
 @inject IImagenesRepositorio ImagenesRepo
 @inject NavigationManager NavigationManager
-@inject AlquileresApp.Core.CasosDeUso.Propiedad.CasoDeUsoListarPropiedades CUListarPropiedades
-@inject AlquileresApp.Core.CasosDeUso.Imagen.CasoDeUsoCargarImagen CUAgregarImagen
+@inject CasoDeUsoListarPropiedades CUListarPropiedades
+@inject CasoDeUsoCargarImagen CUAgregarImagen
+@inject CasoDeUsoModificarPropiedad CUModificarPropiedad
+@inject CasoDeUsoMostrarImagenes CUMostrarImagenes
+@inject CasoDeUsoEliminarImagen CUEliminarImagen
 @inject IJSRuntime JS
 @inject IWebHostEnvironment Environment
 @using Microsoft.AspNetCore.Components.Forms
@@ -32,21 +37,84 @@
             <div class="propiedad-detalle">
                 <div class="propiedad-info">
                     <h2>Detalles de la Propiedad</h2>
-                    <div class="info-grupo">
-                        <h3>Descripción</h3>
-                        <p>@propiedad.Descripcion</p>
-                    </div>
-                    
-                    <div class="info-grupo">
-                        <h3>Ubicación</h3>
-                        <p><strong>Dirección:</strong> @propiedad.Direccion</p>
-                    </div>
-                    
-                    <div class="info-grupo">
-                        <h3>Características</h3>
-                        <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
-                        <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
-                    </div>
+                    @if (!modoEdicion)
+                    {
+                        <div class="info-grupo">
+                            <h3>Descripción</h3>
+                            <p>@propiedad.Descripcion</p>
+                        </div>
+                        
+                        <div class="info-grupo">
+                            <h3>Ubicación</h3>
+                            <p><strong>Dirección:</strong> @propiedad.Direccion</p>
+                            <p><strong>Localidad:</strong> @propiedad.Localidad</p>
+                        </div>
+                        
+                        <div class="info-grupo">
+                            <h3>Características</h3>
+                            <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
+                            <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
+                            <p><strong>Pago anticipado:</strong> @propiedad.PagoAnticipado%</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <EditForm Model="@propiedadEditada" OnValidSubmit="GuardarCambios">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+
+                            <div class="form-group">
+                                <label for="titulo">Título</label>
+                                <InputText id="titulo" class="form-control" @bind-Value="propiedadEditada.Titulo" />
+                                <ValidationMessage For="@(() => propiedadEditada.Titulo)" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="descripcion">Descripción</label>
+                                <InputTextArea id="descripcion" class="form-control" @bind-Value="propiedadEditada.Descripcion" rows="3" />
+                                <ValidationMessage For="@(() => propiedadEditada.Descripcion)" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="precio">Precio por noche</label>
+                                <InputNumber id="precio" class="form-control" @bind-Value="propiedadEditada.PrecioPorNoche" />
+                                <ValidationMessage For="@(() => propiedadEditada.PrecioPorNoche)" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="direccion">Dirección</label>
+                                <InputText id="direccion" class="form-control" @bind-Value="propiedadEditada.Direccion" />
+                                <ValidationMessage For="@(() => propiedadEditada.Direccion)" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="localidad">Localidad</label>
+                                <InputText id="localidad" class="form-control" @bind-Value="propiedadEditada.Localidad" />
+                                <ValidationMessage For="@(() => propiedadEditada.Localidad)" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="capacidad">Capacidad de personas</label>
+                                <InputNumber id="capacidad" class="form-control" @bind-Value="propiedadEditada.Capacidad" />
+                                <ValidationMessage For="@(() => propiedadEditada.Capacidad)" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="pagoAnticipado">Porcentaje de pago anticipado</label>
+                                <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="propiedadEditada.PagoAnticipado">
+                                    <option value="0">0% - Sin pago anticipado</option>
+                                    <option value="20">20% - Pago parcial anticipado</option>
+                                    <option value="100">100% - Pago total anticipado</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => propiedadEditada.PagoAnticipado)" />
+                            </div>
+
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                <button type="button" class="btn btn-secondary" @onclick="CancelarEdicion">Cancelar</button>
+                            </div>
+                        </EditForm>
+                    }
 
                     <div class="info-grupo">
                         <h3>Imágenes</h3>
@@ -57,6 +125,9 @@
                                 {
                                     <div class="imagen-item">
                                         <img src="@imagen.Url" alt="Imagen de la propiedad" />
+                                        <button class="btn-eliminar" @onclick="() => EliminarImagen(imagen.Id)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 }
                             }
@@ -80,6 +151,12 @@
             </div>
 
             <div class="button-group">
+                @if (!modoEdicion)
+                {
+                    <button class="btn btn-primary" @onclick="IniciarEdicion">
+                        <i class="fas fa-edit"></i> Editar Propiedad
+                    </button>
+                }
                 <button class="btn btn-secondary" @onclick="VolverAInicio">Volver al Inicio</button>
             </div>
         </div>
@@ -91,45 +168,106 @@
     public int Id { get; set; }
 
     private Propiedad? propiedad;
+    private Propiedad propiedadEditada = new();
     private List<Imagen>? imagenes;
     private string? errorMensaje;
     private ElementReference fileInput;
+    private bool modoEdicion = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await CargarPropiedad();
-        //await CargarImagenes();
+        CargarPropiedad();
+        CargarImagenes();
     }
 
-    private async Task CargarPropiedad()
+    private void CargarPropiedad()
     {
         try
         {
-            propiedad = CUListarPropiedades.Ejecutar().FirstOrDefault(p => p.Id == Id);
+            var propiedades = CUListarPropiedades.Ejecutar();
+            propiedad = propiedades.FirstOrDefault(p => p.Id == Id);
+            
+            if (propiedad == null)
+            {
+                errorMensaje = "No se encontró la propiedad solicitada";
+                NavigationManager.NavigateTo("/");
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al cargar la propiedad: {ex.Message}");
+            errorMensaje = $"Error al cargar la propiedad: {ex.Message}";
+            Console.WriteLine($"Error en CargarPropiedad: {ex.Message}");
         }
     }
 
-    private async Task CargarImagenes()
+    private void CargarImagenes()
     {
         try
         {
-            imagenes = CUListarPropiedades.Ejecutar().FirstOrDefault(p => p.Id == Id)?.Imagenes;
+            imagenes = CUMostrarImagenes.Ejecutar(Id);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al cargar las imágenes: {ex.Message}");
-            imagenes = new List<Imagen>();
+            errorMensaje = $"Error al cargar las imágenes: {ex.Message}";
+            Console.WriteLine($"Error en CargarImagenes: {ex.Message}");
         }
+    }
+
+    private void IniciarEdicion()
+    {
+        try
+        {
+            if (propiedad != null)
+            {
+                propiedadEditada = new Propiedad
+                {
+                    Id = propiedad.Id,
+                    Titulo = propiedad.Titulo,
+                    Descripcion = propiedad.Descripcion,
+                    Direccion = propiedad.Direccion,
+                    Localidad = propiedad.Localidad,
+                    PrecioPorNoche = propiedad.PrecioPorNoche,
+                    Capacidad = propiedad.Capacidad,
+                    EncargadoId = propiedad.EncargadoId,
+                    PagoAnticipado = propiedad.PagoAnticipado,
+                    ServiciosDisponibles = propiedad.ServiciosDisponibles,
+                    Imagenes = propiedad.Imagenes
+                };
+                modoEdicion = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al iniciar la edición: {ex.Message}";
+            Console.WriteLine($"Error en IniciarEdicion: {ex.Message}");
+        }
+    }
+
+    private async Task GuardarCambios()
+    {
+        try
+        {
+            errorMensaje = null;
+            await Task.Run(() => CUModificarPropiedad.Ejecutar(propiedadEditada));
+            CargarPropiedad();
+            modoEdicion = false;
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al guardar los cambios: {ex.Message}";
+            Console.WriteLine($"Error en GuardarCambios: {ex.Message}");
+        }
+    }
+
+    private void CancelarEdicion()
+    {
+        modoEdicion = false;
+        errorMensaje = null;
     }
 
     private void OnClickUpload()
     {
         // El InputFile se activará automáticamente cuando se haga clic en el botón
-        // No necesitamos hacer nada más aquí
     }
 
     private async Task CargarImagen(InputFileChangeEventArgs e)
@@ -169,16 +307,35 @@
                 };
 
                 var urlImagen = CUAgregarImagen.Ejecutar(imagen, Id);
-                await CargarImagenes(); // Recargar las imágenes
+                
+                // Recargar las imágenes después de agregar una nueva
+                CargarImagenes();
+                
                 errorMensaje = "Imagen cargada exitosamente";
             }
         }
         catch (Exception ex)
         {
             errorMensaje = $"Error al cargar la imagen: {ex.Message}";
+            Console.WriteLine($"Error en CargarImagen: {ex.Message}");
         }
     }
 
+    private async Task EliminarImagen(int imagenId)
+    {
+        try
+        {
+            errorMensaje = null;
+            await Task.Run(() => CUEliminarImagen.Ejecutar(imagenId));
+            CargarImagenes();
+            errorMensaje = "Imagen eliminada exitosamente";
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al eliminar la imagen: {ex.Message}";
+            Console.WriteLine($"Error en EliminarImagen: {ex.Message}");
+        }
+    }
     private void VolverAInicio()
     {
         NavigationManager.NavigateTo("/");

@@ -61,6 +61,9 @@ builder.Services.AddScoped<IPropiedadValidador, PropiedadValidador>();
 builder.Services.AddScoped<CasoDeUsoListarPropiedades>();
 builder.Services.AddScoped<CasoDeUsoAgregarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoCargarImagen>();
+builder.Services.AddScoped<CasoDeUsoModificarPropiedad>();
+builder.Services.AddScoped<CasoDeUsoMostrarImagenes>();
+builder.Services.AddScoped<CasoDeUsoEliminarImagen>();
 
 var app = builder.Build();
 

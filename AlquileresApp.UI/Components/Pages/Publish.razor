@@ -49,6 +49,16 @@
                     <ValidationMessage For="@(() => nuevaPropiedad.Capacidad)" />
                 </div>
 
+                <div class="form-group">
+                    <label for="pagoAnticipado">Porcentaje de pago anticipado</label>
+                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="nuevaPropiedad.PagoAnticipado">
+                        <option value="0">0% - Sin pago anticipado</option>
+                        <option value="20">20% - Pago parcial anticipado</option>
+                        <option value="100">100% - Pago total anticipado</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => nuevaPropiedad.PagoAnticipado)" />
+                </div>
+
                 <div class="button-group">
                     <button type="submit" class="registro-button">Publicar Propiedad</button>
                     <button type="button" class="btn btn-secondary" @onclick="NavigateToHome">Cancelar</button>
@@ -63,7 +73,7 @@
 </div>
 
 @code {
-    private Propiedad nuevaPropiedad = new Propiedad();
+    private Propiedad nuevaPropiedad = new Propiedad { PagoAnticipado = 0 }; // Valor por defecto
     private string? errorMensaje;
 
     private async Task HandleValidSubmit()
