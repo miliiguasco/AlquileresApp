@@ -1,6 +1,6 @@
 namespace AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
-public interface IUsuarioValidador
+public interface IFechaReservaValidador
 {
-    public void FechaValidador(Reserva reserva);
+    public void FechaValidador(DateTime fechaInicio, DateTime fechaFin);
 }

@@ -7,15 +7,7 @@ public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
 {
     public void ReservarPropiedad(Propiedad propiedad, Usuario usuario, DateTime fechaInicio, DateTime fechaFin){
        Reserva reserva = new Reserva(usuario, propiedad, fechaInicio, fechaFin);
-       var propiedadRepositorio = new PropiedadRepositorio(dbContext);
-       var tarjetaRepositorio = new TarjetaRepositorio(dbContext);
-       var tarjetaValidador = new TarjetaValidador();
-       var propiedadValidador = new PropiedadValidador(); //valida que la propiedad exista
-       var pagoTarjetaValidador = new PagoTarjetaValidador();
        
-      //Validadores
-       validador.ValidarFechaReserva(reserva);
-       propiedadValidador.ValidarPropiedad(reserva.Propiedad);
        propiedadRepositorio.ComprobarDisponibilidad(reserva.Propiedad, reserva.FechaInicio, reserva.FechaFin);//verificar este metodo
        
        //Tarjeta y pago
