@@ -6,7 +6,7 @@
 @inject CasoDeUsoRegistrarUsuario CURegistrarUsuario
 @inject NavigationManager NavigationManager
 
-<link href="css/AltaUsuario.css" rel="stylesheet" />
+<link href="css/RegistrarUsuario.css" rel="stylesheet" />
 
 <div class="registro-container">
     <h1 class="registro-title">Registrarse</h1>
@@ -14,7 +14,7 @@
         <section>
             <DatosForm 
                 Input="@Input" 
-                OnSubmit="@RegistrarUsuario"
+                OnSubmit="@Registrar"
                 FormName="Registro"
                 SubmitButtonText="Registrar"
                 ButtonClass="registro-button"
@@ -37,7 +37,7 @@
         StateHasChanged();
     }
 
-    private async Task RegistrarUsuario()
+    private async Task Registrar()
     {
         try {
             errorMensaje = null;

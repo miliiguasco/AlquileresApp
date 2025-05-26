@@ -3,24 +3,47 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Authorization
+@using AlquileresApp.Core.Servicios
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
+@inject ServicioAutenticacion ServicioAutenticacion
 
-<link href="css/NavMenu.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
+<link href="css/NavMenu.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<div class="navbar">
+<nav class="navbar">
     <div class="container">
-        <div class="navbar-brand navbar-start">
-            <img src="images/logo.png" alt="Alquilando Logo" class="logo" />
-            <span class="brand-text">ALQUILANDO</span>
-        </div>
-        
-        <div class="auth-buttons navbar-end">
-            <a href="/Login" class="btn">Iniciar Sesión</a>
-            <a href="/Registro" class="btn">Registrarse</a>
-        </div>
+        <a class="navbar-brand" href="/">
+            <img src="/images/logo.png" alt="Logo" class="logo">
+            <span class="brand-text">Alquilando</span>
+        </a>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="auth-buttons">
+                    <span class="user-info">¡Hola, @context.User.Identity?.Name!</span>
+                    <button class="btn btn-icon" title="Cerrar sesión" @onclick="CerrarSesion">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="auth-buttons">
+                    <a href="/Login" class="btn">Iniciar Sesión</a>
+                    <a href="/Registro" class="btn">Registrarse</a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
-</div>
+</nav>
+
+@code {
+    private async Task CerrarSesion()
+    {
+        await ServicioAutenticacion.Logout();
+        NavigationManager.NavigateTo("/", true);
+    }
+}
 
 
    

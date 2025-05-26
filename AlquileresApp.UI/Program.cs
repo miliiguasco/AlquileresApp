@@ -8,6 +8,7 @@ using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Servicios;
 using Microsoft.EntityFrameworkCore;
 using AlquileresApp.Core.Entidades;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,13 @@ builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<CasoDeUsoRegistrarUsuario>();
 builder.Services.AddScoped<IUsuarioValidador, UsuarioValidador>();
 builder.Services.AddScoped<IServicioHashPassword, ServicioHashPassword>();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<ServicioSesion>();
+builder.Services.AddScoped<ServicioAutenticacion>();
+builder.Services.AddScoped<ServicioCookies>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<ServicioAutenticacion>());
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<CasoDeUsoIniciarSesion>();
 
 var app = builder.Build();
 

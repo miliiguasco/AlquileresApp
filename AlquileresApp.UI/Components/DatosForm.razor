@@ -142,12 +142,12 @@
         public string Apellido { get; set; } = "";
 
         [Required(ErrorMessage = "El correo es requerido")]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "El correo ingresado no es válido")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "El correo ingresado es inválido")]
         [DataType(DataType.Text)]
         public string Email { get; set; } = "";
 
         [Required(ErrorMessage = "El teléfono es requerido")]
-        [RegularExpression(@"^[0-9]{8,15}$", ErrorMessage = "El teléfono debe tener entre 8 y 15 dígitos")]
+        [StringLength(12)]
         [DataType(DataType.PhoneNumber)]
         public string Telefono { get; set; } = "";
 

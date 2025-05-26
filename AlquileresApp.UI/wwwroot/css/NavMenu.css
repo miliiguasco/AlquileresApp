@@ -19,16 +19,6 @@
     max-width: 100%;
 }
 
-.navbar-start {
-    padding-right: 1rem;
-    margin-left: 1rem;
-}
-
-.navbar-end {
-    padding-left: 1rem;
-    margin-right: 1rem;
-}
-
 .navbar-brand {
     display: flex;
     align-items: center;
@@ -49,6 +39,7 @@
 .auth-buttons {
     display: flex;
     gap: 1rem;
+    align-items: center;
 }
 
 .auth-buttons .btn {
@@ -67,9 +58,29 @@
     display: inline-block;
 }
 
+.auth-buttons .btn-icon {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-buttons .btn-icon i {
+    font-size: 1.2rem;
+}
+
 .auth-buttons .btn:hover {
     background-color: #f37820;
     color: white;
+}
+
+.user-info {
+    color: #ffffff;
+    font-weight: 400;
+    font-size: 14px;
+    align-self: center;
 }
 
 @media (max-width: 768px) {
@@ -111,5 +122,14 @@
         padding: 0.3rem 0.8rem;
         font-size: 0.9rem;
         width: 110px;
+    }
+
+    .auth-buttons .btn-icon {
+        width: 35px;
+        height: 35px;
+    }
+
+    .auth-buttons .btn-icon i {
+        font-size: 1.2rem;
     }
 } 
