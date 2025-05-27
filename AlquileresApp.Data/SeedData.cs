@@ -1,9 +1,9 @@
-/*
+/**
 using AlquileresApp.Core.Entidades;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using AlquileresApp.Core.Enumerativos;
+// using System;
+// using System.Collections.Generic;
+// using System.Linq;
+// using AlquileresApp.Core.Enumerativos;
 
 namespace AlquileresApp.Data
 {
@@ -83,8 +83,8 @@ namespace AlquileresApp.Data
                 }
             };
 
-            context.Propiedades.AddRange(propiedades);
-            context.SaveChanges();
+//             context.Propiedades.AddRange(propiedades);
+//             context.SaveChanges();
 
             // Crear reservas
             var reservas = new List<Reserva>

@@ -8,6 +8,10 @@ using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Servicios;
 using Microsoft.EntityFrameworkCore;
 using AlquileresApp.Core.Entidades;
+using Microsoft.AspNetCore.Components.Web;
+using AlquileresApp.Core.CasosDeUso.Imagen;
+using AlquileresApp.Core.CasosDeUso.Propiedad;
+using AlquileresApp.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +55,15 @@ builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<CasoDeUsoRegistrarUsuario>();
 builder.Services.AddScoped<IUsuarioValidador, UsuarioValidador>();
 builder.Services.AddScoped<IServicioHashPassword, ServicioHashPassword>();
+builder.Services.AddScoped<IPropiedadRepositorio, PropiedadesRepositorio>();
+builder.Services.AddScoped<IImagenesRepositorio, ImagenesRepositorio>();
+builder.Services.AddScoped<IPropiedadValidador, PropiedadValidador>();
+builder.Services.AddScoped<CasoDeUsoListarPropiedades>();
+builder.Services.AddScoped<CasoDeUsoAgregarPropiedad>();
+builder.Services.AddScoped<CasoDeUsoCargarImagen>();
+builder.Services.AddScoped<CasoDeUsoModificarPropiedad>();
+builder.Services.AddScoped<CasoDeUsoMostrarImagenes>();
+builder.Services.AddScoped<CasoDeUsoEliminarImagen>();
 
 var app = builder.Build();
 
