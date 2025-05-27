@@ -1,6 +1,7 @@
 @page "/propiedad/{Id:int}"
 @using AlquileresApp.Core.CasosDeUso.Imagen
 @using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.CasosDeUso.Reserva
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
 @using Microsoft.JSInterop
@@ -11,12 +12,14 @@
 @inject CasoDeUsoCargarImagen CUAgregarImagen
 @inject CasoDeUsoModificarPropiedad CUModificarPropiedad
 @inject CasoDeUsoEliminarImagen CUEliminarImagen
+@inject CasoDeUsoMostrarImagenes CUMostrarImagenes
+@inject CasoDeUsoCrearReserva CUCrearReserva
 @inject IJSRuntime JS
 @inject IWebHostEnvironment Environment
 @using Microsoft.AspNetCore.Components.Forms
 @using System.IO
 
-<!-- 
+ 
 <link href="css/AltaUsuario.css" rel="stylesheet" />
 <link href="css/DetallePropiedad.css" rel="stylesheet" />
 
@@ -55,6 +58,27 @@
                             <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
                             <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
                             <p><strong>Pago anticipado:</strong> @propiedad.PagoAnticipado%</p>
+                        </div>
+
+                        <div class="info-grupo">
+                            <h3>Reservar</h3>
+                            <div class="form-group">
+                                <label for="fechaInicio">Fecha de inicio</label>
+                                <InputDate id="fechaInicio" class="form-control" @bind-Value="fechaInicio" />
+                            </div>
+                            <div class="form-group">
+                                <label for="fechaFin">Fecha de fin</label>
+                                <InputDate id="fechaFin" class="form-control" @bind-Value="fechaFin" />
+                            </div>
+                            <button class="btn btn-primary" @onclick="CrearReserva">
+                                <i class="fas fa-calendar-check"></i> Reservar
+                            </button>
+                            @if (!string.IsNullOrEmpty(reservaMensaje))
+                            {
+                                <div class="alert @(reservaExito ? "alert-success" : "alert-danger") mt-2">
+                                    @reservaMensaje
+                                </div>
+                            }
                         </div>
                     }
                     else
@@ -162,8 +186,8 @@
         </div>
     }
 </div>
--->
-@code {/*
+
+@code {
     [Parameter]
     public int Id { get; set; }
 
@@ -173,6 +197,10 @@
     private string? errorMensaje;
     private ElementReference fileInput;
     private bool modoEdicion = false;
+    private DateTime fechaInicio = DateTime.Today;
+    private DateTime fechaFin = DateTime.Today.AddDays(3);
+    private string? reservaMensaje;
+    private bool reservaExito;
 
     protected override void OnInitialized()
     {
@@ -336,8 +364,55 @@
             Console.WriteLine($"Error en EliminarImagen: {ex.Message}");
         }
     }
+
+    private async Task CrearReserva()
+    {
+        try
+        {
+            if (propiedad == null)
+            {
+                reservaMensaje = "No se puede crear la reserva: propiedad no encontrada";
+                reservaExito = false;
+                return;
+            }
+
+            if (fechaInicio >= fechaFin)
+            {
+                reservaMensaje = "La fecha de inicio debe ser anterior a la fecha de fin";
+                reservaExito = false;
+                return;
+            }
+
+            if (fechaInicio < DateTime.Today)
+            {
+                reservaMensaje = "La fecha de inicio no puede ser anterior a hoy";
+                reservaExito = false;
+                return;
+            }
+
+            // Aquí deberías obtener el cliente actual de tu sistema de autenticación
+            // Por ahora usaremos un ID de cliente de prueba
+            int clienteId = 1; // Reemplazar con el ID del cliente actual
+
+            await CUCrearReserva.Ejecutar(clienteId, propiedad.Id, fechaInicio, fechaFin);
+            
+            reservaMensaje = "¡Reserva creada con éxito!";
+            reservaExito = true;
+            
+            // Limpiar las fechas después de una reserva exitosa
+            fechaInicio = DateTime.Today;
+            fechaFin = DateTime.Today.AddDays(1);
+        }
+        catch (Exception ex)
+        {
+            reservaMensaje = $"Error al crear la reserva: {ex.Message}";
+            reservaExito = false;
+            Console.WriteLine($"Error en CrearReserva: {ex.Message}");
+        }
+    }
+
     private void VolverAInicio()
     {
         NavigationManager.NavigateTo("/");
-    }*/
+    }
 } 
