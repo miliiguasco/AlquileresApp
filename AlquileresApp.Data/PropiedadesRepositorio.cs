@@ -79,7 +79,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
      public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin) //
     {
         var reservasExistentes = dbContext.Reservas
-            .Where(r => r.PropiedadId == propiedad.Id &&
+            .Where(r => r.Propiedad.Id == propiedad.Id &&
                         r.FechaInicio <= fechaFin &&
                         r.FechaFin >= fechaInicio)
             .ToList();

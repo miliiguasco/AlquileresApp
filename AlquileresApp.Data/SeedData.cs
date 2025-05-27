@@ -1,3 +1,4 @@
+/*
 using AlquileresApp.Core.Entidades;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,8 @@ namespace AlquileresApp.Data
                     Email = "juan.perez@test.com",
                     Telefono = "123456789",
                     Contraseña = "password123", // En producción, debe estar hasheada
-                    FechaNacimiento = new DateTime(1990, 1, 1)
+                    FechaNacimiento = new DateTime(1990, 1, 1),
+                    //Rol = RolUsuario.Cliente
                 },
                 new Cliente
                 {
@@ -35,7 +37,8 @@ namespace AlquileresApp.Data
                     Email = "maria.garcia@test.com",
                     Telefono = "987654321",
                     Contraseña = "password456",
-                    FechaNacimiento = new DateTime(1985, 5, 15)
+                    FechaNacimiento = new DateTime(1985, 5, 15),
+                    //Rol = RolUsuario.Cliente
                 }
             };
             context.Usuarios.AddRange(usuarios);
@@ -56,7 +59,10 @@ namespace AlquileresApp.Data
                     { 
                         ServiciosPropiedad.Wifi,
                         ServiciosPropiedad.AireAcondicionado
-                    }
+                    },
+                    TipoPago = TipoPagoReserva.Total,
+                    PorcentajeAnticipo = 0,
+                    MontoAPagar = 200m
                 },
                 new Propiedad
                 {
@@ -70,7 +76,10 @@ namespace AlquileresApp.Data
                     {
                         ServiciosPropiedad.Calefaccion,
                         ServiciosPropiedad.Estacionamiento
-                    }
+                    },
+                    TipoPago = TipoPagoReserva.Parcial,
+                    PorcentajeAnticipo = 20,
+                    MontoAPagar = 160m
                 }
             };
 
@@ -80,25 +89,24 @@ namespace AlquileresApp.Data
             // Crear reservas
             var reservas = new List<Reserva>
             {
-                new Reserva
-                {
-                    ClienteId = usuarios[0].Id,
-                    PropiedadId = propiedades[0].Id,
-                    FechaInicio = DateTime.Now.AddDays(10),
-                    FechaFin = DateTime.Now.AddDays(15),
-                    PrecioTotal = 500.00m,
-                },
-                new Reserva
-                {
-                    ClienteId = usuarios[1].Id,
-                    PropiedadId = propiedades[1].Id,
-                    FechaInicio = DateTime.Now.AddDays(20),
-                    FechaFin = DateTime.Now.AddDays(25),
-                    PrecioTotal = 400.00m,
-                }
+                new Reserva(
+                    cliente: usuarios[0],
+                    propiedad: propiedades[0],
+                    fechaInicio: DateTime.Now.AddDays(10),
+                    fechaFin: DateTime.Now.AddDays(15),
+                    precioTotal: 500.00m
+                ),
+                new Reserva(
+                    cliente: usuarios[1],
+                    propiedad: propiedades[1],
+                    fechaInicio: DateTime.Now.AddDays(20),
+                    fechaFin: DateTime.Now.AddDays(25),
+                    precioTotal: 400.00m
+                )
             };
             context.Reservas.AddRange(reservas);
             context.SaveChanges();
         }
     }
 }
+*/

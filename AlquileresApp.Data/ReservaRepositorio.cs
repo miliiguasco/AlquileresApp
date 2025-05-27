@@ -13,7 +13,10 @@ public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
     }
 
     public void ModificarReserva(Reserva reserva){ 
-        var reservaExistente = dbContext.Reservas.Find(reserva.Id);
+        var reservaExistente = dbContext.Reservas
+            .Include(r => r.Cliente)
+            .Include(r => r.Propiedad)
+            .FirstOrDefault(r => r.Id == reserva.Id);
         if (reservaExistente == null)
             throw new Exception("Reserva no encontrada");
             
@@ -23,7 +26,10 @@ public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
 
     public Reserva? ObtenerReservaPorId(int id)
     {
-        return dbContext.Reservas.Find(id);
+        return dbContext.Reservas
+            .Include(r => r.Cliente)
+            .Include(r => r.Propiedad)
+            .FirstOrDefault(r => r.Id == id);
     }   
     /*
     public void CancelarReserva(Reserva reserva){
@@ -35,14 +41,21 @@ public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
     }
     */
     public List<Reserva> ListarReservas(){
-        var reservas = dbContext.Reservas.ToList();
+        var reservas = dbContext.Reservas
+            .Include(r => r.Cliente)
+            .Include(r => r.Propiedad)
+            .ToList();
         if (reservas.Count == 0)
             throw new Exception("No se encontraron reservas.");
         return reservas;
     }                           
 
     public List<Reserva> ListarMisReservas(Usuario usuario){
-        var reservas = dbContext.Reservas.Where(r => r.Cliente.Id == usuario.Id).ToList();  
+        var reservas = dbContext.Reservas
+            .Include(r => r.Cliente)
+            .Include(r => r.Propiedad)
+            .Where(r => r.Cliente.Id == usuario.Id)
+            .ToList();  
         if (reservas.Count == 0)
             throw new Exception("No se encontraron reservas.");
         return reservas;    

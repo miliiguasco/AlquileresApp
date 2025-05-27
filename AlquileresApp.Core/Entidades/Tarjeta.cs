@@ -3,11 +3,20 @@ namespace AlquileresApp.Core.Entidades;
 public class Tarjeta
 {
     public int Id { get; set; }
-    public string NumeroTarjeta { get; set; }
-    public Usuario Titular { get; set; }    
-    public string FechaVencimiento { get; set; }    
-    public string CVV { get; set; }
-    public decimal Saldo { get; set; }  .
-    //public int ReservaId { get; set; }
-    //public Reserva Reserva { get; set; } = null!;
+    public required string NumeroTarjeta { get; set; }
+    public required string Titular { get; set; }
+    public required string FechaVencimiento { get; set; }
+    public required string CVV { get; set; }
+    public decimal Saldo { get; set; }
+
+    public Tarjeta() { }
+
+    public Tarjeta(string numeroTarjeta, string titular, string fechaVencimiento, string cvv, decimal saldo)
+    {
+        NumeroTarjeta = numeroTarjeta;
+        Titular = titular;
+        FechaVencimiento = fechaVencimiento;
+        CVV = cvv;
+        Saldo = saldo;
+    }
 } 
