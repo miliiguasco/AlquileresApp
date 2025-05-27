@@ -1,8 +1,11 @@
-namespace AlquileresApp.Core.CasosDeUso.Imagen
+namespace AlquileresApp.Core.CasosDeUso.Imagen;
+using AlquileresApp.Core.Entidades;
+using AlquileresApp.Core.Interfaces;
+
+public class CasoDeUsoEliminarImagen(IImagenesRepositorio imagenesRepositorio)
 {
-    public class CasoDeUsoEliminarImagen
+    public void Ejecutar(int imagenId)
     {
-        // Agrega aquí la lógica para eliminar una imagen
+        imagenesRepositorio.EliminarImagen(imagenId);
     }
 }
-

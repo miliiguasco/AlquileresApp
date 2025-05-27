@@ -1,8 +1,9 @@
-namespace AlquileresApp.Core.Interfaces
-{
-    public interface IImagenesRepositorio
-    {
-        // Método para cargar una imagen asociada a una propiedad
-        Entidades.Imagen CargarImagen(Entidades.Imagen imagen, int propiedadId);
-    }
+namespace AlquileresApp.Core.Interfaces;
+using AlquileresApp.Core.Entidades;
+
+public interface IImagenesRepositorio{
+    Imagen CargarImagen(Imagen imagen, int propiedadId);
+    List<Imagen> MostrarImagenes(int propiedadId);
+    void EliminarImagen(int imagenId);
 } 
+ 
