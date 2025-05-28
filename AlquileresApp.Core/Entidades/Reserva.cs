@@ -45,19 +45,21 @@ public class Reserva
     }
 }
 
-    //public int PropiedadId { get; set; }
-    //public int ClienteId { get; set; } es necesario?
-    //public Tarjeta? Tarjeta { get; set; } se llega a travez de cliente
-/*
-    public bool seSuperpone(DateTime inicio, DateTime fin) //???
+    public bool seSuperpone(DateTime inicio, DateTime fin)
     {
-        if (inicio >= FechaInicio && fin <= FechaFin)
+        // Caso 1: La nueva reserva empieza durante una existente
+        if (inicio >= FechaInicio && inicio < FechaFin)
             return true;
-        else if (inicio <= FechaInicio && fin >= FechaFin)
-        {
+            
+        // Caso 2: La nueva reserva termina durante una existente
+        if (fin > FechaInicio && fin <= FechaFin)
             return true;
-        }
+            
+        // Caso 3: La nueva reserva engloba completamente a una existente
+        if (inicio <= FechaInicio && fin >= FechaFin)
+            return true;
+
         return false;
     }
-} */
+
 

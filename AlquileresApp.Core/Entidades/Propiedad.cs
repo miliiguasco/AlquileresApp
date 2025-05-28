@@ -19,5 +19,4 @@ public class Propiedad
     public decimal MontoAPagar { get; set; }
     public TipoPagoReserva TipoPago { get; set; }
     public decimal MontoPagoAnticipado { get; set; }
-
 }

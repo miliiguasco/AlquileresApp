@@ -92,6 +92,11 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             .Where(r => r.FechaInicio <= fechaFin && r.FechaFin >= fechaInicio)
             .ToList();       
     }
+
+    public Propiedad? ObtenerPropiedadPorId(int id)
+    {
+        return dbContext.Propiedades.FirstOrDefault(p => p.Id == id);
+    }
 }
 /*
     public List<Propiedad> ListarPropiedadesConReservas()
