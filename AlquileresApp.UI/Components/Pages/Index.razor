@@ -1,83 +1,201 @@
 @page "/"
-@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
 @using AlquileresApp.Core.Entidades
-@using AlquileresApp.Core.Interfaces
 @using AlquileresApp.Core.CasosDeUso.Propiedad
-@inject NavigationManager NavigationManager
-@inject CasoDeUsoListarPropiedades CUListarPropiedades
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.Enumerativos
+@inject CasoDeUsoListarPropiedadesFiltrado CUListarPropiedadesFiltrado
+@inject CasoDeUsoCrearReserva CUReservarPropiedad
 
-<link href="css/AltaUsuario.css" rel="stylesheet" />
-<link href="css/Index.css" rel="stylesheet" />
 
-<PageTitle>Inicio - Alquilando</PageTitle>
+<link href="css/Filtradas.css" rel="stylesheet" />
+<div class="container_listar_propiedades mt-5">
+    <h2 class="tituloo">Busca tu lugar ideal</h2>
 
-<div class="registro-container">
-    <h1 class="registro-title">Bienvenido a Alquilando</h1>
-    <p class="lead">Tu plataforma para encontrar y publicar propiedades</p>
-
-    <div class="registro-form">
-        <button class="registro-button" @onclick="IrAPublicarPropiedad">
-            <i class="fas fa-plus"></i> Publicar Nueva Propiedad
-        </button>
-
-        <h2 class="registro-title">Propiedades Disponibles</h2>
-        
-        @if (propiedades == null)
-        {
-            <p>Cargando propiedades...</p>
-        }
-        else if (!propiedades.Any())
-        {
-            <p>No hay propiedades disponibles en este momento.</p>
-        }
-        else
-        {
-            <div class="propiedades-grid">
-                @foreach (var propiedad in propiedades)
-                {
-                    <div class="propiedad-card" @onclick="() => VerDetallesPropiedad(propiedad.Id)">
-                        <h3>@propiedad.Titulo</h3>
-                        <p class="descripcion">@propiedad.Descripcion</p>
-                        <div class="propiedad-detalles">
-                            <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
-                            <p><strong>Dirección:</strong> @propiedad.Direccion</p>
-                            <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
-                        </div>
-                    </div>
-                }
+    <EditForm Model="Filtros" OnValidSubmit="Buscar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="filtros">
+            <div>
+                <label>Ubicacion:</label>
+                <InputText @bind-Value="Filtros.Localidad" class="input" />
             </div>
-        }
-    </div>
+
+            <div>
+                <label>Cantidad de personas:</label>
+                <InputNumber @bind-Value="Filtros.CantidadHuespedes" class="input" />
+            </div>
+
+            <div>
+                <label>Fecha de inicio:</label>
+                <InputDate @bind-Value="Filtros.FechaInicio" class="input" />
+            </div>
+
+            <div>
+                <label>Fecha de fin:</label>
+                <InputDate @bind-Value="Filtros.FechaFin" class="input" />
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-filtrar">Buscar</button>
+            </div>
+        </div>
+    </EditForm>
+
+    @if (Propiedades is null)
+    {
+        <div class="text-center">
+            <p>...</p>
+        </div>
+    }
+    else if (!Propiedades.Any())
+    {
+        <div class="text-center">
+            <p>No hay propiedades que cumplan con los requisitos disponibles.</p>
+        </div>
+    }
+    else
+    {
+        <ul class="lista-propiedades">
+            @foreach (var propiedad in Propiedades)
+            {
+                var carouselId = $"carousel-{propiedad.Id}";
+
+                <li class="propiedad-item">
+                    <h3>@propiedad.Titulo</h3>
+
+                    <div id="@carouselId" class="carousel slide propiedad-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
+                            {
+                                var index = 0;
+                                foreach (var imagen in propiedad.Imagenes)
+                                {
+                                    <div class="carousel-item @(index == 0 ? "active" : "")">
+                                        <img src="@imagen.Url" class="d-block w-100 propiedad-img" alt="Imagen de @propiedad.Titulo" />
+                                    </div>
+                                    index++;
+                                }
+                            }
+                            else
+                            {
+                                <div class="carousel-item active">
+                                    <img src="Imagenes/Propiedades/iconoimagen.jpg" class="d-block w-100 propiedad-img" alt="Sin imagen" />
+                                </div>
+                            }
+                        </div>
+
+                        @if (propiedad.Imagenes != null && propiedad.Imagenes.Count > 1)
+                        {
+                            <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Anterior</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Siguiente</span>
+                            </button>
+                        }
+                    </div>
+
+                    <p>@propiedad.Descripcion</p>
+                    <p><strong>Dirección:</strong> @propiedad.Direccion</p>
+                    <p><strong>Localidad:</strong> @propiedad.Localidad</p>
+                    <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
+                    <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
+
+                    <button class="btn btn-secondary mt-2">
+                        @(PropiedadesExpandida.Contains(propiedad.Id) ? "Ver menos" : "Ver más")
+                    </button>
+
+                    @if (PropiedadesExpandida.Contains(propiedad.Id))
+                    {
+                        <div class="mt-3 btn-ver-mas" style="display:flex; flex-direction: column; gap: 0.5rem; max-width: 300px;">
+                            <h5>Servicios:</h5>
+                            @if (propiedad.ServiciosDisponibles != null && propiedad.ServiciosDisponibles.Any())
+                            {
+                                <ul>
+                                    @foreach (var servicio in propiedad.ServiciosDisponibles)
+                                    {
+                                        <li>@servicio.ToString()</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p>No se especificaron servicios.</p>
+                            }
+
+                            <h5>Política de cancelación:</h5>
+                            <p>@ObtenerDescripcionPolitica(propiedad.PoliticaCancelacion)</p>
+                        </div>
+                    }
+
+                    <button @onclick="() => Reservar(propiedad)">Reservar</button>
+                </li>
+            }
+        </ul>
+    }
 </div>
 
 @code {
-    private List<Propiedad>? propiedades;
-
-    protected override void OnInitialized()
+    private SearchFilters Filtros = new();
+    private List<Propiedad>? Propiedades;
+    private Usuario UsuarioActual = new Cliente
     {
-        CargarPropiedades();
+        Nombre = "María",
+        Apellido = "Gómez",
+        Email = "maria@demo.com",
+        Telefono = "1234567890",
+        Contraseña = "123456",
+        FechaNacimiento = new DateTime(1990, 1, 1)
+    };
+    private HashSet<int> PropiedadesExpandida = new();
+
+    private void Buscar()
+    {
+        Propiedades = CUListarPropiedadesFiltrado.Ejecutar(Filtros);
     }
 
-    private void CargarPropiedades()
+    private void Reservar(Propiedad propiedad)
+{
+    try
     {
-        try
+        if (Filtros.FechaInicio.HasValue && Filtros.FechaFin.HasValue)
         {
-            propiedades = CUListarPropiedades.Ejecutar();
+            CUReservarPropiedad.Ejecutar(UsuarioActual.Id, propiedad.Id, Filtros.FechaInicio.Value, Filtros.FechaFin.Value);
+            // Mostrar mensaje de éxito o redirigir, como prefieras
+            Console.WriteLine("Reserva exitosa");
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine($"Error al cargar propiedades: {ex.Message}");
-            propiedades = new List<Propiedad>();
+            Console.WriteLine("Debe seleccionar una fecha de inicio y fin.");
         }
     }
-
-    private void IrAPublicarPropiedad()
+    catch (Exception ex)
     {
-        NavigationManager.NavigateTo("/Publish");
+        Console.WriteLine($"Error al reservar: {ex.Message}");
+        // Mostrar error al usuario si lo necesitás
     }
-
-    private void VerDetallesPropiedad(int id)
+}/*
+    private void Buscar()
     {
-        NavigationManager.NavigateTo($"/propiedad/{id}");
+        if (PropiedadesExpandida.Contains(propiedadId))
+            PropiedadesExpandida.Remove(propiedadId);
+        else
+            PropiedadesExpandida.Add(propiedadId);
+{
+    
+    }*/
+
+    private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
+    {
+        return politica switch
+        {
+            PoliticasDeCancelacion.Anticipo20_72hs => "Requiere 20% de anticipo y permite cancelación hasta 72hs antes.",
+            PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No requiere anticipo, pero no permite cancelaciones.",
+            PoliticasDeCancelacion.PagoTotal_48hs_50 => "Pago total por adelantado, permite cancelación hasta 48hs antes con 50% de reintegro.",
+            _ => "No especificada."
+        };
     }
 }
