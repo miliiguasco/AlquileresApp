@@ -43,7 +43,6 @@ public class Reserva
                 throw new Exception($"Tipo de pago no válido: {TipoPago}");
         }
     }
-}
 
     public bool seSuperpone(DateTime inicio, DateTime fin)
     {
@@ -61,5 +60,6 @@ public class Reserva
 
         return false;
     }
+}
 
 

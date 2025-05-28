@@ -1,4 +1,3 @@
-/**
 using AlquileresApp.Core.Entidades;
 // using System;
 // using System.Collections.Generic;
@@ -83,8 +82,8 @@ namespace AlquileresApp.Data
                 }
             };
 
-//             context.Propiedades.AddRange(propiedades);
-//             context.SaveChanges();
+            context.Propiedades.AddRange(propiedades);
+            context.SaveChanges();
 
             // Crear reservas
             var reservas = new List<Reserva>
@@ -109,4 +108,3 @@ namespace AlquileresApp.Data
         }
     }
 }
-*/
