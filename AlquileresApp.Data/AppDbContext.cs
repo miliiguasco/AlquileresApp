@@ -53,6 +53,15 @@ namespace AlquileresApp.Data
             modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+
+            modelBuilder.Entity<Propiedad>()
+                .Property(p => p.Localidad)
+                .IsRequired();
+            // Configuración de Propiedad
+            modelBuilder.Entity<Propiedad>()
+                .Property(p => p.PagoAnticipado)
+                .IsRequired();
+
         }
 
         public void EnsureDatabaseCreated()

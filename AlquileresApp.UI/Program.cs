@@ -9,6 +9,11 @@ using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Servicios;
 using Microsoft.EntityFrameworkCore;
 using AlquileresApp.Core.Entidades;
+using Microsoft.AspNetCore.Components.Web;
+using AlquileresApp.Core.CasosDeUso.Imagen;
+using AlquileresApp.Core.CasosDeUso.Propiedad;
+using AlquileresApp.Core.CasosDeUso.Reserva;
+using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,6 +70,17 @@ builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
 builder.Services.AddScoped<CasoDeUsoReservarPropiedad>();
 builder.Services.AddScoped<IReservaRepositorio, ReservaRepositorio>();
 
+builder.Services.AddScoped<IPropiedadRepositorio, PropiedadesRepositorio>();
+builder.Services.AddScoped<IImagenesRepositorio, ImagenesRepositorio>();
+builder.Services.AddScoped<IPropiedadValidador, PropiedadValidador>();
+builder.Services.AddScoped<IReservaRepositorio, ReservasRepositorio>();
+builder.Services.AddScoped<CasoDeUsoListarPropiedades>();
+builder.Services.AddScoped<CasoDeUsoAgregarPropiedad>();
+builder.Services.AddScoped<CasoDeUsoCargarImagen>();
+builder.Services.AddScoped<CasoDeUsoModificarPropiedad>();
+builder.Services.AddScoped<CasoDeUsoMostrarImagenes>();
+builder.Services.AddScoped<CasoDeUsoEliminarImagen>();
+builder.Services.AddScoped<CasoDeUsoCrearReserva>();
 
 var app = builder.Build();
 
