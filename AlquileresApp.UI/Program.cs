@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using AlquileresApp.Core.Entidades;
 using Microsoft.AspNetCore.Components.Web;
 using AlquileresApp.Core.CasosDeUso.Imagen;
-using AlquileresApp.Core.CasosDeUso.Propiedad;
 using AlquileresApp.Core.CasosDeUso.Reserva;
 using AlquileresApp.Core;
 
@@ -60,7 +59,7 @@ builder.Services.AddScoped<IServicioHashPassword, ServicioHashPassword>();
 builder.Services.AddScoped<IPropiedadRepositorio, PropiedadesRepositorio>();
 builder.Services.AddScoped<IImagenesRepositorio, ImagenesRepositorio>();
 builder.Services.AddScoped<IPropiedadValidador, PropiedadValidador>();
-builder.Services.AddScoped<IReservaRepositorio, ReservasRepositorio>();
+builder.Services.AddScoped<IReservaRepositorio, ReservaRepositorio>();
 builder.Services.AddScoped<CasoDeUsoListarPropiedades>();
 builder.Services.AddScoped<CasoDeUsoAgregarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoCargarImagen>();
