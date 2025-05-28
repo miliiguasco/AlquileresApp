@@ -3,7 +3,7 @@ using AlquileresApp.Core.Entidades;
 using AlquileresApp.Data;
 using Microsoft.EntityFrameworkCore;
 
-public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
+public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
 {
     public void ReservarPropiedad(Propiedad propiedad, Usuario usuario){
        /*Reserva reserva = new Reserva();
