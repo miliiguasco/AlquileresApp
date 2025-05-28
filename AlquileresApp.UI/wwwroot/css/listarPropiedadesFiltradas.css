@@ -155,17 +155,20 @@
     margin-bottom: 1rem;
     transition: background-color 0.3s ease;
 }
-
-
-.btn-reservar {
-    background-color: #f1771faf;
+.reservarr {
+    background-color: #0A3D62;
     color: white;
     border: none;
-    padding: 0.75rem 1rem;
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
     border-radius: 6px;
     cursor: pointer;
-    font-weight: 700;
-    width: 100%;
-    box-shadow: 0 4px 8px rgba(241, 119, 31, 0.3);
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 1rem;
+    width: 100%; /* o un ancho fijo si querés más estabilidad */
+}
+
+.reservarr:hover {
+    background-color: #074060;
+    transform: scale(1.02); /* leve aumento */
 }

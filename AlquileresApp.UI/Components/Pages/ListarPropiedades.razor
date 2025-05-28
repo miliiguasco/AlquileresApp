@@ -130,7 +130,29 @@
                         </div>
                     }
 
-                    <button @onclick="() => Reservar(propiedad)">Reservar</button>
+                    <button
+  style="
+    background-color: #0A3D62;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  "
+  onmouseover="this.style.backgroundColor='#074060'; this.style.transform='scale(1.03)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.2)'"
+  onmouseout="this.style.backgroundColor='#0A3D62'; this.style.transform='scale(1)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'"
+  onmousedown="this.style.transform='scale(0.98)'"
+  onmouseup="this.style.transform='scale(1.03)'"
+  @onclick="() => Reservar(propiedad)"
+>
+  Reservar
+</button>
+
                 </li>
             }
         </ul>
