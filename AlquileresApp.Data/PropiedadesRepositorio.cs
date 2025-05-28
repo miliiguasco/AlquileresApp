@@ -51,29 +51,36 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         }   
     }
 
-     public List<Propiedad> BuscarDisponiblesAsync(SearchFilters filtros)
+      public List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros)
     {
-        //Console.WriteLine("📡 Llamado a BuscarDisponiblesAsync");
-        //Console.WriteLine($"📍 Localidad buscada: {filtros.Localidad}");
-        
         var query = dbContext.Propiedades.AsQueryable();
 
-        //if (!string.IsNullOrWhiteSpace(filtros.Localidad))
-        //{
-        //    query = query.Where(p => string.Equals(p.Localidad, filtros.Localidad, StringComparison.OrdinalIgnoreCase));
-        //}
+        if (!string.IsNullOrWhiteSpace(filtros.Localidad))
+        {
+            query = query.Where(p => p.Localidad.ToLower().Contains(filtros.Localidad.ToLower()));
+        }
 
-        //if (filtros.CantidadHuespedes > 0)
-        //{
-        //    query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes);
-        //}
 
-        var propiedades = query.ToList();
-        //Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
-        return propiedades;
+        /*if (filtros.CantidadHuespedes.HasValue)
+        {
+            query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
+        }
+
+        if (filtros.FechaInicio.HasValue && filtros.FechaFin.HasValue)
+        {
+            query = query.Where(p =>
+                !(p.Reservas.Any(r =>
+                    (filtros.FechaInicio >= r.FechaInicio && filtros.FechaInicio < r.FechaFin) ||
+                    (filtros.FechaFin > r.FechaInicio && filtros.FechaFin <= r.FechaFin) ||
+                    (filtros.FechaInicio <= r.FechaInicio && filtros.FechaFin >= r.FechaFin)
+                ))
+            );
+        }*/
+
+        return query.ToList();
     }
 
-     public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin) //
+    public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin) //
     {
         var reservasExistentes = dbContext.Reservas
             .Where(r => r.Propiedad.Id == propiedad.Id &&

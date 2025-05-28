@@ -1,15 +1,18 @@
 namespace AlquileresApp.Core.CasosDeUso.Reserva;
+
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Core.Enumerativos;
 using AlquileresApp.Core.Interfaces;
-//using AlquileresApp.Core.CasosDeUso.Tarjeta;
-//using AlquileresApp.Core.Validadores;
+//using AlquileresApp.Core.CasosDeUso;
+using AlquileresApp.Core.Validadores;
 
 
-public class CasoDeUsoCrearReserva(IReservaRepositorio reservasRepositorio, IPropiedadRepositorio propiedadRepositorio, IUsuarioRepositorio usuarioRepositorio  /*ITarjetaRepositorio tarjetaRepositorio*/)
+public class CasoDeUsoCrearReserva(IReservaRepositorio reservasRepositorio, IPropiedadRepositorio propiedadRepositorio, IUsuarioRepositorio usuarioRepositorio,  ITarjetaRepositorio tarjetaRepositorio, IFechaReservaValidador fechaReservaValidador)
 {
     public async Task Ejecutar(int clienteId, int propiedadId, DateTime fechaInicio, DateTime fechaFin)
     {
+        //validar fecha
+        fechaReservaValidador.FechaValidador(fechaInicio, fechaFin);
         // Obtener la propiedad
         var propiedad = propiedadRepositorio.ObtenerPropiedadPorId(propiedadId);
         if (propiedad == null)

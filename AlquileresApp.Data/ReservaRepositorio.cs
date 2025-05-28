@@ -31,15 +31,8 @@ public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
             .Include(r => r.Propiedad)
             .FirstOrDefault(r => r.Id == id);
     }   
-    /*
-    public void CancelarReserva(Reserva reserva){
+    
 
-    }   
-
-    public void RegistrarCheckout(Reserva reserva){
-
-    }
-    */
     public List<Reserva> ListarReservas(){
         var reservas = dbContext.Reservas
             .Include(r => r.Cliente)
@@ -60,7 +53,25 @@ public class ReservasRepositorio(AppDbContext dbContext) : IReservaRepositorio
             throw new Exception("No se encontraron reservas.");
         return reservas;    
     }
+     /*
+    public List<Reserva> ListarMisReservas(Usuario usuario){
+        throw new NotImplementedException();
+    }
 
+
+    public void CancelarReserva(Reserva reserva)
+    {
+        // TODO: Implementa la lógica para cancelar una reserva
+        throw new NotImplementedException();
+    }
+
+    public void RegistrarCheckout(Reserva reserva)
+    {
+        // TODO: Implementa la lógica para registrar el checkout
+        throw new NotImplementedException();
+    }
+
+*/
 
 
 

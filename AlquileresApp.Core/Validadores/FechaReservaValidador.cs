@@ -8,7 +8,7 @@ public class FechaReservaValidador : IFechaReservaValidador
         {
             ValidarFechaReserva(fechaInicio, fechaFin);
         }
-
+/*
     public void ValidarFechaReserva(DateTime fechaInicio, DateTime fechaFin){
         if (fechaInicio < DateTime.Now)
             throw new Exception("La fecha de inicio de la reserva no puede ser en el pasado");
@@ -18,7 +18,13 @@ public class FechaReservaValidador : IFechaReservaValidador
             
         if (fechaInicio > fechaFin)
             throw new Exception("La fecha de inicio de la reserva no puede ser mayor a la fecha de fin");
+    }*/
+         public void ValidarFechaReserva(DateTime fechaInicio, DateTime fechaFin)
+        {
+            if (fechaInicio == null || fechaFin == null)
+        {
+            throw new Exception("Debe seleccionar una fecha de inicio y fin.");
+        }
     }
-
-
 }
+
