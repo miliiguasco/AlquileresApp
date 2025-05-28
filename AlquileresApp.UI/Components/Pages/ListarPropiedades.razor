@@ -4,7 +4,7 @@
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
 @inject CasoDeUsoListarPropiedadesFiltrado CUListarPropiedadesFiltrado
-@inject CasoDeUsoReservarPropiedad CUReservarPropiedad
+@inject CasoDeUsoCrearReserva CUReservarPropiedad
 
 <link href="css/listarPropiedadesFiltradas.css" rel="stylesheet" />
 <div class="container_listar_propiedades mt-5">
@@ -122,9 +122,16 @@
 {
     try
     {
-        CUReservarPropiedad.Ejecutar(propiedad, UsuarioActual);
-        // Mostrar mensaje de éxito o redirigir, como prefieras
-        Console.WriteLine("Reserva exitosa");
+        if (Filtros.FechaInicio.HasValue && Filtros.FechaFin.HasValue)
+        {
+            CUReservarPropiedad.Ejecutar(UsuarioActual.Id, propiedad.Id, Filtros.FechaInicio.Value, Filtros.FechaFin.Value);
+            // Mostrar mensaje de éxito o redirigir, como prefieras
+            Console.WriteLine("Reserva exitosa");
+        }
+        else
+        {
+            Console.WriteLine("Debe seleccionar una fecha de inicio y fin.");
+        }
     }
     catch (Exception ex)
     {

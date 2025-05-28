@@ -6,9 +6,11 @@ public interface IPropiedadRepositorio{
     void ModificarPropiedad(Propiedad propiedad);
     void EliminarPropiedad(Propiedad propiedad);
     public List<Propiedad> ListarPropiedades();
-    List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros);
-    public List<Propiedad> BuscarDisponiblesAsync(SearchFilters filtros);
     public Propiedad? ObtenerPropiedadPorId(int id);
+    List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros);
+    public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin);
+    //public List<Propiedad> BuscarDisponiblesAsync(SearchFilters filtros);
 }
+
 
 

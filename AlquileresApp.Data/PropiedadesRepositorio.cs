@@ -53,9 +53,6 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
 
       public List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros)
     {
-        //Console.WriteLine("📡 Llamado a BuscarDisponiblesAsync");
-        //Console.WriteLine($"📍 Localidad buscada: {filtros.Localidad}");
-        
         var query = dbContext.Propiedades.AsQueryable();
 
         //if (!string.IsNullOrWhiteSpace(filtros.Localidad))
@@ -86,7 +83,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         return query.ToList();
     }
 
-     public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin) //
+    public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin) //
     {
         var reservasExistentes = dbContext.Reservas
             .Where(r => r.Propiedad.Id == propiedad.Id &&

@@ -4,6 +4,8 @@ namespace AlquileresApp.Core.Entidades;
 public class Reserva
 {
     public int Id { get; set; }
+    public int ClienteId { get; set; }
+    public int PropiedadId { get; set; }
     public Cliente? Cliente { get; set; }
     public Propiedad? Propiedad { get; set; }
     public DateTime FechaInicio { get; set; }
@@ -12,9 +14,6 @@ public class Reserva
     public TipoPagoReserva TipoPago { get; set; }
     public decimal PrecioTotal { get; set; }
     public decimal MontoAPagar { get; set; }
-    //guardar id_usuario ?
-    //guardar id_propiedad ?
-    //guardar id_tarjeta ?
 
     public Reserva() { }
 
