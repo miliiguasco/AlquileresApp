@@ -394,7 +394,7 @@
             // Por ahora usaremos un ID de cliente de prueba
             int clienteId = 1; // Reemplazar con el ID del cliente actual
 
-            await CUCrearReserva.Ejecutar(clienteId, propiedad.Id, fechaInicio, fechaFin);
+            await CUCrearReserva.Ejecutar(clienteId, propiedad.Id, DateTime.Now, DateTime.Now.AddDays(1));
             
             reservaMensaje = "¡Reserva creada con éxito!";
             reservaExito = true;

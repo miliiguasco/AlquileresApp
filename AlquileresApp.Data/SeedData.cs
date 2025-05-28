@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AlquileresApp.Core.Enumerativos;
 
+
 namespace AlquileresApp.Data
 {
     public static class SeedData
@@ -109,6 +110,9 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.AireAcondicionado
                     }
                 }
+                 propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
+                 propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta2.jpg" });
+
             };
 
              context.Propiedades.AddRange(propiedades);
