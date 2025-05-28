@@ -1,8 +1,10 @@
+
 using AlquileresApp.Core.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using AlquileresApp.Core.Enumerativos;
+
 
 namespace AlquileresApp.Data
 {
@@ -26,7 +28,8 @@ namespace AlquileresApp.Data
                     Email = "juan.perez@test.com",
                     Telefono = "123456789",
                     Contraseña = "password123", // En producción, debe estar hasheada
-                    FechaNacimiento = new DateTime(1990, 1, 1)
+                    FechaNacimiento = new DateTime(1990, 1, 1),
+                    //Rol = RolUsuario.Cliente
                 },
                 new Cliente
                 {
@@ -35,7 +38,8 @@ namespace AlquileresApp.Data
                     Email = "maria.garcia@test.com",
                     Telefono = "987654321",
                     Contraseña = "password456",
-                    FechaNacimiento = new DateTime(1985, 5, 15)
+                    FechaNacimiento = new DateTime(1985, 5, 15),
+                    //Rol = RolUsuario.Cliente
                 }
             };
             context.Usuarios.AddRange(usuarios);
@@ -108,16 +112,18 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.Estacionamiento,
                         ServiciosPropiedad.AireAcondicionado
                     },
-                    PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs
+                    PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs,
                 }
+
             };
+            propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
             propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa1.jpg" });
             propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta1.jpg" });
 
  propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
  propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta2.jpg" });
 
-            context.Propiedades.AddRange(propiedades);
+             context.Propiedades.AddRange(propiedades);
             context.SaveChanges();
 
 
@@ -131,7 +137,7 @@ namespace AlquileresApp.Data
                     PropiedadId = propiedades[0].Id,
                     FechaInicio = DateTime.Now.AddDays(10),
                     FechaFin = DateTime.Now.AddDays(15),
-                    PrecioTotal = 750.00m, // 5 noches * 150
+                    //PrecioTotal = 750.00m, // 5 noches * 150
                 },
                 new Reserva
                 {
@@ -139,7 +145,7 @@ namespace AlquileresApp.Data
                     PropiedadId = propiedades[1].Id,
                     FechaInicio = DateTime.Now.AddDays(20),
                     FechaFin = DateTime.Now.AddDays(25),
-                    PrecioTotal = 600.00m, // 5 noches * 120
+                    //PrecioTotal = 600.00m, // 5 noches * 120
                 },
                 new Reserva
                 {
@@ -147,7 +153,7 @@ namespace AlquileresApp.Data
                     PropiedadId = propiedades[2].Id,
                     FechaInicio = DateTime.Now.AddDays(5),
                     FechaFin = DateTime.Now.AddDays(7),
-                    PrecioTotal = 160.00m, // 2 noches * 80
+                    //PrecioTotal = 160.00m, // 2 noches * 80
                 },
                 new Reserva
                 {
@@ -155,7 +161,7 @@ namespace AlquileresApp.Data
                     PropiedadId = propiedades[3].Id,
                     FechaInicio = DateTime.Now.AddDays(30),
                     FechaFin = DateTime.Now.AddDays(35),
-                    PrecioTotal = 1000.00m, // 5 noches * 200
+                    //PrecioTotal = 1000.00m, // 5 noches * 200
                 }
             };
             context.Reservas.AddRange(reservas);

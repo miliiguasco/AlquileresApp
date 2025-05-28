@@ -6,7 +6,7 @@ using AlquileresApp.Core.Interfaces;
 public class CasoDeUsoAgregarPropiedad(IPropiedadRepositorio propiedadesRepositorio,  IPropiedadValidador propiedadValidador)
 {
     public void Ejecutar(Propiedad propiedad){
-        propiedadValidador.validarPropiedad(propiedad);
+        propiedadValidador.ValidarPropiedad(propiedad);
         propiedadesRepositorio.CargarPropiedad(propiedad);
     }
 }
