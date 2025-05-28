@@ -12,7 +12,7 @@ public class Reserva
     public decimal PrecioTotal { get; set; }
     public Tarjeta? Tarjeta { get; set; }
 
-    public bool seSuperpone(DateTime inicio, DateTime fin)
+    public bool seSuperpone(DateTime inicio, DateTime fin) //???
     {
         if (inicio >= FechaInicio && fin <= FechaFin)
             return true;
