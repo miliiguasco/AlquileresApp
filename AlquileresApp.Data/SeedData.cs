@@ -112,12 +112,11 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.Estacionamiento,
                         ServiciosPropiedad.AireAcondicionado
                     },
-                    PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs
+                    PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs,
                 }
-                 propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
-                 propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta2.jpg" });
 
             };
+            propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
             propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa1.jpg" });
             propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta1.jpg" });
 
