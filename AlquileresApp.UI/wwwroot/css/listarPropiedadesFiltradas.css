@@ -3,18 +3,16 @@
     margin: 0 auto;
     padding: 2rem 1rem;
     background: linear-gradient(
-    135deg,
-    rgba(206, 204, 244, 0.1) 0%,
-    rgba(122, 121, 129, 0.2) 100%
-  );
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px); /* Safari support */
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  margin: 2rem auto;
- 
-
+        135deg,
+        rgba(206, 204, 244, 0.1) 0%,
+        rgba(122, 121, 129, 0.2) 100%
+    );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); /* Safari support */
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
 }
 
 .tituloo {
@@ -38,42 +36,15 @@
 
 .filtros {
     display: flex;
-    flex-direction: column; /* Esto los pone uno abajo del otro */
-    gap: 1rem; /* Espaciado entre los campos */
+    flex-direction: column;
+    gap: 1rem;
     max-width: 400px;
     margin: 2rem auto;
 }
+
 .filtros div {
     display: flex;
     flex-direction: column;
-}
-
-.filtros label {
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-}
-
-.input {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-.btn-filtrar {
-    align-self: flex-start;
-    padding: 0.6rem 1.5rem;
-    background-color: #FF6B00;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.btn-filtrar:hover {
-    background-color: #e65f00;
-    cursor: pointer;
 }
 
 .filtros label {
@@ -144,6 +115,7 @@
     color: #666;
     margin-top: 2rem;
 }
+
 .imagenes {
     display: flex;
     gap: 10px;
@@ -157,6 +129,7 @@
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
+
 .propiedad-carousel {
     max-width: 400px;
     margin: 0 auto 1rem auto;
@@ -170,3 +143,29 @@
     object-fit: cover;
 }
 
+/* === Botones adicionales === */
+.btn-ver-mas {
+    color: rgb(3, 3, 3);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    width: fit-content;
+    margin-bottom: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+
+.btn-reservar {
+    background-color: #f1771faf;
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(241, 119, 31, 0.3);
+    transition: background-color 0.3s;
+}

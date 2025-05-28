@@ -58,7 +58,8 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.AireAcondicionado,
                         ServiciosPropiedad.Piscina,
                         ServiciosPropiedad.Estacionamiento
-                    }
+                    },
+                    PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50
                 },
                 new Propiedad
                 {
@@ -73,7 +74,8 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.Calefaccion,
                         ServiciosPropiedad.Estacionamiento,
                         ServiciosPropiedad.Wifi
-                    }
+                    },
+                    PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs
                 },
                 new Propiedad
                 {
@@ -88,7 +90,8 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.Wifi,
                         ServiciosPropiedad.AireAcondicionado,
                         ServiciosPropiedad.Estacionamiento
-                    }
+                    },
+                    PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable
                 },
                 new Propiedad
                 {
@@ -104,12 +107,20 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.Piscina,
                         ServiciosPropiedad.Estacionamiento,
                         ServiciosPropiedad.AireAcondicionado
-                    }
+                    },
+                    PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs
                 }
             };
+            propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa1.jpg" });
+            propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta1.jpg" });
+
+ propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
+ propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta2.jpg" });
 
             context.Propiedades.AddRange(propiedades);
             context.SaveChanges();
+
+
 
             // Crear reservas
             var reservas = new List<Reserva>
@@ -132,7 +143,7 @@ namespace AlquileresApp.Data
                 },
                 new Reserva
                 {
-                    ClienteId = usuarios[2].Id,
+                    ClienteId = usuarios[1].Id,
                     PropiedadId = propiedades[2].Id,
                     FechaInicio = DateTime.Now.AddDays(5),
                     FechaFin = DateTime.Now.AddDays(7),
