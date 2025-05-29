@@ -163,7 +163,7 @@
     {
         if (Filtros.FechaInicio.HasValue && Filtros.FechaFin.HasValue)
         {
-            CUReservarPropiedad.Ejecutar(UsuarioActual.Id, propiedad.Id, Filtros.FechaInicio.Value, Filtros.FechaFin.Value);
+            CUReservarPropiedad.Ejecutar(UsuarioActual.Id, propiedad.Id, Filtros.FechaInicio.Value, Filtros.FechaFin.Value, Filtros.CantidadHuespedes.Value);
             // Mostrar mensaje de éxito o redirigir, como prefieras
             Console.WriteLine("Reserva exitosa");
         }
