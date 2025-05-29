@@ -1,0 +1,220 @@
+@page "/reservar/{PropiedadId:int}"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.Interfaces
+@inject CasoDeUsoCrearReserva CUCrearReserva
+@inject IPropiedadRepositorio PropiedadRepositorio
+@inject IUsuarioRepositorio UsuarioRepositorio
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+<link href="css/Reservar.css" rel="stylesheet" />
+
+<div class="modal-overlay">
+    <div class="reserva-container">
+        @if (isLoading)
+        {
+            <div class="loading">
+                <p>Cargando...</p>
+            </div>
+        }
+        else if (propiedad is null)
+        {
+            <div class="alert alert-danger">
+                <p>No se pudo cargar la información de la propiedad.</p>
+            </div>
+        }
+        else
+        {
+            <div class="reserva-card">
+                <div class="imagenes-section">
+                    @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
+                    {
+                        <div id="carousel-reserva" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                @{
+                                    var index = 0;
+                                    foreach (var imagen in propiedad.Imagenes)
+                                    {
+                                        <div class="carousel-item @(index == 0 ? "active" : "")">
+                                            <img src="@imagen.Url" class="d-block w-100" alt="Imagen de la propiedad" />
+                                        </div>
+                                        index++;
+                                    }
+                                }
+                            </div>
+                            @if (propiedad.Imagenes.Count > 1)
+                            {
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-reserva" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Anterior</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carousel-reserva" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Siguiente</span>
+                                </button>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-image">
+                            <i class="fas fa-image"></i>
+                            <p>No hay imágenes disponibles</p>
+                        </div>
+                    }
+                </div>
+
+                <div class="propiedad-info">
+                    <h3>@propiedad.Titulo</h3>
+                    <div class="info-details">
+                        <p><i class="fas fa-map-marker-alt"></i> @propiedad.Direccion, @propiedad.Localidad</p>
+                        <p><i class="fas fa-users"></i> Capacidad: @propiedad.Capacidad personas</p>
+                        <p><i class="fas fa-dollar-sign"></i> Precio por noche: $@propiedad.PrecioPorNoche</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reserva-form">
+                <h4>Reservar esta propiedad</h4>
+                <div class="fechas-section">
+                    <div class="fecha-input">
+                        <label><i class="fas fa-calendar-check"></i> Check-in:</label>
+                        <InputDate @bind-Value="fechaInicio" min="@DateTime.Today" />
+                    </div>
+
+                    <div class="fecha-input">
+                        <label><i class="fas fa-calendar-times"></i> Check-out:</label>
+                        <InputDate @bind-Value="fechaFin" min="@DateTime.Today.AddDays(1)" />
+                    </div>
+                </div>
+
+                <div class="fecha-input">
+                    <label><i class="fas fa-users"></i> Cantidad de huéspedes:</label>
+                    <InputNumber @bind-Value="cantidadHuespedes" min="1" max="@propiedad.Capacidad" class="form-control" />
+                    <small class="text-muted">Máximo @propiedad.Capacidad personas</small>
+                </div>
+
+                <div class="resumen-section">
+                    <h4>Resumen de la reserva</h4>
+                    <div class="resumen-details">
+                        <p>Precio por noche: $@propiedad.PrecioPorNoche</p>
+                        <p>Noches: @((fechaFin - fechaInicio).TotalDays)</p>
+                        <p class="total">Total: $@(propiedad.PrecioPorNoche * (decimal)(fechaFin - fechaInicio).TotalDays)</p>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMensaje))
+                {
+                    <div class="alert alert-danger">
+                        @errorMensaje
+                    </div>
+                }
+
+                <button class="btn-reservar" @onclick="ConfirmarReserva" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner"></span>
+                        <span>Procesando...</span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-check-circle"></i>
+                        <span>Confirmar Reserva</span>
+                    }
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int PropiedadId { get; set; }
+
+    private Propiedad? propiedad;
+    private DateTime fechaInicio = DateTime.Today;
+    private DateTime fechaFin = DateTime.Today.AddDays(1);
+    private int cantidadHuespedes = 1;
+    private string? errorMensaje;
+    private bool isLoading = true;
+    private bool isSubmitting = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            errorMensaje = null;
+            propiedad = await Task.Run(() => PropiedadRepositorio.ObtenerPropiedadPorId(PropiedadId));
+            if (propiedad == null)
+            {
+                errorMensaje = "No se encontró la propiedad solicitada";
+                return;
+            }
+            // Inicializar cantidadHuespedes con un valor válido
+            cantidadHuespedes = 1;
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al cargar la información: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ConfirmarReserva()
+    {
+        try
+        {
+            isSubmitting = true;
+            errorMensaje = null;
+
+            if (propiedad == null)
+            {
+                errorMensaje = "No se pudo obtener la información de la propiedad";
+                return;
+            }
+
+            if (fechaInicio < DateTime.Today)
+            {
+                errorMensaje = "La fecha de check-in no puede ser anterior a hoy";
+                return;
+            }
+
+            if (fechaInicio >= fechaFin)
+            {
+                errorMensaje = "La fecha de check-out debe ser posterior a la fecha de check-in";
+                return;
+            }
+
+            if (cantidadHuespedes < 1 || cantidadHuespedes > propiedad.Capacidad)
+            {
+                errorMensaje = $"La cantidad de huéspedes debe estar entre 1 y {propiedad.Capacidad}";
+                return;
+            }
+
+            var usuario = await Task.Run(() => UsuarioRepositorio.ObtenerUsuarioPorId(1)); // Por ahora hardcodeado, pero debería ser el usuario actual
+            if (usuario == null)
+            {
+                errorMensaje = "No se pudo obtener la información del usuario";
+                return;
+            }
+
+            await CUCrearReserva.Ejecutar(usuario.Id, propiedad.Id, fechaInicio, fechaFin, cantidadHuespedes);
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = ex.Message;
+            StateHasChanged();
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
+

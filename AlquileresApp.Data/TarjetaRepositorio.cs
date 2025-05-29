@@ -23,17 +23,34 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
 
     }
 
-    public bool Pagar(Tarjeta tarjeta, decimal monto){
+    public bool Pagar(Tarjeta tarjeta, decimal monto)
+    {
+        Console.WriteLine($"Verificando saldo: Saldo actual={tarjeta.Saldo}, Monto a pagar={monto}");
+        
         if (tarjeta.Saldo < monto)
+        {
+            Console.WriteLine($"Saldo insuficiente: Saldo actual={tarjeta.Saldo}, Monto requerido={monto}");
             return false;
+        }
+
         tarjeta.Saldo -= monto;
         dbContext.SaveChanges();
+        Console.WriteLine($"Pago realizado. Nuevo saldo: {tarjeta.Saldo}");
         return true;
     }
 
-    public bool ValidarSaldo(Tarjeta tarjeta, decimal monto){
+    public bool ValidarSaldo(Tarjeta tarjeta, decimal monto)
+    {
+        Console.WriteLine($"Validando saldo: Saldo actual={tarjeta.Saldo}, Monto requerido={monto}");
+        
         if (tarjeta.Saldo < monto)
-            throw new Exception("Saldo insuficiente");
+        {
+            var mensaje = $"Saldo insuficiente. Saldo actual: {tarjeta.Saldo}, Monto requerido: {monto}";
+            Console.WriteLine(mensaje);
+            throw new Exception(mensaje);
+        }
+        
+        Console.WriteLine("Saldo suficiente");
         return true;
     }
 }

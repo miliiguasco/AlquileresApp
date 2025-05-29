@@ -188,8 +188,6 @@
     transition: background-color 0.3s;
 }
 .validation-summary {
-    background-color: #f8d7da;
-    border-left: 5px solid #f5c6cb;
     padding: 1rem;
     border-radius: 8px;
     font-family: 'Segoe UI', sans-serif;

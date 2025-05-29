@@ -1,7 +1,12 @@
-@page "/propiedadd/{PropiedadId:int}"
+@page "/propiedad/{PropiedadId:int}"
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.CasosDeUso.Propiedad
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject IWebHostEnvironment Environment
 @inject CasoDeUsoObtenerPropiedad CUObtenerPropiedad
 
 <link href="css/VerPropiedad.css" rel="stylesheet" />
@@ -76,28 +81,11 @@
             <h4 class="mt-5 mb-3">Política de cancelación</h4>
             <p class="fst-italic">@ObtenerDescripcionPolitica(propiedad.PoliticaCancelacion)</p>
         </div>
-        <button
-  style="
-    background-color: #0A3D62;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  "
-  onmouseover="this.style.backgroundColor='#074060'; this.style.transform='scale(1.03)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.2)'"
-  onmouseout="this.style.backgroundColor='#0A3D62'; this.style.transform='scale(1)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'"
-  onmousedown="this.style.transform='scale(0.98)'"
-  onmouseup="this.style.transform='scale(1.03)'"
-  @onclick="() => Reservar(propiedad)"
->
-  Reservar
-</button>
+       <div class="info-grupo">
+                            <button class="btn btn-primary" @onclick="IrAReservar">
+                                <i class="fas fa-calendar-check"></i> Reservar esta propiedad
+                            </button>
+                        </div>
     }
 </div>
 
@@ -133,20 +121,8 @@
             _ => "No especificada."
         };
     }
-    private void Reservar(Propiedad propiedad)
-{
-    /*try
+    private void IrAReservar()
     {
-        
-            CUReservarPropiedad.Ejecutar(UsuarioActual.Id, propiedadId);
-            // Mostrar mensaje de éxito o redirigir, como prefieras
-            Console.WriteLine("Reserva exitosa");
-        
+        NavigationManager.NavigateTo($"/reservar/{PropiedadId}");
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error al reservar: {ex.Message}");
-        // Mostrar error al usuario si lo necesitás
-    }*/
-}
 }

@@ -165,6 +165,33 @@ namespace AlquileresApp.Data
             };
             context.Reservas.AddRange(reservas);
             context.SaveChanges();
+
+            //Tarjetas de prueba
+            var tarjetas = new List<Tarjeta>
+            {
+                new Tarjeta
+                {
+                    NumeroTarjeta = "1234567890123456",
+                    Titular = "Juan Pérez", 
+                    FechaVencimiento = "12/2025",
+                    CVV = "123",
+                    Saldo = 1000.00m,
+                    ClienteId = usuarios[0].Id
+                },
+                new Tarjeta
+                {
+                    NumeroTarjeta = "9876543210987654",
+                    Titular = "María García",
+                    FechaVencimiento = "12/2025",
+                    CVV = "456",
+                    Saldo = 500.00m,
+                    ClienteId = usuarios[1].Id
+                }
+            };
+            context.Tarjetas.AddRange(tarjetas);
+            context.SaveChanges();
+            
+            
         }
     }
 }

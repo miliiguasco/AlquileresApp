@@ -14,18 +14,22 @@ public class Reserva
     public TipoPagoReserva TipoPago { get; set; }
     public decimal PrecioTotal { get; set; }
     public decimal MontoAPagar { get; set; }
+    public int CantidadHuespedes { get; set; }
 
     public Reserva() { }
 
-    public Reserva(Cliente cliente, Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin)
+    public Reserva(Cliente cliente, Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin, int cantidadHuespedes)
     {
         Cliente = cliente;
+        ClienteId = cliente.Id;
         Propiedad = propiedad;
+        PropiedadId = propiedad.Id;
         FechaInicio = fechaInicio;
         FechaFin = fechaFin;
         Estado = EstadoReserva.Pendiente;
         PrecioTotal = propiedad.PrecioPorNoche * (decimal)(fechaFin - fechaInicio).TotalDays;
         TipoPago = propiedad.TipoPago;
+        CantidadHuespedes = cantidadHuespedes;
         
         switch (TipoPago)
         {

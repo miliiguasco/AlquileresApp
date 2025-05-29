@@ -104,7 +104,9 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
 
     public Propiedad? ObtenerPropiedadPorId(int id)
     {
-        return dbContext.Propiedades.FirstOrDefault(p => p.Id == id);
+        return dbContext.Propiedades
+            .Include(p => p.Imagenes)
+            .FirstOrDefault(p => p.Id == id);
     }
     public Propiedad? ObtenerPorId(int id)
 {
