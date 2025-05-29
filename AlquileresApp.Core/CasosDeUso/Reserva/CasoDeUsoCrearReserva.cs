@@ -46,7 +46,14 @@ public class CasoDeUsoCrearReserva(IReservaRepositorio reservasRepositorio, IPro
 
             // Calcular el monto total de la reserva
             var dias = (fechaFin - fechaInicio).Days;
-            var montoTotal = propiedad.PrecioPorNoche * dias;
+            var montoBase = propiedad.PrecioPorNoche * dias;
+            var montoTotal = propiedad.TipoPago switch //actualizar tmb deuda 
+            {
+                TipoPago.SinAnticipo => 0,
+                TipoPago.Parcial => montoBase * 0.20m,
+                TipoPago.Total => montoBase,
+                _ => throw new Exception("Tipo de pago no válido")
+            };
             Console.WriteLine($"Monto total a pagar: {montoTotal} (Precio por noche: {propiedad.PrecioPorNoche}, Días: {dias})");
 
             // Realizar pago (que incluye la validación de saldo)
