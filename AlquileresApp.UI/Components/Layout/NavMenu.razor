@@ -11,6 +11,11 @@
 <link href="css/NavMenu.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+@if (isDropdownOpen)
+{
+    <div class="dropdown-overlay" @onclick="CerrarDropdown"></div>
+}
+
 <nav class="navbar">
     <div class="container">
         <a class="navbar-brand" href="/">
@@ -21,10 +26,23 @@
         <AuthorizeView>
             <Authorized>
                 <div class="auth-buttons">
-                    <span class="user-info">¡Hola, @context.User.Identity?.Name!</span>
-                    <button class="btn btn-icon" title="Cerrar sesión" @onclick="CerrarSesion">
-                        <i class="bi bi-box-arrow-right"></i>
-                    </button>
+                    <div class="dropdown">
+                        <button class="dropdown-toggle btn btn-dropdown" @onclick:stopPropagation @onclick="ToggleDropdown">
+                            ¡Hola, @context.User.Identity?.Name!
+                        </button>
+                        @if (isDropdownOpen)
+                        {
+                            <div class="dropdown-menu show" @onclick:stopPropagation>
+                                <a class="dropdown-item" href="/perfil">
+                                    <i class="bi bi-person"></i> Ver perfil
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" @onclick="CerrarSesion">
+                                    <i class="bi bi-box-arrow-right"></i> Salir
+                                </button>
+                            </div>
+                        }
+                    </div>
                 </div>
             </Authorized>
             <NotAuthorized>
@@ -38,6 +56,18 @@
 </nav>
 
 @code {
+    private bool isDropdownOpen = false;
+
+    private void ToggleDropdown()
+    {
+        isDropdownOpen = !isDropdownOpen;
+    }
+
+    private void CerrarDropdown()
+    {
+        isDropdownOpen = false;
+    }
+
     private async Task CerrarSesion()
     {
         await ServicioAutenticacion.Logout();

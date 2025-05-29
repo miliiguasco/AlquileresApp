@@ -9,7 +9,6 @@ public interface IReservaRepositorio{
    // void RegistrarCheckout(Reserva reserva);
     public List<Reserva> ListarReservas();
     public List<Reserva> ListarMisReservas(Usuario usuario);
-
 }
 
 

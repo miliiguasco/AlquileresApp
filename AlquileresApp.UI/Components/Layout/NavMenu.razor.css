@@ -38,11 +38,17 @@
 
 .auth-buttons {
     display: flex;
+    align-items: center;
     gap: 1rem;
 }
 
+.user-info {
+    color: white;
+    font-size: 0.9rem;
+}
+
 .auth-buttons .btn {
-    padding: 0.5rem 1.25rem;
+    padding: 0.5rem 1.5rem;
     border-radius: 4px;
     text-decoration: none;
     font-weight: 500;
@@ -56,17 +62,43 @@
     background-color: #e65f00;
 }
 
-@media (max-width: 640px) {
-    .brand-text {
-        font-size: 1.2rem;
-    }
-
-    .logo {
-        height: 30px;
-    }
-
-    .auth-buttons .btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.9rem;
-    }
+.dropdown-menu {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    margin-top: 0.5rem;
+    min-width: 200px;
+    padding: 0.5rem 0;
 }
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #FF6B00;
+}
+
+.dropdown-item i {
+    font-size: 1rem;
+    color: #666;
+}
+
+.dropdown-item:hover i {
+    color: #FF6B00;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #e9ecef;
+    margin: 0.5rem 0;
+}
+
