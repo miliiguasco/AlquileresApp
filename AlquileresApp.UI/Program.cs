@@ -13,6 +13,7 @@ using AlquileresApp.Core.CasosDeUso.Imagen;
 using AlquileresApp.Core.CasosDeUso.Reserva;
 using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +61,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<ServicioSesion>();
 builder.Services.AddScoped<ServicioAutenticacion>();
 builder.Services.AddScoped<ServicioCookies>();
+builder.Services.AddScoped<IServicioSesion, ServicioSesion>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<ServicioAutenticacion>());
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<CasoDeUsoIniciarSesion>();
@@ -78,6 +80,7 @@ builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
 builder.Services.AddScoped<ITarjetaRepositorio, TarjetaRepositorio>();
 builder.Services.AddScoped<IFechaReservaValidador, FechaReservaValidador>();
 builder.Services.AddScoped<CasoDeUsoObtenerPropiedad>();
+builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
 
 
 var app = builder.Build();
@@ -105,10 +108,10 @@ using (var scope = app.Services.CreateScope())
             var hashedPassword = hashService.HashPassword("Password123!");
             Console.WriteLine($"Contraseña hasheada para usuario de prueba: {hashedPassword}");
             
-            var testUser = new Cliente(
-                "Test",
+            var testUser = new Administrador(
+                "Admin",
                 "User",
-                "test@test.com",
+                "admin@gmail.com",
                 "123456789",
                 hashedPassword,
                 DateTime.Now.AddYears(-20)

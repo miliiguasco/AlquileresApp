@@ -32,7 +32,7 @@ public class ServicioSesion(ServicioCookies servicioCookies) : IServicioSesion
         return VerificarUsuario(token);
     }
 
-    private IEnumerable<Claim>? VerificarUsuario(string token)
+    public IEnumerable<Claim>? VerificarUsuario(string token)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var tokenHandler = new JwtSecurityTokenHandler();

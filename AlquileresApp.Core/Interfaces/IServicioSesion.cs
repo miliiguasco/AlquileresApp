@@ -8,4 +8,5 @@ public interface IServicioSesion
     public Task<string> Autenticar(Usuario usuario);
     public Task eliminarCookie();
     public Task<IEnumerable<Claim>?> VerificarUsuario();
+    public IEnumerable<Claim>? VerificarUsuario(string token);
 }
