@@ -77,6 +77,8 @@ builder.Services.AddScoped<CasoDeUsoCrearReserva>();
 builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
 builder.Services.AddScoped<ITarjetaRepositorio, TarjetaRepositorio>();
 builder.Services.AddScoped<IFechaReservaValidador, FechaReservaValidador>();
+builder.Services.AddScoped<CasoDeUsoObtenerPropiedad>();
+
 
 var app = builder.Build();
 

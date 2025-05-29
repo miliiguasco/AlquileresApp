@@ -4,6 +4,11 @@
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
 @using AlquileresApp.Core.Enumerativos
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@inject IJSRuntime JS
+@inject IWebHostEnvironment Environment
 @inject CasoDeUsoListarPropiedadesFiltrado CUListarPropiedadesFiltrado
 @inject CasoDeUsoCrearReserva CUReservarPropiedad
 
@@ -14,7 +19,10 @@
 
     <EditForm Model="Filtros" OnValidSubmit="Buscar">
         <DataAnnotationsValidator />
-        <ValidationSummary />
+       <div class="validation-summary">
+           <ValidationSummary />
+       </div>
+
         <div class="filtros">
             <div>
                 <label>Ubicacion:</label>
@@ -104,9 +112,9 @@
                     <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
                     <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
 
-                    <button class="btn btn-secondary mt-2">
-                        @(PropiedadesExpandida.Contains(propiedad.Id) ? "Ver menos" : "Ver más")
-                    </button>
+                    <a class="btn btn-secondary mt-2" href="/propiedad/@propiedad.Id">Ver más</a>
+
+
 
                     @if (PropiedadesExpandida.Contains(propiedad.Id))
                     {
@@ -131,7 +139,12 @@
                         </div>
                     }
 
-                    <button @onclick="() => Reservar(propiedad)">Reservar</button>
+                    <div class="info-grupo">
+                            <button class="btn btn-primary" @onclick="() => IrAReservar(propiedad.Id)">
+                                <i class="fas fa-calendar-check"></i> Reservar esta propiedad
+                            </button>
+                        </div>
+
                 </li>
             }
         </ul>
@@ -157,36 +170,10 @@
         Propiedades = CUListarPropiedadesFiltrado.Ejecutar(Filtros);
     }
 
-    private void Reservar(Propiedad propiedad)
-{
-    try
+    private void IrAReservar( int Id)
     {
-        if (Filtros.FechaInicio.HasValue && Filtros.FechaFin.HasValue)
-        {
-            CUReservarPropiedad.Ejecutar(UsuarioActual.Id, propiedad.Id, Filtros.FechaInicio.Value, Filtros.FechaFin.Value, Filtros.CantidadHuespedes.Value);
-            // Mostrar mensaje de éxito o redirigir, como prefieras
-            Console.WriteLine("Reserva exitosa");
-        }
-        else
-        {
-            Console.WriteLine("Debe seleccionar una fecha de inicio y fin.");
-        }
+        NavigationManager.NavigateTo($"/reservar/{Id}");
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error al reservar: {ex.Message}");
-        // Mostrar error al usuario si lo necesitás
-    }
-}/*
-    private void Buscar()
-    {
-        if (PropiedadesExpandida.Contains(propiedadId))
-            PropiedadesExpandida.Remove(propiedadId);
-        else
-            PropiedadesExpandida.Add(propiedadId);
-{
-    
-    }*/
 
     private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
     {

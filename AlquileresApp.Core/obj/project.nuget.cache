@@ -1,24 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "l5I0AgDG2EI=",
+  "dgSpecHash": "fTDBRMXuZwM=",
   "success": true,
-  "projectFilePath": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.aspnetcore.authorization\\9.0.5\\microsoft.aspnetcore.authorization.9.0.5.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.aspnetcore.components\\9.0.5\\microsoft.aspnetcore.components.9.0.5.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\9.0.5\\microsoft.aspnetcore.components.analyzers.9.0.5.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.aspnetcore.components.authorization\\9.0.5\\microsoft.aspnetcore.components.authorization.9.0.5.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.aspnetcore.metadata\\9.0.5\\microsoft.aspnetcore.metadata.9.0.5.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\9.0.5\\microsoft.extensions.dependencyinjection.abstractions.9.0.5.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\9.0.5\\microsoft.extensions.logging.abstractions.9.0.5.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.extensions.options\\9.0.5\\microsoft.extensions.options.9.0.5.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.extensions.primitives\\9.0.5\\microsoft.extensions.primitives.9.0.5.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.identitymodel.abstractions\\8.11.0\\microsoft.identitymodel.abstractions.8.11.0.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\8.11.0\\microsoft.identitymodel.jsonwebtokens.8.11.0.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.identitymodel.logging\\8.11.0\\microsoft.identitymodel.logging.8.11.0.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.11.0\\microsoft.identitymodel.tokens.8.11.0.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\microsoft.jsinterop\\9.0.5\\microsoft.jsinterop.9.0.5.nupkg.sha512",
-    "C:\\Users\\valen\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.11.0\\system.identitymodel.tokens.jwt.8.11.0.nupkg.sha512"
-  ],
+  "projectFilePath": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }
