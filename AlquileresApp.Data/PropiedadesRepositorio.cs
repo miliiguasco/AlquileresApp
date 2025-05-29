@@ -26,7 +26,9 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
     }
 
     public List<Propiedad> ListarPropiedades(){
-        List<Propiedad> propiedades = dbContext.Propiedades.ToList();
+        List<Propiedad> propiedades = dbContext.Propiedades
+            .Include(p => p.Imagenes)
+            .ToList();
         if (propiedades.Count == 0)
             throw new Exception("No se encontraron propiedades.");
         return propiedades;

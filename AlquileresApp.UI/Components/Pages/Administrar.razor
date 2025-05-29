@@ -1,0 +1,114 @@
+@page "/Administrar"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.Interfaces
+@inject CasoDeUsoListarPropiedades CUListarPropiedades
+@inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
+@inject CasoDeUsoModificarPropiedad CUModificarPropiedad
+@attribute [Authorize(Roles = "Administrador")] 
+
+<PageTitle>Administración - Alquilando</PageTitle>
+
+@* Importar CSS usando la directiva de Blazor *@
+<HeadContent>
+    <link href="css/Administrar.css" rel="stylesheet" />
+</HeadContent>
+
+<div class="admin-container">
+    <h1 class="admin-title">Panel de Administración</h1>
+
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab-button @(tabActiva == "reservas" ? "active" : "")" 
+                    @onclick='@(() => CambiarTab("reservas"))'>
+                Reservas
+            </button>
+            <button class="tab-button @(tabActiva == "encargados" ? "active" : "")" 
+                    @onclick='@(() => CambiarTab("encargados"))'>
+                Encargados
+            </button>
+            <button class="tab-button @(tabActiva == "propiedades" ? "active" : "")" 
+                    @onclick='@(() => CambiarTab("propiedades"))'>
+                Propiedades
+            </button>
+        </div>
+
+        <div class="tab-content">
+            @if (tabActiva == "reservas")
+            {
+                <div class="tab-pane">
+                    <h3>Gestión de Reservas</h3>
+                    <!-- Contenido de reservas -->
+                </div>
+            }
+            else if (tabActiva == "encargados")
+            {
+                <div class="tab-pane">
+                    <h3>Gestión de Encargados</h3>
+                    <!-- Contenido de encargados -->
+                </div>
+            }
+            else if (tabActiva == "propiedades")
+            {
+                <Propiedades />
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string tabActiva = "propiedades";
+    private List<Propiedad>? propiedades;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPropiedades();
+    }
+
+    private void CambiarTab(string tab)
+    {
+        tabActiva = tab;
+    }
+
+    private Task CargarPropiedades()
+    {
+        try
+        {
+            propiedades = CUListarPropiedades.Ejecutar();
+            StateHasChanged();
+        }
+        catch
+        {
+            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
+        }
+        return Task.CompletedTask;
+    }
+
+    private async Task EditarPropiedad(Propiedad propiedad)
+    {
+        try
+        {
+            CUModificarPropiedad.Ejecutar(propiedad);
+            await CargarPropiedades();
+        }
+        catch
+        {
+            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
+        }
+    }
+
+    private async Task EliminarPropiedad(Propiedad propiedad)
+    {
+        try
+        {
+            CUEliminarPropiedad.Ejecutar(propiedad);
+            await CargarPropiedades();
+        }
+        catch
+        {
+            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
+        }
+    }
+} 
