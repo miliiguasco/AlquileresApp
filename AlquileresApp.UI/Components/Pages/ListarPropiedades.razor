@@ -1,4 +1,4 @@
-@page "/Propiedades"
+@page "/"
 @rendermode InteractiveServer
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.CasosDeUso.Propiedad
@@ -14,7 +14,10 @@
 
     <EditForm Model="Filtros" OnValidSubmit="Buscar">
         <DataAnnotationsValidator />
-        <ValidationSummary />
+       <div class="validation-summary">
+           <ValidationSummary />
+       </div>
+
         <div class="filtros">
             <div>
                 <label>Ubicacion:</label>
@@ -104,9 +107,9 @@
                     <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
                     <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
 
-                    <button class="btn btn-secondary mt-2">
-                        @(PropiedadesExpandida.Contains(propiedad.Id) ? "Ver menos" : "Ver más")
-                    </button>
+                    <a class="btn btn-secondary mt-2" href="/propiedad/@propiedad.Id">Ver más</a>
+
+
 
                     @if (PropiedadesExpandida.Contains(propiedad.Id))
                     {
@@ -181,11 +184,11 @@
 
     private void Reservar(Propiedad propiedad)
 {
-    try
+   /* try
     {
         if (Filtros.FechaInicio.HasValue && Filtros.FechaFin.HasValue)
         {
-            CUReservarPropiedad.Ejecutar(UsuarioActual.Id, propiedad.Id, Filtros.FechaInicio.Value, Filtros.FechaFin.Value);
+            CUReservarPropiedad.Ejecutar(UsuarioActual.Id, propiedad.Id);
             // Mostrar mensaje de éxito o redirigir, como prefieras
             Console.WriteLine("Reserva exitosa");
         }
@@ -198,7 +201,7 @@
     {
         Console.WriteLine($"Error al reservar: {ex.Message}");
         // Mostrar error al usuario si lo necesitás
-    }
+    }*/
 }/*
     private void Buscar()
     {

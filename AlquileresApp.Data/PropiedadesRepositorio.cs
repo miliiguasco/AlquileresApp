@@ -106,6 +106,12 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
     {
         return dbContext.Propiedades.FirstOrDefault(p => p.Id == id);
     }
+    public Propiedad? ObtenerPorId(int id)
+{
+    return dbContext.Propiedades
+        .Include(p => p.Imagenes)
+        .FirstOrDefault(p => p.Id == id);
+}
 }
 /*
     public List<Propiedad> ListarPropiedadesConReservas()

@@ -10,6 +10,7 @@ public interface IPropiedadRepositorio{
     List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros);
     public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin);
     //public List<Propiedad> BuscarDisponiblesAsync(SearchFilters filtros);
+    Propiedad? ObtenerPorId(int id);
 }
 
 
