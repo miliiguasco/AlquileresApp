@@ -53,7 +53,9 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
 
       public List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros)
     {
-        var query = dbContext.Propiedades.AsQueryable();
+        var query = dbContext.Propiedades
+        .Include(p => p.Imagenes)
+        .AsQueryable();
 
         //if (!string.IsNullOrWhiteSpace(filtros.Localidad))
         //{
@@ -61,10 +63,10 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         //}
 
 
-        /*//if (filtros.CantidadHuespedes.HasValue)
-        //{
-        //    query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
-        //}
+        if (filtros.CantidadHuespedes.HasValue)
+        {
+            query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
+        }
 
         var propiedades = query.ToList();
         //Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
@@ -78,7 +80,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
                     (filtros.FechaInicio <= r.FechaInicio && filtros.FechaFin >= r.FechaFin)
                 ))
             );
-        }*/
+        }
 
         return query.ToList();
     }

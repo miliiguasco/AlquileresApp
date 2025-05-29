@@ -3,6 +3,7 @@ using System;
 using AlquileresApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlquileresApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250526200954_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
@@ -54,9 +57,6 @@ namespace AlquileresApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("EncargadoId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Localidad")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -70,9 +70,6 @@ namespace AlquileresApp.Data.Migrations
                     b.PrimitiveCollection<string>("ServiciosDisponibles")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("TipoPago")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
@@ -98,16 +95,10 @@ namespace AlquileresApp.Data.Migrations
                     b.Property<DateTime>("FechaInicio")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("MontoAPagar")
-                        .HasColumnType("TEXT");
-
                     b.Property<decimal>("PrecioTotal")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("PropiedadId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TipoPago")
+                    b.Property<int>("PropiedadId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -137,14 +128,17 @@ namespace AlquileresApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Saldo")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("ReservaId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Titular")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReservaId")
+                        .IsUnique();
 
                     b.ToTable("Tarjetas");
                 });
@@ -235,11 +229,24 @@ namespace AlquileresApp.Data.Migrations
 
                     b.HasOne("AlquileresApp.Core.Entidades.Propiedad", "Propiedad")
                         .WithMany("Reservas")
-                        .HasForeignKey("PropiedadId");
-
-                    b.Navigation("Cliente");
+                        .HasForeignKey("PropiedadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Propiedad");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Tarjeta", b =>
+                {
+                    b.HasOne("AlquileresApp.Core.Entidades.Reserva", "Reserva")
+                        .WithOne("Tarjeta")
+                        .HasForeignKey("AlquileresApp.Core.Entidades.Tarjeta", "ReservaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reserva");
                 });
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Propiedad", b =>
