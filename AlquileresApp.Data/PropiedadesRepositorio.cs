@@ -13,16 +13,16 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
 
     public void EliminarPropiedad(Propiedad propiedad)
     {
-            var propiedadExistente = dbContext.Propiedades.FirstOrDefault(p => p.Id == propiedad.Id);
-            if (propiedadExistente == null)
-                throw new Exception("La propiedad no existe");
+        var propiedadExistente = dbContext.Propiedades.FirstOrDefault(p => p.Id == propiedad.Id);
+        if (propiedadExistente == null)
+            throw new Exception("La propiedad no existe");
 
-            var tieneReservaActiva = dbContext.Reservas.Any(r => r.PropiedadId == propiedad.Id);
-            if (tieneReservaActiva)
-                throw new Exception("No se puede eliminar una propiedad con reserva activa");
+        var tieneReservaActiva = dbContext.Reservas.Any(r => r.PropiedadId == propiedad.Id);
+        if (tieneReservaActiva)
+            throw new Exception("No se puede eliminar una propiedad con reserva activa");
 
-            dbContext.Propiedades.Remove(propiedadExistente);
-            dbContext.SaveChanges();
+        dbContext.Propiedades.Remove(propiedadExistente);
+        dbContext.SaveChanges();
     }
 
     public List<Propiedad> ListarPropiedades(){
@@ -51,42 +51,9 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         }   
     }
 
-     public List<Propiedad> BuscarDisponiblesAsync(SearchFilters filtros)
+    public bool TieneReservaActiva(int propiedadId)
     {
-        //Console.WriteLine("📡 Llamado a BuscarDisponiblesAsync");
-        //Console.WriteLine($"📍 Localidad buscada: {filtros.Localidad}");
-        
-        var query = dbContext.Propiedades.AsQueryable();
-
-        //if (!string.IsNullOrWhiteSpace(filtros.Localidad))
-        //{
-        //    query = query.Where(p => string.Equals(p.Localidad, filtros.Localidad, StringComparison.OrdinalIgnoreCase));
-        //}
-
-        //if (filtros.CantidadHuespedes > 0)
-        //{
-        //    query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes);
-        //}
-
-        var propiedades = query.ToList();
-        //Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
-        return propiedades;
+        return dbContext.Reservas.Any(r => r.PropiedadId == propiedadId);
     }
+
 }
-/*
-    public List<Propiedad> ListarPropiedadesConReservas()
-    {
-        var propiedadesConReservas = dbContext.Propiedades
-            .Where(p => dbContext.Reservas.Any(r => r.PropiedadId == p.Id))
-            .ToList();
-
-        Console.WriteLine($"📊 Se encontraron {propiedadesConReservas.Count} propiedades con reservas");
-        
-        if (!propiedadesConReservas.Any())
-        {
-            throw new Exception("No se encontraron propiedades con reservas.");
-        }
-
-        return propiedadesConReservas;
-    }
-*/

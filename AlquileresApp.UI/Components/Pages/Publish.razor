@@ -2,20 +2,27 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
 @using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.Enumerativos
 @inject IPropiedadRepositorio PropiedadesRepositorio
 @inject CasoDeUsoAgregarPropiedad CUAgregarPropiedad
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components.Forms
+@using GoogleMaps.LocationServices
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@inject IJSRuntime JsRuntime
+
 
 <link href="css/AltaUsuario.css" rel="stylesheet" />
 
 <PageTitle>Publicar Propiedad - Alquilando</PageTitle>
-
+    
 <div class="registro-container">
     <h1 class="registro-title">Publicar Nueva Propiedad</h1>
     <div class="registro-form">
         <section>
-            <EditForm Model="@nuevaPropiedad" OnValidSubmit="HandleValidSubmit">
+            <EditForm Model="@nuevaPropiedad" OnValidSubmit="HandleSubmitWithGeocoding">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
@@ -38,15 +45,58 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="direccion">Dirección</label>
-                    <InputText id="direccion" class="form-control" @bind-Value="nuevaPropiedad.Direccion" />
-                    <ValidationMessage For="@(() => nuevaPropiedad.Direccion)" />
+                    <label for="direccion">Dirección:</label>
+                    <div id="place-picker-container" style="width: 100%; height: 40px;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="localidad">Localidad</label>
+                    <InputText id="localidad" class="form-control" @bind-Value="nuevaPropiedad.Localidad" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.Localidad)" />
                 </div>
 
                 <div class="form-group">
                     <label for="capacidad">Capacidad de personas</label>
                     <InputNumber id="capacidad" class="form-control" @bind-Value="nuevaPropiedad.Capacidad" />
                     <ValidationMessage For="@(() => nuevaPropiedad.Capacidad)" />
+                </div>
+
+                <div class="form-group">
+                    <label>Servicios disponibles</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="wifi" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Wifi]" />
+                            <label class="form-check-label" for="wifi">WiFi</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="aire" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.AireAcondicionado]" />
+                            <label class="form-check-label" for="aire">Aire Acondicionado</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="calefaccion" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Calefaccion]" />
+                            <label class="form-check-label" for="calefaccion">Calefacción</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="cocina" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Cocina]" />
+                            <label class="form-check-label" for="cocina">Cocina</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="lavadora" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Lavadora]" />
+                            <label class="form-check-label" for="lavadora">Lavadora</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="estacionamiento" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Estacionamiento]" />
+                            <label class="form-check-label" for="estacionamiento">Estacionamiento</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="piscina" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Piscina]" />
+                            <label class="form-check-label" for="piscina">Piscina</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="television" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Television]" />
+                            <label class="form-check-label" for="television">Televisión</label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -73,25 +123,143 @@
 </div>
 
 @code {
-    private Propiedad nuevaPropiedad = new Propiedad { PagoAnticipado = 0 }; // Valor por defecto
+    private Propiedad nuevaPropiedad = new Propiedad { PagoAnticipado = 0, Latitud = 0, Longitud = 0 };
     private string? errorMensaje;
+    private string? googleMapsApiKey;
+    private Dictionary<ServiciosPropiedad, bool> serviciosSeleccionados = new();
 
-    private async Task HandleValidSubmit()
+    protected override void OnInitialized()
+    {
+        googleMapsApiKey = Configuration["GoogleMaps:ApiKey"];
+        if (string.IsNullOrEmpty(googleMapsApiKey))
+        {
+            errorMensaje = "Error: La clave de API de Google Maps no está configurada.";
+            Console.WriteLine(errorMensaje);
+        }
+
+        // Inicializar el diccionario de servicios
+        foreach (ServiciosPropiedad servicio in Enum.GetValues(typeof(ServiciosPropiedad)))
+        {
+            serviciosSeleccionados[servicio] = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                Console.WriteLine("Iniciando place picker...");
+                await JsRuntime.InvokeVoidAsync("initPlacePicker", "place-picker-container", DotNetObjectReference.Create(this));
+                Console.WriteLine("Place picker inicializado correctamente");
+            }
+            catch (Exception ex)
+            {
+                errorMensaje = $"Error al inicializar el selector de dirección: {ex.Message}";
+                Console.WriteLine($"Error al inicializar place picker: {ex}");
+            }
+        }
+    }
+
+    [JSInvokable]
+    public async Task SetAddressFromPicker(string address)
     {
         try
         {
-            errorMensaje = null;
+            Console.WriteLine($"Recibida dirección: {address}");
+            if (!string.IsNullOrEmpty(address))
+            {
+                nuevaPropiedad.Direccion = address;
+                await InvokeAsync(StateHasChanged);
+                Console.WriteLine($"Dirección actualizada en el modelo: {nuevaPropiedad.Direccion}");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al actualizar la dirección: {ex.Message}";
+            Console.WriteLine($"Error en SetAddressFromPicker: {ex}");
+        }
+    }
+
+    private async Task HandleSubmitWithGeocoding()
+    {
+        errorMensaje = null;
+
+        // Actualizar los servicios seleccionados
+        nuevaPropiedad.ServiciosDisponibles = serviciosSeleccionados
+            .Where(s => s.Value)
+            .Select(s => s.Key)
+            .ToList();
+
+        // Primero, intenta obtener las coordenadas de la dirección seleccionada
+        bool geocodingSuccessful = await GetCoordinatesForAddressAsync();
+
+        if (geocodingSuccessful)
+        {
+            await SavePropertyAsync();
+        }
+    }
+
+    private async Task SavePropertyAsync()
+    {
+        try
+        {
             await Task.Run(() => CUAgregarPropiedad.Ejecutar(nuevaPropiedad));
             NavigationManager.NavigateTo("/");
         }
         catch (Exception ex)
         {
             errorMensaje = $"Error al publicar la propiedad: {ex.Message}";
+            Console.WriteLine($"Error al guardar la propiedad: {ex}");
         }
     }
 
     private void NavigateToHome()
     {
         NavigationManager.NavigateTo("/");
+    }
+
+    private async Task<bool> GetCoordinatesForAddressAsync()
+    {
+        errorMensaje = string.Empty;
+        nuevaPropiedad.Latitud = 0;
+        nuevaPropiedad.Longitud = 0;
+
+        if (string.IsNullOrEmpty(googleMapsApiKey))
+        {
+            errorMensaje = "Error: La clave de API de Google Maps no está configurada.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(nuevaPropiedad.Direccion))
+        {
+            errorMensaje = "Por favor, ingresa una dirección.";
+            return false;
+        }
+
+        try
+        {
+            var locationService = new GoogleLocationService(googleMapsApiKey);
+            var coordenadas = locationService.GetLatLongFromAddress(nuevaPropiedad.Direccion);
+
+            if (coordenadas != null)
+            {
+                nuevaPropiedad.Latitud = coordenadas.Latitude;
+                nuevaPropiedad.Longitud = coordenadas.Longitude;
+                return true;
+            }
+            else
+            {
+                errorMensaje = "No se encontraron coordenadas para la dirección ingresada. Intenta ser más específico.";
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Ocurrió un error al buscar la dirección: {ex.Message}. Asegúrate de que tu clave de API sea válida.";
+            Console.WriteLine($"Error de geocodificación: {ex}");
+            return false;
+        }
     }
 }

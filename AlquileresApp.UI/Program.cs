@@ -13,6 +13,7 @@ using AlquileresApp.Core.CasosDeUso.Imagen;
 using AlquileresApp.Core.CasosDeUso.Propiedad;
 using AlquileresApp.Core;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -64,6 +65,7 @@ builder.Services.AddScoped<CasoDeUsoCargarImagen>();
 builder.Services.AddScoped<CasoDeUsoModificarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoMostrarImagenes>();
 builder.Services.AddScoped<CasoDeUsoEliminarImagen>();
+builder.Services.AddScoped<CasoDeUsoEliminarPropiedad>();
 
 var app = builder.Build();
 

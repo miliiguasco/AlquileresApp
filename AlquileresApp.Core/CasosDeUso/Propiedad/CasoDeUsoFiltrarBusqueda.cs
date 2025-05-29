@@ -2,7 +2,7 @@ namespace AlquileresApp.Core.CasosDeUso.Propiedad;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Core.Interfaces;
 
-
+/**
 public class CasoDeUsoFiltrarBusqueda(IPropiedadRepositorio propiedadesRepositorio)
 {
     public List<Propiedad> Ejecutar(SearchFilters filtros)
@@ -13,3 +13,4 @@ public class CasoDeUsoFiltrarBusqueda(IPropiedadRepositorio propiedadesRepositor
         return propiedades;
     }
 }
+*/

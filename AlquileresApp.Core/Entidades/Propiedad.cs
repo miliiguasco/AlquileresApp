@@ -10,6 +10,8 @@ public class Propiedad
     public string Direccion { get; set; } = string.Empty;
     public string Localidad { get; set; } = string.Empty;
     public decimal PrecioPorNoche { get; set; }
+    public double Latitud { get; set; }
+    public double Longitud { get; set; }
     public int Capacidad { get; set; }
     public int EncargadoId { get; set; }
     public int PagoAnticipado { get; set; }
