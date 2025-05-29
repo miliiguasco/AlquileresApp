@@ -1,6 +1,6 @@
 namespace AlquileresApp.Core.Enumerativos;
 
-public enum TipoPagoReserva
+public enum TipoPago
 {
     Total,
     Parcial,

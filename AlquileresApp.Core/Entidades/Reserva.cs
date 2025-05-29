@@ -11,7 +11,7 @@ public class Reserva
     public DateTime FechaInicio { get; set; }
     public DateTime FechaFin { get; set; }
     public EstadoReserva Estado { get; set; }
-    public TipoPagoReserva TipoPago { get; set; }
+    public TipoPago TipoPago { get; set; }
     public decimal PrecioTotal { get; set; }
     public decimal MontoAPagar { get; set; }
     public int CantidadHuespedes { get; set; }
@@ -30,21 +30,7 @@ public class Reserva
         PrecioTotal = propiedad.PrecioPorNoche * (decimal)(fechaFin - fechaInicio).TotalDays;
         TipoPago = propiedad.TipoPago;
         CantidadHuespedes = cantidadHuespedes;
-        
-        switch (TipoPago)
-        {
-            case TipoPagoReserva.Parcial:
-                MontoAPagar = PrecioTotal * 0.2m;
-                break;
-            case TipoPagoReserva.Total:
-                MontoAPagar = PrecioTotal;
-                break;
-            case TipoPagoReserva.SinAnticipo:
-                MontoAPagar = 0;
-                break;
-            default:
-                throw new Exception($"Tipo de pago no válido: {TipoPago}");
-        }
+        //falta monto restante
     }
 
     public bool seSuperpone(DateTime inicio, DateTime fin)
