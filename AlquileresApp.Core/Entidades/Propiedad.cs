@@ -17,4 +17,10 @@ public class Propiedad
     public int PagoAnticipado { get; set; }
     public List<ServiciosPropiedad> ServiciosDisponibles { get; set; } = new();
     public List<Imagen> Imagenes { get; set; } = new();
+    public List<Reserva> Reservas { get; set; } = new();
+    public PoliticasDeCancelacion PoliticaCancelacion { get; set; }
+    public TipoPago TipoPago { get; set; }
+    public decimal MontoAPagar { get; set; }
+    public decimal MontoPagoAnticipado { get; set; }
 } 
+

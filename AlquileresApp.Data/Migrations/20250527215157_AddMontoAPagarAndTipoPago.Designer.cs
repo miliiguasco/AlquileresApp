@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlquileresApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250524001537_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250527215157_AddMontoAPagarAndTipoPago")]
+    partial class AddMontoAPagarAndTipoPago
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,9 +57,21 @@ namespace AlquileresApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("EncargadoId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Localidad")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<decimal>("MontoAPagar")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("MontoPagoAnticipado")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PagoAnticipado")
+                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("PrecioPorNoche")
                         .HasColumnType("TEXT");
@@ -67,6 +79,9 @@ namespace AlquileresApp.Data.Migrations
                     b.PrimitiveCollection<string>("ServiciosDisponibles")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("TipoPago")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
@@ -83,13 +98,10 @@ namespace AlquileresApp.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("AdministradorId")
+                    b.Property<int?>("ClienteId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ClienteId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("EncargadoId")
+                    b.Property<int>("Estado")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("FechaFin")
@@ -98,19 +110,21 @@ namespace AlquileresApp.Data.Migrations
                     b.Property<DateTime>("FechaInicio")
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("MontoAPagar")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("PrecioTotal")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("PropiedadId")
+                    b.Property<int?>("PropiedadId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TipoPago")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdministradorId");
-
                     b.HasIndex("ClienteId");
-
-                    b.HasIndex("EncargadoId");
 
                     b.HasIndex("PropiedadId");
 
@@ -135,17 +149,14 @@ namespace AlquileresApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ReservaId")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal>("Saldo")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Titular")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ReservaId")
-                        .IsUnique();
 
                     b.ToTable("Tarjetas");
                 });
@@ -160,6 +171,10 @@ namespace AlquileresApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Contraseña")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -168,10 +183,6 @@ namespace AlquileresApp.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -228,40 +239,17 @@ namespace AlquileresApp.Data.Migrations
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Reserva", b =>
                 {
-                    b.HasOne("AlquileresApp.Core.Entidades.Administrador", null)
+                    b.HasOne("AlquileresApp.Core.Entidades.Cliente", "Cliente")
                         .WithMany("Reservas")
-                        .HasForeignKey("AdministradorId");
-
-                    b.HasOne("AlquileresApp.Core.Entidades.Cliente", "Usuario")
-                        .WithMany("Reservas")
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AlquileresApp.Core.Entidades.Encargado", null)
-                        .WithMany("Reservas")
-                        .HasForeignKey("EncargadoId");
+                        .HasForeignKey("ClienteId");
 
                     b.HasOne("AlquileresApp.Core.Entidades.Propiedad", "Propiedad")
                         .WithMany("Reservas")
-                        .HasForeignKey("PropiedadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PropiedadId");
+
+                    b.Navigation("Cliente");
 
                     b.Navigation("Propiedad");
-
-                    b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("AlquileresApp.Core.Entidades.Tarjeta", b =>
-                {
-                    b.HasOne("AlquileresApp.Core.Entidades.Reserva", "Reserva")
-                        .WithOne("Tarjeta")
-                        .HasForeignKey("AlquileresApp.Core.Entidades.Tarjeta", "ReservaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Reserva");
                 });
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Propiedad", b =>
@@ -271,22 +259,7 @@ namespace AlquileresApp.Data.Migrations
                     b.Navigation("Reservas");
                 });
 
-            modelBuilder.Entity("AlquileresApp.Core.Entidades.Reserva", b =>
-                {
-                    b.Navigation("Tarjeta");
-                });
-
-            modelBuilder.Entity("AlquileresApp.Core.Entidades.Administrador", b =>
-                {
-                    b.Navigation("Reservas");
-                });
-
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Cliente", b =>
-                {
-                    b.Navigation("Reservas");
-                });
-
-            modelBuilder.Entity("AlquileresApp.Core.Entidades.Encargado", b =>
                 {
                     b.Navigation("Reservas");
                 });

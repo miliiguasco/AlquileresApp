@@ -101,12 +101,12 @@
 
                 <div class="form-group">
                     <label for="pagoAnticipado">Porcentaje de pago anticipado</label>
-                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="nuevaPropiedad.PagoAnticipado">
+                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="nuevaPropiedad.MontoPagoAnticipado">
                         <option value="0">0% - Sin pago anticipado</option>
                         <option value="20">20% - Pago parcial anticipado</option>
                         <option value="100">100% - Pago total anticipado</option>
                     </InputSelect>
-                    <ValidationMessage For="@(() => nuevaPropiedad.PagoAnticipado)" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.MontoPagoAnticipado)" />
                 </div>
 
                 <div class="button-group">
@@ -123,7 +123,7 @@
 </div>
 
 @code {
-    private Propiedad nuevaPropiedad = new Propiedad { PagoAnticipado = 0, Latitud = 0, Longitud = 0 };
+    private Propiedad nuevaPropiedad = new Propiedad { }; //PagoAnticipado = 0 }; // Valor por defecto
     private string? errorMensaje;
     private string? googleMapsApiKey;
     private Dictionary<ServiciosPropiedad, bool> serviciosSeleccionados = new();

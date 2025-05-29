@@ -1,6 +1,7 @@
-@page "/propiedad/{Id:int}"
+@page "/propiedadd/{Id:int}"
 @using AlquileresApp.Core.CasosDeUso.Imagen
 @using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.CasosDeUso.Reserva
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
 @using Microsoft.JSInterop
@@ -10,14 +11,16 @@
 @inject CasoDeUsoListarPropiedades CUListarPropiedades
 @inject CasoDeUsoCargarImagen CUAgregarImagen
 @inject CasoDeUsoModificarPropiedad CUModificarPropiedad
-@inject CasoDeUsoMostrarImagenes CUMostrarImagenes
 @inject CasoDeUsoEliminarImagen CUEliminarImagen
+@inject CasoDeUsoMostrarImagenes CUMostrarImagenes
+@inject CasoDeUsoCrearReserva CUCrearReserva
 @inject IJSRuntime JS
 @inject IWebHostEnvironment Environment
 @using Microsoft.AspNetCore.Components.Forms
 @using System.IO
 
-<link href="css/AltaUsuario.css" rel="stylesheet" />
+ 
+<!-- <link href="css/AltaUsuario.css" rel="stylesheet" /> -->
 <link href="css/DetallePropiedad.css" rel="stylesheet" />
 
 <PageTitle>Detalles de Propiedad - Alquilando</PageTitle>
@@ -33,7 +36,37 @@
     {
         <div class="registro-form">
             <h1 class="registro-title">@propiedad.Titulo</h1>
-            
+              <div class="info-grupo">
+                        <h3>Imágenes</h3>
+                        <div class="imagenes-container">
+                            @if (imagenes != null && imagenes.Any())
+                            {
+                                @foreach (var imagen in imagenes)
+                                {
+                                    <div class="imagen-item">
+                                        <img src="@imagen.Url" alt="Imagen de la propiedad" />
+                                        <button class="btn-eliminar" @onclick="() => EliminarImagen(imagen.Id)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p>No hay imágenes disponibles</p>
+                            }
+                        </div>
+                        <div class="upload-section">
+                            <InputFile OnChange="@CargarImagen" accept=".jpg,.jpeg,.png" class="file-input" />
+                            <button class="btn btn-primary" @onclick="() => OnClickUpload()">
+                                <i class="fas fa-upload"></i> Cargar Imagen
+                            </button>
+                            @if (!string.IsNullOrEmpty(errorMensaje))
+                            {
+                                <div class="alert alert-danger mt-2">@errorMensaje</div>
+                            }
+                        </div>
+                    </div>
             <div class="propiedad-detalle">
                 <div class="propiedad-info">
                     <h2>Detalles de la Propiedad</h2>
@@ -57,6 +90,13 @@
                             <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
                             <p><strong>Pago anticipado:</strong> @propiedad.PagoAnticipado%</p>
                         </div>
+
+                        <div class="info-grupo">
+                            <h3>Reservar</h3>
+                            <button class="btn btn-primary" @onclick="IrAReservar">
+                                <i class="fas fa-calendar-check"></i> Reservar esta propiedad
+                            </button>
+                        </div>
                     }
                     else
                     {
@@ -64,6 +104,7 @@
                             <DataAnnotationsValidator />
                             <ValidationSummary />
 
+                  
                             <div class="form-group">
                                 <label for="titulo">Título</label>
                                 <InputText id="titulo" class="form-control" @bind-Value="propiedadEditada.Titulo" />
@@ -121,37 +162,6 @@
                         </EditForm>
                     }
 
-                    <div class="info-grupo">
-                        <h3>Imágenes</h3>
-                        <div class="imagenes-container">
-                            @if (imagenes != null && imagenes.Any())
-                            {
-                                @foreach (var imagen in imagenes)
-                                {
-                                    <div class="imagen-item">
-                                        <img src="@imagen.Url" alt="Imagen de la propiedad" />
-                                        <button class="btn-eliminar" @onclick="() => EliminarImagen(imagen.Id)">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                }
-                            }
-                            else
-                            {
-                                <p>No hay imágenes disponibles</p>
-                            }
-                        </div>
-                        <div class="upload-section">
-                            <InputFile OnChange="@CargarImagen" accept=".jpg,.jpeg,.png" class="file-input" />
-                            <button class="btn btn-primary" @onclick="() => OnClickUpload()">
-                                <i class="fas fa-upload"></i> Cargar Imagen
-                            </button>
-                            @if (!string.IsNullOrEmpty(errorMensaje))
-                            {
-                                <div class="alert alert-danger mt-2">@errorMensaje</div>
-                            }
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -176,7 +186,10 @@
     private Propiedad propiedadEditada = new();
     private List<Imagen>? imagenes;
     private string? errorMensaje;
+ //   private ElementReference fileInput;
     private bool modoEdicion = false;
+    private string? reservaMensaje;
+    private bool reservaExito;
 
     protected override async Task OnInitializedAsync()
     {
@@ -356,8 +369,15 @@
         }
     }
 
+    
+
     private void VolverAInicio()
     {
         NavigationManager.NavigateTo("/");
+    }
+
+    private void IrAReservar()
+    {
+        NavigationManager.NavigateTo($"/reservar/{Id}");
     }
 } 
