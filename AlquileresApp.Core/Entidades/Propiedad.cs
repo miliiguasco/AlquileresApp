@@ -18,4 +18,8 @@ public class Propiedad
     public List<Reserva> Reservas { get; set; } = new();
     public PoliticasDeCancelacion PoliticaCancelacion { get; set; }
 
+    public decimal MontoAPagar { get; set; }
+    public TipoPagoReserva TipoPago { get; set; }
+    public decimal MontoPagoAnticipado { get; set; }
 } 
+

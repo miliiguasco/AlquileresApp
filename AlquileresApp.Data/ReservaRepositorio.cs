@@ -5,11 +5,46 @@ using Microsoft.EntityFrameworkCore;
 
 public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
 {
-    public void CrearReserva(Cliente  cliente, Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin){
-       Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin);
-       dbContext.Reservas.Add(reserva);
-       dbContext.SaveChanges();
-       Console.WriteLine("Reserva creada correctamente");
+    public void CrearReserva(Cliente cliente, Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin, int cantidadHuespedes)
+    {
+        try
+        {
+            Console.WriteLine($"Creando reserva: ClienteId={cliente.Id}, PropiedadId={propiedad.Id}");
+            Console.WriteLine($"Conexión a la base de datos: {dbContext.Database.GetConnectionString()}");
+            
+            // Verificar si la base de datos existe
+            Console.WriteLine($"Base de datos existe: {dbContext.Database.CanConnect()}");
+            
+            Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes);
+            Console.WriteLine($"Reserva creada con ID: {reserva.Id}, Estado: {reserva.Estado}, PrecioTotal: {reserva.PrecioTotal}");
+            
+            dbContext.Reservas.Add(reserva);
+            Console.WriteLine("Reserva agregada al contexto");
+            
+            var result = dbContext.SaveChanges();
+            Console.WriteLine($"SaveChanges result: {result} filas afectadas");
+            
+            if (result > 0)
+            {
+                // Verificar que la reserva se guardó
+                var reservaGuardada = dbContext.Reservas.Find(reserva.Id);
+                Console.WriteLine($"Reserva guardada en BD: {(reservaGuardada != null ? "Sí" : "No")}");
+                if (reservaGuardada != null)
+                {
+                    Console.WriteLine($"Datos de la reserva guardada: Id={reservaGuardada.Id}, ClienteId={reservaGuardada.ClienteId}, PropiedadId={reservaGuardada.PropiedadId}");
+                }
+            }
+            else
+            {
+                throw new Exception("No se pudo crear la reserva en la base de datos");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al crear reserva: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            throw new Exception($"Error al crear la reserva: {ex.Message}");
+        }
     }
 
     public void ModificarReserva(Reserva reserva){ 

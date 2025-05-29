@@ -64,6 +64,15 @@ namespace AlquileresApp.Data.Migrations
                     b.Property<int>("PoliticaCancelacion")
                         .HasColumnType("INTEGER");
 
+                    b.Property<decimal>("MontoAPagar")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("MontoPagoAnticipado")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PagoAnticipado")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("PrecioPorNoche")
                         .HasColumnType("TEXT");
 
@@ -89,7 +98,10 @@ namespace AlquileresApp.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ClienteId")
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Estado")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("FechaFin")
@@ -227,6 +239,10 @@ namespace AlquileresApp.Data.Migrations
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Reserva", b =>
                 {
+                    b.HasOne("AlquileresApp.Core.Entidades.Cliente", "Cliente")
+                        .WithMany("Reservas")
+                        .HasForeignKey("ClienteId");
+
                     b.HasOne("AlquileresApp.Core.Entidades.Cliente", "Usuario")
                         .WithMany("Reservas")
                         .HasForeignKey("ClienteId")
