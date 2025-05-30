@@ -3,11 +3,10 @@
 }
 
 .table-container {
-    margin-top: 1rem;
+    margin-top: 0.3rem;
     overflow-x: auto;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 2px;
 }
 
 .property-table {

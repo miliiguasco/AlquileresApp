@@ -42,10 +42,6 @@ public class ServicioAutenticacion(ServicioSesion servicioSesion) : Authenticati
             var state = new AuthenticationState(user);
             NotifyAuthenticationStateChanged(Task.FromResult(state));
         }
-        else
-        {
-            //do nothing
-        }
     }
 
     public async Task Logout()
