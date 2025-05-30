@@ -12,6 +12,7 @@ using AlquileresApp.Core.Entidades;
 using Microsoft.AspNetCore.Components.Web;
 using AlquileresApp.Core.CasosDeUso.Imagen;
 using AlquileresApp.Core.CasosDeUso.Reserva;
+using AlquileresApp.Core.CasosDeUso.Tarjeta;
 using AlquileresApp.Core;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -70,6 +71,8 @@ builder.Services.AddScoped<CasoDeUsoCrearReserva>();
 builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
 builder.Services.AddScoped<ITarjetaRepositorio, TarjetaRepositorio>();
 builder.Services.AddScoped<IFechaReservaValidador, FechaReservaValidador>();
+builder.Services.AddScoped<ITarjetaValidador, TarjetaValidador>();
+builder.Services.AddScoped<CasoDeUsoRegistrarTarjeta>();
 
 var app = builder.Build();
 

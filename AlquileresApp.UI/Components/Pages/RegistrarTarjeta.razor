@@ -1,0 +1,143 @@
+@page "/registrar-tarjeta"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.CasosDeUso.Tarjeta
+@using AlquileresApp.Core.Interfaces
+@inject CasoDeUsoRegistrarTarjeta CURegistrarTarjeta
+@inject NavigationManager NavigationManager
+<link href="css/RegistrarTarjeta.css" rel="stylesheet" />
+
+<div class="modal-overlay">
+    <div class="reserva-container">
+        <div class="reserva-form">
+            <h3>Registrar Nueva Tarjeta</h3>
+            <p class="text-muted">Complete los datos de su tarjeta para realizar pagos</p>
+            
+            <div class="form-group">
+                <label><i class="fas fa-credit-card"></i> Número de Tarjeta:</label>
+                <input type="text" class="form-control" @bind="numeroTarjeta" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" />
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Nombre del Titular:</label>
+                <input type="text" class="form-control" @bind="titular" placeholder="Como aparece en la tarjeta" />
+            </div>
+
+            <div class="fechas-section">
+                <div class="fecha-input">
+                    <label><i class="fas fa-calendar"></i> Fecha de Vencimiento:</label>
+                    <input type="text" class="form-control" @bind="fechaVencimiento" placeholder="MM/AA" maxlength="5" @oninput="FormatearFechaVencimiento" />
+                </div>
+
+                <div class="fecha-input">
+                    <label><i class="fas fa-lock"></i> CVV:</label>
+                    <input type="password" class="form-control" @bind="cvv" placeholder="XXX" maxlength="3" />
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMensaje))
+            {
+                <div class="alert alert-danger">
+                    @errorMensaje
+                </div>
+            }
+
+            <button class="btn-reservar" @onclick="OnRegistrarTarjeta" disabled="@isSubmitting">
+                @if (isSubmitting)
+                {
+                    <span class="spinner"></span>
+                    <span>Procesando...</span>
+                }
+                else
+                {
+                    <i class="fas fa-check-circle"></i>
+                    <span>Registrar Tarjeta</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string numeroTarjeta = "";
+    private string titular = "";
+    private string fechaVencimiento = "";
+    private string cvv = "";
+    private string? errorMensaje;
+    private bool isSubmitting = false;
+
+    private void FormatearFechaVencimiento(ChangeEventArgs e)
+    {
+        var input = e.Value?.ToString() ?? "";
+        // Remover caracteres no numéricos
+        input = new string(input.Where(char.IsDigit).ToArray());
+        
+        if (input.Length > 2)
+        {
+            fechaVencimiento = $"{input.Substring(0, 2)}/{input.Substring(2, Math.Min(2, input.Length - 2))}";
+        }
+        else
+        {
+            fechaVencimiento = input;
+        }
+    }
+
+    private bool ValidarFechaVencimiento()
+    {
+        if (string.IsNullOrWhiteSpace(fechaVencimiento) || fechaVencimiento.Length != 5)
+            return false;
+
+        var partes = fechaVencimiento.Split('/');
+        if (partes.Length != 2)
+            return false;
+
+        if (!int.TryParse(partes[0], out int mes) || !int.TryParse(partes[1], out int anio))
+            return false;
+
+        if (mes < 1 || mes > 12)
+            return false;
+
+        var fechaActual = DateTime.Now;
+        var anioActual = fechaActual.Year % 100; // Obtener los últimos dos dígitos del año
+        var anioCompleto = 2000 + anio; // Asumimos que las tarjetas son del siglo XXI
+
+        if (anio < anioActual || (anio == anioActual && mes < fechaActual.Month))
+            return false;
+
+        return true;
+    }
+
+    private async Task OnRegistrarTarjeta()
+    {
+        try
+        {
+            isSubmitting = true;
+            errorMensaje = null;
+
+            if (string.IsNullOrWhiteSpace(numeroTarjeta) || string.IsNullOrWhiteSpace(titular) ||
+                string.IsNullOrWhiteSpace(fechaVencimiento) || string.IsNullOrWhiteSpace(cvv))
+            {
+                errorMensaje = "Por favor complete todos los campos";
+                return;
+            }
+
+            if (!ValidarFechaVencimiento())
+            {
+                errorMensaje = "La fecha de vencimiento no es válida o la tarjeta está vencida";
+                return;
+            }
+
+            // Por ahora hardcodeado el clienteId como 1, pero debería ser el usuario actual
+            CURegistrarTarjeta.Ejecutar(1, numeroTarjeta, titular, fechaVencimiento, cvv, 10000);
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = ex.Message;
+            StateHasChanged();
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+} 
