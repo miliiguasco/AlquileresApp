@@ -18,6 +18,7 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 0;
+    box-shadow: none;
 }
 
 .property-table th,
