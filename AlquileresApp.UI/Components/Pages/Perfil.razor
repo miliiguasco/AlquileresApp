@@ -5,14 +5,14 @@
 @using System.Security.Claims
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
-@using AlquileresApp.UI.Components.Forms
+@using AlquileresApp.UI.Components
 @inject AuthenticationStateProvider ServicioAutenticacion
 @inject IUsuarioRepositorio UsuarioRepositorio
 @inject ILogger<Perfil> Logger
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
 
-<PageTitle>Mi Perfil - Alquilando</PageTitle>
+<PageTitle>Mi Perfil</PageTitle>
 
 <div class="profile-container">
     @if (usuario != null)
@@ -178,7 +178,7 @@
             usuario.Telefono = datosForm.Telefono;
             usuario.FechaNacimiento = datosForm.FechaDeNacimiento;
 
-            UsuarioRepositorio.ModificarUsuario(usuario);
+            await Task.Run(() => UsuarioRepositorio.ModificarUsuario(usuario));
             
             modoEdicion = false;
             mensajeExito = "Perfil actualizado exitosamente";
