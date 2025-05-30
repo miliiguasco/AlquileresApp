@@ -73,6 +73,8 @@ builder.Services.AddScoped<ITarjetaRepositorio, TarjetaRepositorio>();
 builder.Services.AddScoped<IFechaReservaValidador, FechaReservaValidador>();
 builder.Services.AddScoped<ITarjetaValidador, TarjetaValidador>();
 builder.Services.AddScoped<CasoDeUsoRegistrarTarjeta>();
+builder.Services.AddScoped<CasoDeUsoObtenerPropiedad>();
+
 
 var app = builder.Build();
 

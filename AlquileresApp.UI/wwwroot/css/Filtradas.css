@@ -1,3 +1,4 @@
+
 .container_listar_propiedades {
     max-width: 1200px;
     margin: 0 auto;
@@ -155,6 +156,23 @@
     margin-bottom: 1rem;
     transition: background-color 0.3s ease;
 }
+.reservarr {
+    background-color: #0A3D62;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 1rem;
+    width: 100%; /* o un ancho fijo si querés más estabilidad */
+}
+
+.reservarr:hover {
+    background-color: #074060;
+    transform: scale(1.02); /* leve aumento */
+}
 
 
 .btn-reservar {
@@ -168,4 +186,24 @@
     width: 100%;
     box-shadow: 0 4px 8px rgba(241, 119, 31, 0.3);
     transition: background-color 0.3s;
+}
+.validation-summary {
+    padding: 1rem;
+    border-radius: 8px;
+    font-family: 'Segoe UI', sans-serif;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.validation-summary ul {
+    padding-left: 1.2rem;
+    margin: 0;
+}
+
+.validation-summary li {
+    margin-bottom: 0.5rem;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }

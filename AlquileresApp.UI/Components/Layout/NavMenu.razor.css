@@ -10,14 +10,6 @@
     padding: 0.5rem;
 }
 
-.container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
 .navbar-brand {
     display: flex;
     align-items: center;
