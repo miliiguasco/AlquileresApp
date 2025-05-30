@@ -23,6 +23,12 @@
     font-size: 0.875rem;
 }
 
+.btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
 ::deep button.btn,
 ::deep input[type="submit"].btn {
     padding: 0.4rem 1.2rem !important;

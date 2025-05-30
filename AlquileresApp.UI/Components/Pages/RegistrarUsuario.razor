@@ -54,8 +54,8 @@
             registroExitoso = true;
             StateHasChanged();
             
-            // Esperar 2,5 segundos antes de redirigir
-            await Task.Delay(1500);
+            // Esperar 2 segundos antes de redirigir
+            await Task.Delay(2000);
             registroExitoso = false;
             VaciarCampos();
             NavigationManager.NavigateTo("/Login");

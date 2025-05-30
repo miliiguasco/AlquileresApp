@@ -21,10 +21,11 @@
             <h1>Mi Perfil</h1>
         </div>
 
-        @if (modoEdicion)
+        @if (esAdministrador)
         {
-            <div class="profile-content">
-                <div class="profile-section">
+            <div class="profile-section">
+                @if (modoEdicion)
+                {
                     <div class="btn-container">
                         <h2>Editar Información Personal</h2>
                         <button class="btn-outline" @onclick="CancelarEdicion">
@@ -36,14 +37,9 @@
                                   FormName="editarPerfil"
                                   SubmitButtonText="Guardar"
                                   ButtonClass="btn" />          
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="profile-content">
-                
-                <div class="profile-section">
+                }
+                else
+                {
                     <h2>Información Personal</h2>
                     <div class="info-group">
                         <label>Nombre:</label>
@@ -65,12 +61,101 @@
                         <label>Fecha de Nacimiento:</label>
                         <span>@(usuario.FechaNacimiento?.ToShortDateString() ?? "No especificada")</span>
                     </div>
+                    <div class="profile-actions">   
+                        <button type="button" class="btn" @onclick="IniciarEdicion">
+                            <i class="fas fa-edit"></i> Editar Perfil
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-button @(tabActiva == "datos" ? "active" : "")" 
+                            @onclick="@(() => CambiarTab("datos"))">
+                        <i class="fas fa-user"></i> Datos Personales
+                    </button>
+                    <button class="tab-button @(tabActiva == "pagos" ? "active" : "")" 
+                            @onclick="@(() => CambiarTab("pagos"))">
+                        <i class="fas fa-credit-card"></i> Método de Pago
+                    </button>
+                    <button class="tab-button @(tabActiva == "reservas" ? "active" : "")" 
+                            @onclick="@(() => CambiarTab("reservas"))">
+                        <i class="fas fa-calendar-alt"></i> Reservas
+                    </button>
                 </div>
 
-                <div class="profile-actions">   
-                    <button type="button" class="btn" @onclick="IniciarEdicion">
-                        <i class="fas fa-edit"></i> Editar Perfil
-                    </button>
+                <div class="tab-content">
+                    @if (tabActiva == "datos")
+                    {
+                        <div class="tab-pane active">
+                            <div class="profile-section">
+                                @if (modoEdicion)
+                                {
+                                    <div class="btn-container">
+                                        <h2>Editar Información Personal</h2>
+                                        <button class="btn-outline" @onclick="CancelarEdicion">
+                                            <i class="fas fa-times"></i> 
+                                        </button>
+                                    </div>
+                                    <DatosFormEdicion Input="@datosForm" 
+                                                  OnSubmit="GuardarCambios"
+                                                  FormName="editarPerfil"
+                                                  SubmitButtonText="Guardar"
+                                                  ButtonClass="btn" />          
+                                }
+                                else
+                                {
+                                    <h3>Información Personal</h3>
+                                    <div class="info-group">
+                                        <label>Nombre:</label>
+                                        <span>@usuario.Nombre</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Apellido:</label>
+                                        <span>@usuario.Apellido</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Email:</label>
+                                        <span>@usuario.Email</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Teléfono:</label>
+                                        <span>@usuario.Telefono</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Fecha de Nacimiento:</label>
+                                        <span>@(usuario.FechaNacimiento?.ToShortDateString() ?? "No especificada")</span>
+                                    </div>
+                                    <div class="profile-actions">   
+                                        <button type="button" class="btn" @onclick="IniciarEdicion">
+                                            <i class="fas fa-edit"></i> Editar Perfil
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else if (tabActiva == "pagos")
+                    {
+                        <div class="tab-pane">
+                            <h3>Métodos de Pago</h3>
+                            <div class="profile-section">
+                                <p class="text-muted">Próximamente: Aquí podrás gestionar tus métodos de pago.</p>
+                            </div>
+                        </div>
+                    }
+                    else if (tabActiva == "reservas")
+                    {
+                        <div class="tab-pane">
+                            <h3>Mis Reservas</h3>
+                            <div class="profile-section">
+                                <p class="text-muted">Próximamente: Aquí podrás ver el historial de tus reservas.</p>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         }
@@ -105,46 +190,51 @@
     private bool mostrarCambioPassword = false;
     private DatosFormEdicion.InputModel datosForm = new();
     private string? mensajeExito;
+    private string tabActiva = "datos";
+    private bool esAdministrador;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
-            Logger.LogInformation("Estado de autenticación obtenido");
             
-            // Imprimir todas las claims disponibles
-            foreach (var claim in authState.User.Claims)
-            {
-                Logger.LogInformation($"Claim: {claim.Type} = {claim.Value}");
-            }
+            // Verificar si el usuario es administrador
+            esAdministrador = authState.User.IsInRole("Administrador");
 
             var email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
-            Logger.LogInformation($"Email from claims: {email}");
             
             if (email != null)
             {
-                usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(email);
+                usuario = await Task.Run(() => UsuarioRepositorio.ObtenerUsuarioPorEmail(email));
+                
                 if (usuario == null)
                 {
                     _error = $"No se encontró usuario con email: {email}";
-                    Logger.LogWarning(_error);
                 }
                 else
                 {
-                    Logger.LogInformation($"Usuario encontrado: {usuario.Nombre} {usuario.Apellido}");
+                    // Establecer la pestaña activa por defecto
+                    tabActiva = "datos";
                 }
             }
             else
             {
                 _error = "No se pudo obtener el email del usuario autenticado";
-                Logger.LogWarning(_error);
             }
         }
         catch (Exception ex)
         {
             _error = $"Error al cargar el perfil: {ex.Message}";
-            Logger.LogError(_error);
+        }
+    }
+
+    private void CambiarTab(string tab)
+    {
+        tabActiva = tab;
+        if (modoEdicion)
+        {
+            CancelarEdicion();
         }
     }
 
@@ -187,7 +277,6 @@
         catch (Exception ex)
         {
             _error = $"Error al actualizar el perfil: {ex.Message}";
-            Logger.LogError(_error);
         }
     }
 } 
