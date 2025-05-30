@@ -96,32 +96,61 @@
     padding: 2rem;
 }
 
+.profile-section h2 {
+    color: #1F3F48;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
 .info-group {
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
+    margin-bottom: 1.2rem;
+    padding: 0.8rem;
+    border-radius: var(--bs-border-radius);
+    background-color: var(--bs-tertiary-bg);
+    transition: background-color 0.2s ease;
+}
+
+.info-group:hover {
+    background-color: var(--bs-secondary-bg);
 }
 
 .info-group label {
-    font-weight: 500;
-    color: #495057;
-    margin-right: 1rem;
-    min-width: 150px;
+    display: block;
+    font-weight: 600;
+    color: #1F3F48;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
 }
 
 .info-group span {
-    color: #212529;
+    display: block;
+    color: var(--bs-body-color);
+    font-size: 1rem;
+    padding: 0.2rem 0;
 }
 
 .profile-actions {
     margin-top: 2rem;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     gap: 1rem;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
 }
 
 .btn {
     padding: 0.5rem 1rem;
     border-radius: 4px;
+    width: 160px;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -134,24 +163,28 @@
     transform: translateY(-1px);
 }
 
-.btn-outline {
-    background: none;
-    border: 1px solid #f1771f;
-    color: #f1771f;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.mensaje-exito {
+    width: 300px;
+    color: var(--bs-success);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    animation: fadeIn 0.3s ease-out;
+    text-align: center;
 }
 
-.btn-outline:hover {
-    background-color: #f1771f;
-    color: white;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .text-muted {
     color: #6c757d;
 }
+
 @media (max-width: 1440px) {
     .profile-container {
         max-width: 95%;

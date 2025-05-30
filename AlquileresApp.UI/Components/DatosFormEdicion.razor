@@ -54,8 +54,10 @@
         <small class="text-muted d-block pt-2 ps-2">Debes tener al menos 18 años</small>
         <Error Mensaje="@errorFechaNacimiento" />
     </div>
-    
     <div class="btn-container">
+        <button class="btn-outline" @onclick="@CancelarEdicion">
+            Volver
+        </button>
         <button type="submit" class="@ButtonClass">@SubmitButtonText</button>
     </div>
 </EditForm>
@@ -78,6 +80,8 @@
 
     [Parameter]
     public string ButtonClass { get; set; } = "";
+    [Parameter]
+    public EventCallback CancelarEdicion { get; set; }
 
     private string? errorNombre;
     private string? errorApellido;

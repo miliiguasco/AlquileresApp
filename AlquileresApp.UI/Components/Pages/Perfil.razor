@@ -26,17 +26,13 @@
             <div class="profile-section">
                 @if (modoEdicion)
                 {
-                    <div class="btn-container">
-                        <h2>Editar Información Personal</h2>
-                        <button class="btn-outline" @onclick="CancelarEdicion">
-                            <i class="fas fa-times"></i> 
-                        </button>
-                    </div>
+                    <h2>Editar Información Personal</h2>
                     <DatosFormEdicion Input="@datosForm" 
                                   OnSubmit="GuardarCambios"
                                   FormName="editarPerfil"
                                   SubmitButtonText="Guardar"
-                                  ButtonClass="btn" />          
+                                  ButtonClass="btn"
+                                  CancelarEdicion="CancelarEdicion" />          
                 }
                 else
                 {
@@ -62,6 +58,10 @@
                         <span>@(usuario.FechaNacimiento?.ToShortDateString() ?? "No especificada")</span>
                     </div>
                     <div class="profile-actions">   
+                        @if (!string.IsNullOrEmpty(mensajeExito))
+                        {
+                            <div class="mensaje-exito">@mensajeExito</div>
+                        }   
                         <button type="button" class="btn" @onclick="IniciarEdicion">
                             <i class="fas fa-edit"></i> Editar Perfil
                         </button>
@@ -94,42 +94,42 @@
                             <div class="profile-section">
                                 @if (modoEdicion)
                                 {
-                                    <div class="btn-container">
-                                        <h2>Editar Información Personal</h2>
-                                        <button class="btn-outline" @onclick="CancelarEdicion">
-                                            <i class="fas fa-times"></i> 
-                                        </button>
-                                    </div>
+                                    <h2>Editar Información Personal</h2>
                                     <DatosFormEdicion Input="@datosForm" 
                                                   OnSubmit="GuardarCambios"
                                                   FormName="editarPerfil"
                                                   SubmitButtonText="Guardar"
-                                                  ButtonClass="btn" />          
+                                                  ButtonClass="btn"
+                                                  CancelarEdicion="CancelarEdicion" />          
                                 }
                                 else
                                 {
                                     <h3>Información Personal</h3>
                                     <div class="info-group">
-                                        <label>Nombre:</label>
+                                        <label>Nombre</label>
                                         <span>@usuario.Nombre</span>
                                     </div>
                                     <div class="info-group">
-                                        <label>Apellido:</label>
+                                        <label>Apellido</label>
                                         <span>@usuario.Apellido</span>
                                     </div>
                                     <div class="info-group">
-                                        <label>Email:</label>
+                                        <label>Email</label>
                                         <span>@usuario.Email</span>
                                     </div>
                                     <div class="info-group">
-                                        <label>Teléfono:</label>
+                                        <label>Teléfono</label>
                                         <span>@usuario.Telefono</span>
                                     </div>
                                     <div class="info-group">
-                                        <label>Fecha de Nacimiento:</label>
+                                        <label>Fecha de Nacimiento</label>
                                         <span>@(usuario.FechaNacimiento?.ToShortDateString() ?? "No especificada")</span>
                                     </div>
-                                    <div class="profile-actions">   
+                                    <div class="profile-actions">
+                                        @if (!string.IsNullOrEmpty(mensajeExito))
+                                        {
+                                            <div class="mensaje-exito">@mensajeExito</div>
+                                        }   
                                         <button type="button" class="btn" @onclick="IniciarEdicion">
                                             <i class="fas fa-edit"></i> Editar Perfil
                                         </button>
@@ -174,14 +174,6 @@
         </div>
     }
 </div>
-
-@if (!string.IsNullOrEmpty(mensajeExito))
-{
-    <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
-        @mensajeExito
-        <button type="button" class="btn-close" @onclick="@(() => mensajeExito = null)"></button>
-    </div>
-}
 
 @code {
     private Usuario? usuario;
