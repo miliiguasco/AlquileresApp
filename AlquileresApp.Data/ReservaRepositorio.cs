@@ -2,47 +2,19 @@ using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Data;
 using Microsoft.EntityFrameworkCore;
+using AlquileresApp.Core.Enumerativos;
 
 public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
 {
-    public void CrearReserva(Cliente cliente, Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin, int cantidadHuespedes)
+    public void CrearReserva(Reserva reserva)
     {
         try
-        {
-            Console.WriteLine($"Creando reserva: ClienteId={cliente.Id}, PropiedadId={propiedad.Id}");
-            Console.WriteLine($"Conexión a la base de datos: {dbContext.Database.GetConnectionString()}");
-            
-            // Verificar si la base de datos existe
-            Console.WriteLine($"Base de datos existe: {dbContext.Database.CanConnect()}");
-            
-            Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes);
-            Console.WriteLine($"Reserva creada con ID: {reserva.Id}, Estado: {reserva.Estado}, PrecioTotal: {reserva.PrecioTotal}");
-            
-            dbContext.Reservas.Add(reserva);
-            Console.WriteLine("Reserva agregada al contexto");
-            
-            var result = dbContext.SaveChanges();
-            Console.WriteLine($"SaveChanges result: {result} filas afectadas");
-            
-            if (result > 0)
-            {
-                // Verificar que la reserva se guardó
-                var reservaGuardada = dbContext.Reservas.Find(reserva.Id);
-                Console.WriteLine($"Reserva guardada en BD: {(reservaGuardada != null ? "Sí" : "No")}");
-                if (reservaGuardada != null)
-                {
-                    Console.WriteLine($"Datos de la reserva guardada: Id={reservaGuardada.Id}, ClienteId={reservaGuardada.ClienteId}, PropiedadId={reservaGuardada.PropiedadId}");
-                }
-            }
-            else
-            {
-                throw new Exception("No se pudo crear la reserva en la base de datos");
-            }
+        {         
+            dbContext.Reservas.Add(reserva);      
+            dbContext.SaveChanges();            
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al crear reserva: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
             throw new Exception($"Error al crear la reserva: {ex.Message}");
         }
     }
@@ -88,6 +60,15 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
             throw new Exception("No se encontraron reservas.");
         return reservas;    
     }
+
+    public void RegistrarCheckout(Reserva reserva, int empleadoId)
+    {
+        reserva.Estado = EstadoReserva.Finalizada;
+        reserva.FechaCheckOut = DateTime.Now;
+        reserva.EmpleadoQueRealizoCheckOutId = empleadoId;
+        dbContext.SaveChanges();
+    }
+
      /*
     public List<Reserva> ListarMisReservas(Usuario usuario){
         throw new NotImplementedException();
@@ -97,12 +78,6 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
     public void CancelarReserva(Reserva reserva)
     {
         // TODO: Implementa la lógica para cancelar una reserva
-        throw new NotImplementedException();
-    }
-
-    public void RegistrarCheckout(Reserva reserva)
-    {
-        // TODO: Implementa la lógica para registrar el checkout
         throw new NotImplementedException();
     }
 

@@ -5,6 +5,6 @@ public enum EstadoReserva
     Pendiente,
     Confirmada,
     Cancelada,
-    EnCurso,
+    Activa,
     Finalizada
     }

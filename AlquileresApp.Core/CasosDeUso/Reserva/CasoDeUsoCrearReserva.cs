@@ -56,16 +56,31 @@ public class CasoDeUsoCrearReserva(IReservaRepositorio reservasRepositorio, IPro
             };
             Console.WriteLine($"Monto total a pagar: {montoTotal} (Precio por noche: {propiedad.PrecioPorNoche}, Días: {dias})");
 
+            // Calcular y guardar el monto restante
+            
+
             // Realizar pago (que incluye la validación de saldo)
             if (!tarjetaRepositorio.Pagar(tarjeta, montoTotal))
             {
                 throw new Exception($"Saldo insuficiente. Saldo actual: {tarjeta.Saldo}, Monto requerido: {montoTotal}");
             }
-            Console.WriteLine("Pago procesado correctamente");
 
+            Console.WriteLine("Pago procesado correctamente");
+            Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes);
+            
+            reserva.MontoRestante = propiedad.TipoPago switch
+            {
+                TipoPago.SinAnticipo => montoBase,
+                TipoPago.Parcial => montoBase - (montoBase * 0.20m),
+                TipoPago.Total => 0,
+                _ => throw new Exception("Tipo de pago no válido")
+            };
+            
             // Crear reserva
-            reservasRepositorio.CrearReserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes);
+            reservasRepositorio.CrearReserva(reserva);
             Console.WriteLine("Reserva creada exitosamente");
+
+  
         }
         catch (Exception ex)
         {
