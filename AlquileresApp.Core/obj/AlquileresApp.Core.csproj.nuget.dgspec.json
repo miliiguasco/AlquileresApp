@@ -43,6 +43,24 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.Authentication": {
+              "target": "Package",
+              "version": "[2.3.0, )"
+            },
+            "Microsoft.AspNetCore.Components.Authorization": {
+              "target": "Package",
+              "version": "[9.0.5, )"
+            },
+            "Microsoft.JSInterop": {
+              "target": "Package",
+              "version": "[9.0.5, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.11.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

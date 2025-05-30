@@ -3,6 +3,8 @@
 @using AlquileresApp.Core.Entidades
 @using System.Collections.Generic
 
+@namespace AlquileresApp.UI.Components
+
 <EditForm Model="Input" OnValidSubmit="OnSubmit" OnInvalidSubmit="ManejarInvalidSubmit" FormName="@FormName">
     <DataAnnotationsValidator />
     <div class="form-floating mb-3">
@@ -52,14 +54,9 @@
         <small class="text-muted d-block pt-2 ps-2">Debes tener al menos 18 años</small>
         <Error Mensaje="@errorFechaNacimiento" />
     </div>
-    <div class="form-floating mb-3">
-        <InputText type="password" @bind-Value="Input.Password" class="form-control" aria-required="true" @oninput="@(() => { errorPassword = null; StateHasChanged(); })" />
-        <label for="password" class="form-label">Contraseña</label>
-        <Error Mensaje="@errorPassword" />
-    </div>
     
-    <div>
-        <button type="submit" class="w-100 btn btn-lg @ButtonClass">@SubmitButtonText</button>
+    <div class="btn-container">
+        <button type="submit" class="@ButtonClass">@SubmitButtonText</button>
     </div>
 </EditForm>
 
@@ -74,7 +71,7 @@
     public EventCallback OnEmailChange { get; set; }
 
     [Parameter]
-    public string FormName { get; set; } = "DatosForm";
+    public string FormName { get; set; } = "DatosFormEdicion";
 
     [Parameter]
     public string SubmitButtonText { get; set; } = "Guardar";
@@ -87,7 +84,6 @@
     private string? errorEmail;
     private string? errorTelefono;
     private string? errorFechaNacimiento;
-    private string? errorPassword;
 
     public void LimpiarErrores()
     {
@@ -96,7 +92,6 @@
         errorEmail = null;
         errorTelefono = null;
         errorFechaNacimiento = null;
-        errorPassword = null;
         StateHasChanged();
     }
 
@@ -125,8 +120,6 @@
                     errorTelefono = result.ErrorMessage;
                 else if (result.MemberNames.Contains(nameof(Input.FechaDeNacimiento)))
                     errorFechaNacimiento = result.ErrorMessage;
-                else if (result.MemberNames.Contains(nameof(Input.Password)))
-                    errorPassword = result.ErrorMessage;
             }
         }
     }
@@ -154,10 +147,5 @@
         [Required(ErrorMessage = "La fecha de nacimiento es requerida")]
         [DataType(DataType.Date)]
         public DateTime? FechaDeNacimiento { get; set; }
-
-        [Required(ErrorMessage = "La contraseña es requerida")]
-        [StringLength(30, MinimumLength = 8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres")]
-        [DataType(DataType.Password)]
-        public string Password { get; set; } = "";
     }
 } 
