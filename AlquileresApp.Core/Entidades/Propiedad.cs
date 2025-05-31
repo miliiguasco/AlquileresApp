@@ -13,8 +13,9 @@ public class Propiedad
     public double Latitud { get; set; }
     public double Longitud { get; set; }
     public int Capacidad { get; set; }
+
+    public bool NoHabitable { get; set; } = false;
     public int EncargadoId { get; set; }
-    public int PagoAnticipado { get; set; }
     public List<ServiciosPropiedad> ServiciosDisponibles { get; set; } = new();
     public List<Imagen> Imagenes { get; set; } = new();
     public List<Reserva> Reservas { get; set; } = new();
@@ -22,5 +23,5 @@ public class Propiedad
     public TipoPago TipoPago { get; set; }
     public decimal MontoAPagar { get; set; }
     public decimal MontoPagoAnticipado { get; set; }
-} 
+}
 

@@ -65,10 +65,31 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
             .FirstOrDefault(r => r.Id == id);
-    }   
+    }
+
+    public void ModificarReserva2(Reserva reserva)
+    {
+        var existingReserva = dbContext.Reservas.Find(reserva.Id); // O alguna forma de obtener la reserva existente
+
+        if (existingReserva != null)
+        {
+            // Actualizar las propiedades necesarias
+            existingReserva.PropiedadId = reserva.Propiedad.Id; // Asegúrate de asignar el ID
+            existingReserva.Propiedad = reserva.Propiedad;     // También podrías necesitar asignar la navegación
+
+            dbContext.Reservas.Update(existingReserva); // O _dbContext.Entry(existingReserva).State = EntityState.Modified;
+            dbContext.SaveChanges();
+        }
+        else
+        {
+            // Manejar el caso en que la reserva no existe
+            throw new Exception($"No se encontró la reserva con ID: {reserva.Id}");
+        }
+    } 
     
 
-    public List<Reserva> ListarReservas(){
+    public List<Reserva> ListarReservas()
+    {
         var reservas = dbContext.Reservas
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)

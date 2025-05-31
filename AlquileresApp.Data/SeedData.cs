@@ -67,6 +67,23 @@ namespace AlquileresApp.Data
                 },
                 new Propiedad
                 {
+                    Titulo = "Casa en la playa 2",
+                    Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
+                    Direccion = "Av. Costanera 123",
+                    Localidad = "Mar del Plata",
+                    PrecioPorNoche = 150.00m,
+                    Capacidad = 6,
+                    ServiciosDisponibles = new List<ServiciosPropiedad> 
+                    { 
+                        ServiciosPropiedad.Wifi,
+                        ServiciosPropiedad.AireAcondicionado,
+                        ServiciosPropiedad.Piscina,
+                        ServiciosPropiedad.Estacionamiento
+                    },
+                    PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50
+                },
+                new Propiedad
+                {
                     Titulo = "Cabaña en la montaña",
                     Descripcion = "Acogedora cabaña con vista a la montaña y chimenea",
                     Direccion = "Cerro Catedral 456",

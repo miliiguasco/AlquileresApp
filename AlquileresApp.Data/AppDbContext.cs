@@ -57,10 +57,6 @@ namespace AlquileresApp.Data
             modelBuilder.Entity<Propiedad>()
                 .Property(p => p.Localidad)
                 .IsRequired();
-            // Configuración de Propiedad
-            modelBuilder.Entity<Propiedad>()
-                .Property(p => p.PagoAnticipado)
-                .IsRequired();
 
             // Configuración de Reserva
             modelBuilder.Entity<Reserva>()
@@ -74,6 +70,7 @@ namespace AlquileresApp.Data
                 .WithMany(p => p.Reservas)
                 .HasForeignKey(r => r.PropiedadId)
                 .OnDelete(DeleteBehavior.Cascade);
+
 
             // Configuración de Tarjeta
             modelBuilder.Entity<Tarjeta>()

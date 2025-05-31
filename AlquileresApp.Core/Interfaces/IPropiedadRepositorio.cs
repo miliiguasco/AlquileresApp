@@ -5,9 +5,8 @@ public interface IPropiedadRepositorio{
     void CargarPropiedad(Propiedad propiedad);
     void ModificarPropiedad(Propiedad propiedad);
     void EliminarPropiedad(Propiedad propiedad);
-    //void MarcarPropiedadComoNoHabitable(Propiedad propiedad);
+    void MarcarPropiedadComoNoHabitable(Propiedad propiedad);
     public List<Propiedad> ListarPropiedades();
-    bool TieneReservaActiva(int propiedadId);
     public Propiedad? ObtenerPropiedadPorId(int id);
     List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros);
     public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin);
