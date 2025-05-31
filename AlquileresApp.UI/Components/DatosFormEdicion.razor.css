@@ -23,53 +23,76 @@
     font-size: 0.875rem;
 }
 
+.btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    gap: 1rem;
+}
+
+.btn-outline {
+    background: none;
+    border: 1px solid #f1771f;
+    color: #f1771f;
+    padding: 0.4rem 1.2rem;
+    width: 130px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+    background-color: #f1771f;
+    color: white;
+}
+
 ::deep button.btn,
 ::deep input[type="submit"].btn {
-    padding: 0.4rem 1.2rem !important;
-    border-radius: 4px !important;
-    font-weight: 500 !important;
-    transition: all 0.3s ease !important;
-    text-decoration: none !important;
-    cursor: pointer !important;
-    background-color: #f1771f !important;
-    border: 1px solid #f1771f !important;
-    color: white !important;
-    white-space: nowrap !important;
-    font-size: 0.95rem !important;
-    width: 130px !important;
-    text-align: center !important;
-    display: inline-block !important;
+    padding: 0.4rem 1.2rem;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    cursor: pointer;
+    background-color: #f1771f;
+    border: 1px solid #f1771f;
+    color: white;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    width: 130px;
+    text-align: center;
+    display: inline-block;
 }
 
 ::deep button.btn:hover,
 ::deep input[type="submit"].btn:hover {
-    background-color: #f37820 !important;
-    border-color: #f37820 !important;
-    color: white !important;
+    background-color: #f37820;
+    border-color: #f37820;
+    color: white;
 }
 
 @media (max-width: 768px) {
     ::deep button.btn,
     ::deep input[type="submit"].btn {
-        padding: 0.3rem 0.8rem !important;
-        font-size: 0.9rem !important;
-        width: 110px !important;
+        padding: 0.3rem 0.8rem;
+        font-size: 0.9rem;
+        width: 110px;
     }
 }
 
 ::deep input:focus,
 ::deep .form-control:focus {
-    border-color: #596E69 !important;
-    outline: none !important;
-    box-shadow: none !important;
+    border-color: #596E69;
+    outline: none;
+    box-shadow: none;
 }
 
 ::deep .form-floating > .form-control:focus {
-    border-color: #596E69 !important;
-    outline: none !important;
-    box-shadow: none !important;
+    border-color: #596E69;
+    outline: none;
+    box-shadow: none;
 }
 
 ::deep .form-floating > .form-control:focus ~ label {
-    color: #596E69 !important;
+    color: #596E69;
 } 
