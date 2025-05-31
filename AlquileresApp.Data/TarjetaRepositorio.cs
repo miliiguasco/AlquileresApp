@@ -29,7 +29,7 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
         
         // Validar fecha de vencimiento
         var fechaActual = DateTime.Now;
-        var fechaVencimiento = DateTime.ParseExact(tarjeta.FechaVencimiento, "MM/yy", null);
+        var fechaVencimiento = DateTime.ParseExact(tarjeta.FechaVencimiento, "MM/yyyy", null);
         if (fechaVencimiento < fechaActual)
         {
             Console.WriteLine("La tarjeta está vencida");
@@ -62,4 +62,20 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
         Console.WriteLine("Saldo suficiente");
         return true;
     }
+
+    public void EliminarTarjeta(Tarjeta tarjeta){
+        dbContext.Tarjetas.Remove(tarjeta);
+        dbContext.SaveChanges();
+    }
+
+    public List<Tarjeta> ObtenerTarjetasPorUsuario(int usuarioId){
+        return dbContext.Tarjetas.Where(t => t.ClienteId == usuarioId).ToList();
+    }
+
+
+    public void PagarMontoRestante(Tarjeta tarjeta, decimal monto){
+        tarjeta.Saldo -= monto;
+        dbContext.SaveChanges();
+    }
+    
 }

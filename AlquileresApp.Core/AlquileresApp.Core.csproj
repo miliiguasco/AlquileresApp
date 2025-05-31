@@ -18,6 +18,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.5" />
     <PackageReference Include="Microsoft.JSInterop" Version="9.0.5" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.11.0" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.7" />
   </ItemGroup>
 
 </Project>

@@ -34,8 +34,9 @@ builder.Services.AddServerSideBlazor(options =>
 
 builder.Services.AddCascadingAuthenticationState();
 
-builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseSqlite("Data Source=../AlquileresApp.Data/Alquilando.db"));
+// Configurar DbContext
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure HTTPS
 builder.WebHost.UseUrls("https://localhost:7234", "http://localhost:5234");
@@ -84,8 +85,11 @@ builder.Services.AddScoped<IFechaReservaValidador, FechaReservaValidador>();
 builder.Services.AddScoped<ITarjetaValidador, TarjetaValidador>();
 builder.Services.AddScoped<CasoDeUsoRegistrarTarjeta>();
 builder.Services.AddScoped<CasoDeUsoObtenerPropiedad>();
+builder.Services.AddScoped<CasoDeUsoVisualizarReserva>();
+builder.Services.AddScoped<CasoDeUsoVisualizarTarjeta>();
+builder.Services.AddScoped<CasoDeUsoEliminarTarjeta>();
+builder.Services.AddScoped<CasoDeUsoModificarTarjeta>();
 builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
-
 
 var app = builder.Build();
 
@@ -146,7 +150,7 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
 else

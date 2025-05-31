@@ -1,0 +1,130 @@
+@page "/visualizar-reservas/{UsuarioId:int}"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Enumerativos
+@inject CasoDeUsoVisualizarReserva CUVisualizarReserva
+@inject NavigationManager NavigationManager
+
+<div class="reservas-container">
+    <div class="reservas-header">
+        <h2>Mis Reservas</h2>
+        <button class="btn-nueva-reserva" @onclick="NuevaReserva">
+            <i class="fas fa-plus"></i>
+            Nueva Reserva
+        </button>
+    </div>
+
+    @if (reservas != null && reservas.Any())
+    {
+        <div class="reservas-grid">
+            @foreach (var reserva in reservas)
+            {
+                <div class="reserva-card">
+                    <div class="reserva-header">
+                        <h3>@reserva.Propiedad?.Titulo</h3>
+                        <span class="estado-badge @GetEstadoClass(reserva.Estado)">
+                            @reserva.Estado
+                        </span>
+                    </div>
+                    
+                    <div class="reserva-info">
+                        <div class="info-item">
+                            <i class="fas fa-calendar"></i>
+                            <div>
+                                <label>Fecha de Inicio:</label>
+                                <p>@reserva.FechaInicio.ToShortDateString()</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <div>
+                                <label>Fecha de Fin:</label>
+                                <p>@reserva.FechaFin.ToShortDateString()</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <label>Huéspedes:</label>
+                                <p>@reserva.CantidadHuespedes personas</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div>
+                                <label>Precio Total:</label>
+                                <p>$@reserva.PrecioTotal.ToString("N2")</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reserva-actions">
+                        <button class="btn-detalles" @onclick="() => VerDetalles(reserva.Id)">
+                            <i class="fas fa-info-circle"></i>
+                            Ver Detalles
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (errorMensaje != null)
+    {
+        <div class="alert alert-danger">
+            @errorMensaje
+        </div>
+    }
+    else
+    {
+        <div class="no-reservas">
+            <i class="fas fa-calendar-times"></i>
+            <p>No tienes reservas activas</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int UsuarioId { get; set; }
+
+    private List<Reserva>? reservas;
+    private string? errorMensaje;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            reservas = CUVisualizarReserva.Ejecutar(UsuarioId);
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = ex.Message;
+        }
+    }
+
+    private string GetEstadoClass(EstadoReserva estado)
+    {
+        return estado switch
+        {
+            EstadoReserva.Pendiente => "estado-pendiente",
+            EstadoReserva.Confirmada => "estado-confirmada",
+            EstadoReserva.Cancelada => "estado-cancelada",
+            EstadoReserva.Finalizada => "estado-finalizada",
+            _ => ""
+        };
+    }
+
+    private void VerDetalles(int reservaId)
+    {
+        NavigationManager.NavigateTo($"/reserva/{reservaId}");
+    }
+
+    private void NuevaReserva()
+    {
+        NavigationManager.NavigateTo("/nueva-reserva");
+    }
+} 

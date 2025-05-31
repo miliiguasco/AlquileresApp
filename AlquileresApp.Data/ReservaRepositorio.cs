@@ -61,18 +61,14 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         return reservas;    
     }
 
-    public void RegistrarCheckout(Reserva reserva, int empleadoId)
+    public void RegistrarCheckout(Reserva reserva)
     {
         reserva.Estado = EstadoReserva.Finalizada;
         reserva.FechaCheckOut = DateTime.Now;
-        reserva.EmpleadoQueRealizoCheckOutId = empleadoId;
         dbContext.SaveChanges();
     }
 
-     /*
-    public List<Reserva> ListarMisReservas(Usuario usuario){
-        throw new NotImplementedException();
-    }
+    
 
 
     public void CancelarReserva(Reserva reserva)
@@ -81,7 +77,7 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         throw new NotImplementedException();
     }
 
-*/
+
 
 
 

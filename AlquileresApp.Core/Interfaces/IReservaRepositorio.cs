@@ -8,7 +8,8 @@ public interface IReservaRepositorio{
     public Reserva? ObtenerReservaPorId(int id);
     public List<Reserva> ListarReservas();
     public List<Reserva> ListarMisReservas(Usuario usuario);
-    public void RegistrarCheckout(Reserva reserva, int empleadoId);
+    public void RegistrarCheckout(Reserva reserva);
+
 }
 
 

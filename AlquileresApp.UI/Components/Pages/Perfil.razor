@@ -5,12 +5,17 @@
 @using System.Security.Claims
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.Tarjeta
 @using AlquileresApp.UI.Components
 @inject AuthenticationStateProvider ServicioAutenticacion
 @inject IUsuarioRepositorio UsuarioRepositorio
 @inject ILogger<Perfil> Logger
 @inject NavigationManager NavigationManager
+@inject CasoDeUsoVisualizarTarjeta CUVisualizarTarjeta
+@inject CasoDeUsoEliminarTarjeta CUEliminarTarjeta
+@inject IJSRuntime JS
 @attribute [Authorize]
+
 
 <PageTitle>Mi Perfil</PageTitle>
 
@@ -67,9 +72,68 @@
                     </div>
                 </div>
 
+                @if (mostrarEliminarTarjeta)
+                {
+                    <div class="profile-section">
+                        <div class="btn-container">
+                            <h2>Seleccionar Tarjeta a Eliminar</h2>
+                            <button class="btn-outline" @onclick="CancelarEliminacion">
+                                <i class="fas fa-times"></i> 
+                            </button>
+                        </div>
+                        @if (tarjetas != null && tarjetas.Any())
+                        {
+                            <div class="tarjetas-list">
+                                @foreach (var tarjeta in tarjetas)
+                                {
+                                    <div class="tarjeta-item">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" 
+                                                   id="tarjeta-@tarjeta.Id" 
+                                                   name="tarjetaSeleccionada"
+                                                   @onchange="@(() => SeleccionarTarjeta(tarjeta.Id))"
+                                                   checked="@(tarjetaSeleccionada == tarjeta.Id)">
+                                            <label class="form-check-label" for="tarjeta-@tarjeta.Id">
+                                                **** **** **** @tarjeta.NumeroTarjeta.Substring(tarjeta.NumeroTarjeta.Length - 4)
+                                            </label>
+                                        </div>
+                                        <div class="tarjeta-info">
+                                            <small>Titular: @tarjeta.Titular</small>
+                                            <small>Vence: @tarjeta.FechaVencimiento</small>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-danger" @onclick="ConfirmarEliminacion" disabled="@(tarjetaSeleccionada == 0)">
+                                    <i class="fas fa-trash"></i> Eliminar Tarjeta Seleccionada
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                No tienes tarjetas registradas.
+                            </div>
+                        }
+                    </div>
+                }
+
                 <div class="profile-actions">   
-                    <button type="button" class="btn" @onclick="IniciarEdicion">
-                        <i class="fas fa-edit"></i> Editar Perfil
+                    <button type="button" class="btn btn-primary" @onclick="IniciarEdicion">
+                        <i class="fas fa-user-edit"></i> Editar Perfil
+                    </button>
+                    <button type="button" class="btn btn-info" @onclick="IrAVerTarjeta">
+                        <i class="fas fa-credit-card"></i> Ver Tarjeta
+                    </button>
+                    <button type="button" class="btn btn-success" @onclick="IrAEditarTarjeta">
+                        <i class="fas fa-edit"></i> Editar Tarjeta
+                    </button>
+                    <button type="button" class="btn btn-danger" @onclick="IniciarEliminacion">
+                        <i class="fas fa-trash"></i> Eliminar Tarjeta
+                    </button>
+                    <button type="button" class="btn btn-warning" @onclick="IrARegistrarTarjeta">
+                        <i class="fas fa-plus-circle"></i> Registrar Nueva Tarjeta
                     </button>
                 </div>
             </div>
@@ -105,6 +169,9 @@
     private bool mostrarCambioPassword = false;
     private DatosFormEdicion.InputModel datosForm = new();
     private string? mensajeExito;
+    private bool mostrarEliminarTarjeta = false;
+    private List<Tarjeta>? tarjetas;
+    private int tarjetaSeleccionada = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -190,4 +257,188 @@
             Logger.LogError(_error);
         }
     }
-} 
+
+    private void IrAVerTarjeta()
+    {
+        var usuarioId = usuario!.Id;
+        NavigationManager.NavigateTo($"/visualizar-tarjeta/{usuarioId}");
+    }
+
+    private void IrAEditarTarjeta()
+    {
+        NavigationManager.NavigateTo("/editar-tarjeta");
+    }
+
+    private void IniciarEliminacion()
+    {
+        mostrarEliminarTarjeta = true;
+        tarjetas = CUVisualizarTarjeta.Ejecutar(usuario!.Id);
+        tarjetaSeleccionada = 0;
+    }
+
+    private void CancelarEliminacion()
+    {
+        mostrarEliminarTarjeta = false;
+        tarjetas = null;
+        tarjetaSeleccionada = 0;
+    }
+
+    private void SeleccionarTarjeta(int tarjetaId)
+    {
+        tarjetaSeleccionada = tarjetaId;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmarEliminacion()
+    {
+        if (tarjetaSeleccionada == 0)
+        {
+            await JS.InvokeVoidAsync("alert", "Por favor, seleccione una tarjeta para eliminar.");
+            return;
+        }
+
+        var confirmacion = await JS.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar esta tarjeta?");
+        if (confirmacion)
+        {
+            try
+            {
+                await CUEliminarTarjeta.Ejecutar(tarjetaSeleccionada);
+                await JS.InvokeVoidAsync("alert", "Tarjeta eliminada exitosamente");
+                CancelarEliminacion();
+            }
+            catch (Exception ex)
+            {
+                await JS.InvokeVoidAsync("alert", $"Error al eliminar la tarjeta: {ex.Message}");
+            }
+        }
+    }
+
+    private void IrARegistrarTarjeta()
+    {
+        NavigationManager.NavigateTo("/registrar-tarjeta");
+    }
+}
+
+<style>
+    .profile-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .profile-actions button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        color: white;
+        border: none;
+    }
+
+    .profile-actions button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .profile-actions .btn-primary {
+        background-color: #4a9cb5;
+        border-color: #4a9cb5;
+    }
+
+    .profile-actions .btn-primary:hover {
+        background-color: #3d8ba0;
+    }
+
+    .profile-actions .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+        color: white;
+    }
+
+    .profile-actions .btn-info:hover {
+        background-color: #138496;
+    }
+
+    .profile-actions .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .profile-actions .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .profile-actions .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .profile-actions .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .profile-actions .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: white;
+    }
+
+    .profile-actions .btn-warning:hover {
+        background-color: #e0a800;
+    }
+
+    .profile-actions button i {
+        font-size: 1.1rem;
+    }
+
+    .tarjetas-list {
+        margin-top: 1rem;
+    }
+
+    .tarjeta-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        background-color: #f8f9fa;
+    }
+
+    .tarjeta-item:hover {
+        background-color: #e9ecef;
+    }
+
+    .tarjeta-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .tarjeta-info small {
+        color: #6c757d;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0;
+    }
+
+    .form-check-label {
+        font-weight: 500;
+        color: #495057;
+    }
+</style> 

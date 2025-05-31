@@ -3,16 +3,33 @@ namespace AlquileresApp.Core.CasosDeUso.Reserva;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Core.Enumerativos;
 using AlquileresApp.Core.Interfaces;
-//using AlquileresApp.Core.CasosDeUso;
 using AlquileresApp.Core.Validadores;
+using AlquileresApp.Core.Servicios;
 
 
-public class CasoDeUsoCrearReserva(IReservaRepositorio reservasRepositorio, IPropiedadRepositorio propiedadRepositorio, IUsuarioRepositorio usuarioRepositorio,  ITarjetaRepositorio tarjetaRepositorio, IFechaReservaValidador fechaReservaValidador)
+public class CasoDeUsoCrearReserva(
+    IReservaRepositorio reservasRepositorio, 
+    IPropiedadRepositorio propiedadRepositorio, 
+    IUsuarioRepositorio usuarioRepositorio,  
+    ITarjetaRepositorio tarjetaRepositorio, 
+    IFechaReservaValidador fechaReservaValidador)
 {
     public async Task Ejecutar(int clienteId, int propiedadId, DateTime fechaInicio, DateTime fechaFin, int cantidadHuespedes)
     {
         Console.WriteLine($"Iniciando creación de reserva: ClienteId={clienteId}, PropiedadId={propiedadId}");
+        Console.WriteLine($"Fechas recibidas - Inicio: {fechaInicio:yyyy-MM-dd}, Fin: {fechaFin:yyyy-MM-dd}");
         
+        // Validar fechas
+        if (fechaInicio < DateTime.Today)
+        {
+            throw new Exception("La fecha de inicio no puede ser anterior a hoy");
+        }
+
+        if (fechaFin <= fechaInicio)
+        {
+            throw new Exception("La fecha de fin debe ser posterior a la fecha de inicio");
+        }
+
         //validar fecha
         fechaReservaValidador.FechaValidador(fechaInicio, fechaFin);
         
@@ -25,11 +42,17 @@ public class CasoDeUsoCrearReserva(IReservaRepositorio reservasRepositorio, IPro
         Console.WriteLine($"Propiedad encontrada: {propiedad.Titulo}");
 
         // Obtener el cliente
-        var cliente = usuarioRepositorio.ObtenerUsuarioPorId(clienteId) as Cliente;
-        if (cliente == null)
+        var usuario = usuarioRepositorio.ObtenerUsuarioPorId(clienteId);
+        if (usuario == null)
         {
-            throw new Exception("Cliente no encontrado");
+            throw new Exception($"No se encontró usuario con ID: {clienteId}");
         }
+
+        if (usuario is not Cliente cliente)
+        {
+            throw new Exception($"El usuario con ID {clienteId} no es un cliente");
+        }
+
         Console.WriteLine($"Cliente encontrado: {cliente.Nombre} {cliente.Apellido}");
 
         propiedadRepositorio.ComprobarDisponibilidad(propiedad, fechaInicio, fechaFin);
@@ -38,10 +61,27 @@ public class CasoDeUsoCrearReserva(IReservaRepositorio reservasRepositorio, IPro
         try
         {
             // Obtener y validar tarjeta
-            var tarjeta = tarjetaRepositorio.ObtenerTarjetaPorId(cliente.Id);
+            var tarjetas = tarjetaRepositorio.ObtenerTarjetasPorUsuario(cliente.Id);
+            if (tarjetas == null || !tarjetas.Any())
+            {
+                throw new Exception("El cliente no tiene ninguna tarjeta registrada. Por favor, registre una tarjeta antes de realizar la reserva.");
+            }
+
+            var tarjeta = tarjetas.First();
             if (tarjeta == null)
             {
                 throw new Exception("No se pudo validar la tarjeta");
+            }
+
+            // Validar fecha de vencimiento de la tarjeta
+            if (!DateTime.TryParseExact(tarjeta.FechaVencimiento, "MM/yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime fechaVencimiento))
+            {
+                throw new Exception("Formato de fecha de vencimiento de tarjeta inválido");
+            }
+
+            if (fechaVencimiento < DateTime.Today)
+            {
+                throw new Exception("La tarjeta ha expirado");
             }
 
             // Calcular el monto total de la reserva
@@ -67,7 +107,7 @@ public class CasoDeUsoCrearReserva(IReservaRepositorio reservasRepositorio, IPro
 
             Console.WriteLine("Pago procesado correctamente");
             Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes);
-            
+            reserva.Estado = EstadoReserva.Activa;
             reserva.MontoRestante = propiedad.TipoPago switch
             {
                 TipoPago.SinAnticipo => montoBase,
@@ -80,12 +120,13 @@ public class CasoDeUsoCrearReserva(IReservaRepositorio reservasRepositorio, IPro
             reservasRepositorio.CrearReserva(reserva);
             Console.WriteLine("Reserva creada exitosamente");
 
-  
+            // Programar tareas automáticas
+
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error en el proceso de reserva: {ex.Message}");
-            throw new Exception($"Error al procesar la reserva: {ex.Message}");
+            Console.WriteLine($"Error al crear la reserva: {ex.Message}");
+            throw;
         }
     }
 }

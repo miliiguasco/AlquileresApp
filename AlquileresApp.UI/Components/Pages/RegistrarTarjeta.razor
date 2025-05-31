@@ -1,9 +1,20 @@
 @page "/registrar-tarjeta"
 @rendermode InteractiveServer
+@using AlquileresApp.Core.Entidades
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 @using AlquileresApp.Core.CasosDeUso.Tarjeta
 @using AlquileresApp.Core.Interfaces
 @inject CasoDeUsoRegistrarTarjeta CURegistrarTarjeta
+@inject IUsuarioRepositorio UsuarioRepositorio
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject AuthenticationStateProvider ServicioAutenticacion
+@inject ILogger<RegistrarTarjeta> Logger
+@attribute [Authorize]
+
+
 <link href="css/RegistrarTarjeta.css" rel="stylesheet" />
 
 <div class="modal-overlay">
@@ -41,18 +52,25 @@
                 </div>
             }
 
-            <button class="btn-reservar" @onclick="OnRegistrarTarjeta" disabled="@isSubmitting">
-                @if (isSubmitting)
-                {
-                    <span class="spinner"></span>
-                    <span>Procesando...</span>
-                }
-                else
-                {
-                    <i class="fas fa-check-circle"></i>
-                    <span>Registrar Tarjeta</span>
-                }
-            </button>
+            <div class="botones-tarjeta">
+                <button class="btn-cancelar" @onclick="CancelarRegistro">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Cancelar</span>
+                </button>
+
+                <button class="btn-reservar" @onclick="OnRegistrarTarjeta" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner"></span>
+                        <span>Procesando...</span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-check-circle"></i>
+                        <span>Registrar Tarjeta</span>
+                    }
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -125,10 +143,19 @@
                 errorMensaje = "La fecha de vencimiento no es válida o la tarjeta está vencida";
                 return;
             }
-
+            var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+            var email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
+            if (email == null)
+                throw new Exception("No se pudo obtener el email del usuario autenticado");
+                
+            var usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(email);
+            if (usuario == null)
+                throw new Exception($"No se encontró usuario con email: {email}");
+                
+            var usuarioId = usuario.Id;
             // Por ahora hardcodeado el clienteId como 1, pero debería ser el usuario actual
-            CURegistrarTarjeta.Ejecutar(1, numeroTarjeta, titular, fechaVencimiento, cvv, 10000);
-            NavigationManager.NavigateTo("/");
+            CURegistrarTarjeta.Ejecutar(usuarioId, numeroTarjeta, titular, fechaVencimiento, cvv, 10000);
+            NavigationManager.NavigateTo("/Perfil");
         }
         catch (Exception ex)
         {
@@ -140,4 +167,40 @@
             isSubmitting = false;
         }
     }
-} 
+
+    private void CancelarRegistro()
+    {
+        NavigationManager.NavigateTo("/Perfil");
+    }
+}
+
+<style>
+    .botones-tarjeta {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn-cancelar {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-cancelar:hover {
+        background-color: #c82333;
+    }
+
+    .btn-cancelar i {
+        font-size: 1.1rem;
+    }
+</style> 
