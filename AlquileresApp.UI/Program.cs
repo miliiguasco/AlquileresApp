@@ -9,10 +9,11 @@ using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Servicios;
 using Microsoft.EntityFrameworkCore;
 using AlquileresApp.Core.Entidades;
-using Microsoft.AspNetCore.Components.Web;
 using AlquileresApp.Core.CasosDeUso.Imagen;
 using AlquileresApp.Core.CasosDeUso.Reserva;
 using AlquileresApp.Core;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Authentication;
 
 
 
@@ -58,6 +59,14 @@ builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<CasoDeUsoRegistrarUsuario>();
 builder.Services.AddScoped<IUsuarioValidador, UsuarioValidador>();
 builder.Services.AddScoped<IServicioHashPassword, ServicioHashPassword>();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<ServicioSesion>();
+builder.Services.AddScoped<ServicioAutenticacion>();
+builder.Services.AddScoped<ServicioCookies>();
+builder.Services.AddScoped<IServicioSesion, ServicioSesion>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<ServicioAutenticacion>());
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<CasoDeUsoIniciarSesion>();
 builder.Services.AddScoped<IPropiedadRepositorio, PropiedadesRepositorio>();
 builder.Services.AddScoped<IImagenesRepositorio, ImagenesRepositorio>();
 builder.Services.AddScoped<IPropiedadValidador, PropiedadValidador>();
@@ -66,6 +75,7 @@ builder.Services.AddScoped<CasoDeUsoListarPropiedades>();
 builder.Services.AddScoped<CasoDeUsoAgregarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoCargarImagen>();
 builder.Services.AddScoped<CasoDeUsoModificarPropiedad>();
+builder.Services.AddScoped<CasoDeUsoEliminarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoMostrarImagenes>();
 builder.Services.AddScoped<CasoDeUsoEliminarImagen>();
 builder.Services.AddScoped<CasoDeUsoEliminarPropiedad>();
@@ -74,6 +84,7 @@ builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
 builder.Services.AddScoped<ITarjetaRepositorio, TarjetaRepositorio>();
 builder.Services.AddScoped<IFechaReservaValidador, FechaReservaValidador>();
 builder.Services.AddScoped<CasoDeUsoObtenerPropiedad>();
+builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
 builder.Services.AddScoped<CasoDeUsoMarcarPropiedadComoNoHabitable>();
 
 
@@ -102,10 +113,10 @@ using (var scope = app.Services.CreateScope())
             var hashedPassword = hashService.HashPassword("Password123!");
             Console.WriteLine($"Contraseña hasheada para usuario de prueba: {hashedPassword}");
             
-            var testUser = new Cliente(
-                "Test",
+            var testUser = new Administrador(
+                "Admin",
                 "User",
-                "test@test.com",
+                "admin@gmail.com",
                 "123456789",
                 hashedPassword,
                 DateTime.Now.AddYears(-20)

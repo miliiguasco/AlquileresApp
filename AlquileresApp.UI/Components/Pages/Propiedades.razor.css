@@ -1,0 +1,144 @@
+.admin-section {
+    padding: 1rem;
+}
+
+.table-container {
+    margin-top: 0.3rem;
+    overflow-x: auto;
+    background: white;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.property-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+    box-shadow: none;
+}
+
+.property-table th,
+.property-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.property-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #1F3F48;
+    white-space: nowrap;
+}
+
+.property-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.image-cell {
+    width: 120px;
+    padding: 8px;
+}
+
+.image-cell img {
+    width: 100px;
+    height: 75px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.actions-cell {
+    width: 100px;
+    white-space: nowrap;
+}
+
+.actions-cell button {
+    padding: 0.4rem;
+    margin: 0 0.25rem;
+    border: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.actions-cell .btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.actions-cell .btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.actions-cell button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.actions-cell button i {
+    font-size: 1rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    width: 160px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #f1771f;
+    color: white;
+    margin-top: 1rem;
+}
+
+.btn-primary, .btn-danger {
+    width: 50px;
+}
+
+.tab-pane {
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tab-pane h3 {
+    color: #1F3F48;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .property-table {
+        font-size: 0.9rem;
+    }
+
+    .image-cell {
+        width: 60px;
+    }
+
+    .image-cell img {
+        width: 50px;
+        height: 40px;
+    }
+
+    .actions-cell button {
+        padding: 0.4rem;
+    }
+}

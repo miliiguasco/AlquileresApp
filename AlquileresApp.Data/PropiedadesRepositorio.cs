@@ -25,8 +25,10 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         dbContext.SaveChanges();
     }
 
-    public List<Propiedad> ListarPropiedades() {
-        List<Propiedad> propiedades = dbContext.Propiedades.ToList();
+    public List<Propiedad> ListarPropiedades(){
+        List<Propiedad> propiedades = dbContext.Propiedades
+            .Include(p => p.Imagenes)
+            .ToList();
         if (propiedades.Count == 0)
             throw new Exception("No se encontraron propiedades.");
         return propiedades;
@@ -82,10 +84,10 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         .Include(p => p.Imagenes)
         .AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(filtros.Localidad))
-        {
-            query = query.Where(p => p.Localidad.ToLower().Contains(filtros.Localidad.ToLower()));
-        }
+        //if (!string.IsNullOrWhiteSpace(filtros.Localidad))
+        //{
+        //    query = query.Where(p => p.Localidad.ToLower().Contains(filtros.Localidad.ToLower()));
+        //}
 
 
         if (filtros.CantidadHuespedes.HasValue)
@@ -93,6 +95,9 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
         }
 
+        var propiedades = query.ToList();
+        //Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
+        return propiedades;
         if (filtros.FechaInicio.HasValue && filtros.FechaFin.HasValue)
         {
             query = query.Where(p =>

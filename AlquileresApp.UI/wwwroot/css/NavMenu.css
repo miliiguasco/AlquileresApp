@@ -19,16 +19,6 @@
     max-width: 100%;
 }
 
-.navbar-start {
-    padding-right: 1rem;
-    margin-left: 1rem;
-}
-
-.navbar-end {
-    padding-left: 1rem;
-    margin-right: 1rem;
-}
-
 .navbar-brand {
     display: flex;
     align-items: center;
@@ -49,6 +39,7 @@
 .auth-buttons {
     display: flex;
     gap: 1rem;
+    align-items: center;
 }
 
 .auth-buttons .btn {
@@ -58,7 +49,7 @@
     transition: all 0.3s ease;
     text-decoration: none;
     cursor: pointer;
-    background-color: #f1771faf;
+    background-color: #f1771f;
     color: white;
     white-space: nowrap;
     font-size: 0.95rem;
@@ -67,9 +58,34 @@
     display: inline-block;
 }
 
+.auth-buttons .btn-dropdown {
+    width: 160px;
+    padding: 0.4rem 1.2rem
+}
+
+.auth-buttons .btn-icon {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-buttons .btn-icon i {
+    font-size: 1.2rem;
+}
+
 .auth-buttons .btn:hover {
     background-color: #f37820;
     color: white;
+}
+
+.user-info {
+    color: #ffffff;
+    font-weight: 400;
+    font-size: 14px;
+    align-self: center;
 }
 
 @media (max-width: 768px) {
@@ -112,4 +128,67 @@
         font-size: 0.9rem;
         width: 110px;
     }
+
+    .auth-buttons .btn-icon {
+        width: 35px;
+        height: 35px;
+    }
+
+    .auth-buttons .btn-icon i {
+        font-size: 1.2rem;
+    }
+}
+
+.dropdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+}
+
+.dropdown {
+    position: relative;
+    z-index: 1000;
+}
+
+.dropdown-menu {
+    position: absolute;
+    z-index: 1001;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    max-width: 160px;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #FF6B00;
+}
+
+.dropdown-item i {
+    font-size: 1rem;
+    color: #666;
+}
+
+.dropdown-item:hover i {
+    color: #FF6B00;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #e9ecef;
+    margin: 0.5rem 0;
 } 

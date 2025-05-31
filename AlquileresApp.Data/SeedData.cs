@@ -1,10 +1,9 @@
-
 using AlquileresApp.Core.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using AlquileresApp.Core.Enumerativos;
-
+using AlquileresApp.Core.Servicios;
 
 namespace AlquileresApp.Data
 {
@@ -18,18 +17,19 @@ namespace AlquileresApp.Data
                 return; // La base de datos ya está inicializada
             }
 
+            var hashService = new ServicioHashPassword();
+
             // Crear usuarios registrados
-            var usuarios = new List<Cliente>
+            var usuarios = new List<Usuario>
             {
-                new Cliente
+                new Administrador
                 {
                     Nombre = "Juan",
                     Apellido = "Pérez",
-                    Email = "juan.perez@test.com",
+                    Email = "admin@gmail.com",
                     Telefono = "123456789",
-                    Contraseña = "password123", // En producción, debe estar hasheada
+                    Contraseña = hashService.HashPassword("password123"),
                     FechaNacimiento = new DateTime(1990, 1, 1),
-                    //Rol = RolUsuario.Cliente
                 },
                 new Cliente
                 {
@@ -37,9 +37,8 @@ namespace AlquileresApp.Data
                     Apellido = "García",
                     Email = "maria.garcia@test.com",
                     Telefono = "987654321",
-                    Contraseña = "password456",
+                    Contraseña = hashService.HashPassword("password456"),
                     FechaNacimiento = new DateTime(1985, 5, 15),
-                    //Rol = RolUsuario.Cliente
                 }
             };
             context.Usuarios.AddRange(usuarios);

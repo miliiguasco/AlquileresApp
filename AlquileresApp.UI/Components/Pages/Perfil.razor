@@ -1,0 +1,275 @@
+@page "/Perfil/{userId:int}"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.UI.Components
+@inject AuthenticationStateProvider ServicioAutenticacion
+@inject IUsuarioRepositorio UsuarioRepositorio
+@inject ILogger<Perfil> Logger
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+<PageTitle>Mi Perfil</PageTitle>
+
+<div class="profile-container">
+    @if (usuario != null)
+    {
+        <div class="profile-header">
+            <h1>Mi Perfil</h1>
+        </div>
+
+        @if (esAdministrador)
+        {
+            <div class="profile-section">
+                @if (modoEdicion)
+                {
+                    <h2>Editar Información Personal</h2>
+                    <DatosFormEdicion Input="@datosForm" 
+                                  OnSubmit="GuardarCambios"
+                                  FormName="editarPerfil"
+                                  SubmitButtonText="Guardar"
+                                  ButtonClass="btn"
+                                  CancelarEdicion="CancelarEdicion" />          
+                }
+                else
+                {
+                    <h2>Información Personal</h2>
+                    <div class="info-group">
+                        <label>Nombre:</label>
+                        <span>@usuario.Nombre</span>
+                    </div>
+                    <div class="info-group">
+                        <label>Apellido:</label>
+                        <span>@usuario.Apellido</span>
+                    </div>
+                    <div class="info-group">
+                        <label>Email:</label>
+                        <span>@usuario.Email</span>
+                    </div>
+                    <div class="info-group">
+                        <label>Teléfono:</label>
+                        <span>@usuario.Telefono</span>
+                    </div>
+                    <div class="info-group">
+                        <label>Fecha de Nacimiento:</label>
+                        <span>@(usuario.FechaNacimiento?.ToShortDateString() ?? "No especificada")</span>
+                    </div>
+                    <div class="profile-actions">   
+                        @if (!string.IsNullOrEmpty(mensajeExito))
+                        {
+                            <div class="mensaje-exito">@mensajeExito</div>
+                        }   
+                        <button type="button" class="btn" @onclick="IniciarEdicion">
+                            <i class="fas fa-edit"></i> Editar Perfil
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-button @(tabActiva == "datos" ? "active" : "")" 
+                            @onclick="@(() => CambiarTab("datos"))">
+                        <i class="fas fa-user"></i> Datos Personales
+                    </button>
+                    <button class="tab-button @(tabActiva == "pagos" ? "active" : "")" 
+                            @onclick="@(() => CambiarTab("pagos"))">
+                        <i class="fas fa-credit-card"></i> Método de Pago
+                    </button>
+                    <button class="tab-button @(tabActiva == "reservas" ? "active" : "")" 
+                            @onclick="@(() => CambiarTab("reservas"))">
+                        <i class="fas fa-calendar-alt"></i> Reservas
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    @if (tabActiva == "datos")
+                    {
+                        <div class="tab-pane active">
+                            <div class="profile-section">
+                                @if (modoEdicion)
+                                {
+                                    <h2>Editar Información Personal</h2>
+                                    <DatosFormEdicion Input="@datosForm" 
+                                                  OnSubmit="GuardarCambios"
+                                                  FormName="editarPerfil"
+                                                  SubmitButtonText="Guardar"
+                                                  ButtonClass="btn"
+                                                  CancelarEdicion="CancelarEdicion" />          
+                                }
+                                else
+                                {
+                                    <h3>Información Personal</h3>
+                                    <div class="info-group">
+                                        <label>Nombre</label>
+                                        <span>@usuario.Nombre</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Apellido</label>
+                                        <span>@usuario.Apellido</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Email</label>
+                                        <span>@usuario.Email</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Teléfono</label>
+                                        <span>@usuario.Telefono</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Fecha de Nacimiento</label>
+                                        <span>@(usuario.FechaNacimiento?.ToShortDateString() ?? "No especificada")</span>
+                                    </div>
+                                    <div class="profile-actions">
+                                        @if (!string.IsNullOrEmpty(mensajeExito))
+                                        {
+                                            <div class="mensaje-exito">@mensajeExito</div>
+                                        }   
+                                        <button type="button" class="btn" @onclick="IniciarEdicion">
+                                            <i class="fas fa-edit"></i> Editar Perfil
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else if (tabActiva == "pagos")
+                    {
+                        <div class="tab-pane">
+                            <h3>Métodos de Pago</h3>
+                            <div class="profile-section">
+                                <p class="text-muted">Próximamente: Aquí podrás gestionar tus métodos de pago.</p>
+                            </div>
+                        </div>
+                    }
+                    else if (tabActiva == "reservas")
+                    {
+                        <div class="tab-pane">
+                            <h3>Mis Reservas</h3>
+                            <div class="profile-section">
+                                <p class="text-muted">Próximamente: Aquí podrás ver el historial de tus reservas.</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info">
+            @if (_error != null)
+            {
+                <p>Error: @_error</p>
+            }
+            else
+            {
+                <p>Cargando información del perfil...</p>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private Usuario? usuario;
+    private string? _error;
+    private bool modoEdicion = false;
+    private bool mostrarCambioPassword = false;
+    private DatosFormEdicion.InputModel datosForm = new();
+    private string? mensajeExito;
+    private string tabActiva = "datos";
+    private bool esAdministrador;
+    [Parameter]
+    public int userId { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+            
+            // Verificar si el usuario es administrador
+            esAdministrador = authState.User.IsInRole("Administrador");
+
+            var email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
+            
+            if (email != null)
+            {
+                usuario = await Task.Run(() => UsuarioRepositorio.ObtenerUsuarioPorEmail(email));
+                
+                if (usuario == null)
+                {
+                    _error = $"No se encontró usuario con email: {email}";
+                }
+                else
+                {
+                    // Establecer la pestaña activa por defecto
+                    tabActiva = "datos";
+                }
+            }
+            else
+            {
+                _error = "No se pudo obtener el email del usuario autenticado";
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error al cargar el perfil: {ex.Message}";
+        }
+    }
+
+    private void CambiarTab(string tab)
+    {
+        tabActiva = tab;
+        if (modoEdicion)
+        {
+            CancelarEdicion();
+        }
+    }
+
+    private void IniciarEdicion()
+    {
+        datosForm = new DatosFormEdicion.InputModel
+        {
+            Nombre = usuario!.Nombre,
+            Apellido = usuario.Apellido,
+            Email = usuario.Email,
+            Telefono = usuario.Telefono,
+            FechaDeNacimiento = usuario.FechaNacimiento
+        };
+        modoEdicion = true;
+    }
+
+    private void CancelarEdicion()
+    {
+        modoEdicion = false;
+        mostrarCambioPassword = false;
+        datosForm = new();
+    }
+
+    private async Task GuardarCambios()
+    {
+        try
+        {
+            usuario!.Nombre = datosForm.Nombre;
+            usuario.Apellido = datosForm.Apellido;
+            usuario.Email = datosForm.Email;
+            usuario.Telefono = datosForm.Telefono;
+            usuario.FechaNacimiento = datosForm.FechaDeNacimiento;
+
+            await Task.Run(() => UsuarioRepositorio.ModificarUsuario(usuario));
+            
+            modoEdicion = false;
+            mensajeExito = "Perfil actualizado exitosamente";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error al actualizar el perfil: {ex.Message}";
+        }
+    }
+} 
