@@ -14,11 +14,6 @@ public class CasoDeUsoVisualizarReserva(
             throw new Exception("El usuario no existe.");
         }
 
-        var reservas = reservaRepositorio.ListarMisReservas(usuario);
-        if (reservas == null)
-        {
-            throw new Exception("No se pudieron obtener las reservas.");
-        }
-        return reservas;
+        return reservaRepositorio.ListarMisReservas(usuario);
     }
 }

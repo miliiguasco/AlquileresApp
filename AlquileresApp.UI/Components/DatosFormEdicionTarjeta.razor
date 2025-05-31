@@ -5,57 +5,61 @@
 
 @namespace AlquileresApp.UI.Components
 
-<EditForm Model="Input" OnValidSubmit="OnSubmit" OnInvalidSubmit="ManejarInvalidSubmit" FormName="@FormName">
-    <DataAnnotationsValidator />
-    <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.NumeroTarjeta" 
-                  class="form-control" 
-                  aria-required="true" 
-                  @oninput="@(() => { 
-                      errorNumeroTarjeta = null; 
-                      FormatearNumeroTarjeta();
-                      StateHasChanged(); 
-                  })"
-                  maxlength="19" />
-        <label for="numeroTarjeta" class="form-label">Número de Tarjeta</label>
-        <Error Mensaje="@errorNumeroTarjeta" />
-    </div>
-    <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.Titular" 
-                  class="form-control" 
-                  aria-required="true" 
-                  @oninput="@(() => { errorTitular = null; StateHasChanged(); })" />
-        <label for="titular" class="form-label">Nombre del Titular</label>
-        <Error Mensaje="@errorTitular" />
-    </div>
-    <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.FechaVencimiento" 
-                  class="form-control" 
-                  aria-required="true" 
-                  @oninput="@(() => { 
-                      errorFechaVencimiento = null; 
-                      FormatearFechaVencimiento();
-                      StateHasChanged(); 
-                  })"
-                  maxlength="5" />
-        <label for="fechaVencimiento" class="form-label">Fecha de Vencimiento (MM/AA)</label>
-        <Error Mensaje="@errorFechaVencimiento" />
-    </div>
-    <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.CVV" 
-                  class="form-control" 
-                  aria-required="true" 
-                  @oninput="@(() => { errorCVV = null; StateHasChanged(); })"
-                  type="password"
-                  maxlength="3" />
-        <label for="cvv" class="form-label">CVV</label>
-        <Error Mensaje="@errorCVV" />
-    </div>
-    
-    <div class="btn-container">
-        <button type="submit" class="@ButtonClass">@SubmitButtonText</button>
-    </div>
-</EditForm>
+<div class="form-container">
+    <EditForm Model="@Input" OnValidSubmit="@OnSubmit">
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label><i class="fas fa-credit-card"></i> Número de Tarjeta:</label>
+            <InputText @bind-Value="Input.NumeroTarjeta" 
+                      class="form-control" 
+                      placeholder="XXXX XXXX XXXX XXXX"
+                      maxlength="19"
+                      @oninput="FormatearNumeroTarjeta" />
+            <ValidationMessage For="@(() => Input.NumeroTarjeta)" />
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-user"></i> Nombre del Titular:</label>
+            <InputText @bind-Value="Input.Titular" 
+                      class="form-control" 
+                      placeholder="Como aparece en la tarjeta" />
+            <ValidationMessage For="@(() => Input.Titular)" />
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label><i class="fas fa-calendar"></i> Fecha de Vencimiento:</label>
+                <InputText @bind-Value="Input.FechaVencimiento" 
+                          class="form-control" 
+                          placeholder="MM/AA"
+                          maxlength="5"
+                          @oninput="FormatearFechaVencimiento" />
+                <ValidationMessage For="@(() => Input.FechaVencimiento)" />
+                @if (mostrarErrorFechaVencimiento)
+                {
+                    <div class="validation-message">@ErrorFechaVencimiento</div>
+                }
+            </div>
+
+            <div class="form-group col-md-6">
+                <label><i class="fas fa-lock"></i> CVV:</label>
+                <InputText @bind-Value="Input.CVV" 
+                          class="form-control" 
+                          placeholder="XXX"
+                          maxlength="3"
+                          @oninput="FormatearCVV" />
+                <ValidationMessage For="@(() => Input.CVV)" />
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="@ButtonClass" @onclick="ValidarFormulario">
+                <i class="fas fa-save"></i> @SubmitButtonText
+            </button>
+        </div>
+    </EditForm>
+</div>
 
 @code {
     [Parameter]
@@ -65,88 +69,115 @@
     public EventCallback OnSubmit { get; set; }
 
     [Parameter]
-    public string FormName { get; set; } = "DatosFormEdicionTarjeta";
+    public string FormName { get; set; } = "";
 
     [Parameter]
     public string SubmitButtonText { get; set; } = "Guardar";
 
     [Parameter]
-    public string ButtonClass { get; set; } = "";
+    public string ButtonClass { get; set; } = "btn btn-primary";
 
-    private string? errorNumeroTarjeta;
-    private string? errorTitular;
-    private string? errorFechaVencimiento;
-    private string? errorCVV;
+    private string? ErrorFechaVencimiento { get; set; }
+    private bool mostrarErrorFechaVencimiento = false;
 
-    public void LimpiarErrores()
+    private void FormatearNumeroTarjeta(ChangeEventArgs e)
     {
-        errorNumeroTarjeta = null;
-        errorTitular = null;
-        errorFechaVencimiento = null;
-        errorCVV = null;
-        StateHasChanged();
-    }
-
-    private void ManejarInvalidSubmit()
-    {
-        ValidarCampos();
-        StateHasChanged();
-    }
-
-    private void ValidarCampos()
-    {
-        var context = new ValidationContext(Input);
-        var results = new List<ValidationResult>();
+        var valor = e.Value?.ToString() ?? "";
+        // Remover todos los caracteres no numéricos
+        var numeros = new string(valor.Where(char.IsDigit).ToArray());
         
-        if (!Validator.TryValidateObject(Input, context, results, true))
-        {
-            foreach (var result in results)
-            {
-                if (result.MemberNames.Contains(nameof(Input.NumeroTarjeta)))
-                    errorNumeroTarjeta = result.ErrorMessage;
-                else if (result.MemberNames.Contains(nameof(Input.Titular)))
-                    errorTitular = result.ErrorMessage;
-                else if (result.MemberNames.Contains(nameof(Input.FechaVencimiento)))
-                    errorFechaVencimiento = result.ErrorMessage;
-                else if (result.MemberNames.Contains(nameof(Input.CVV)))
-                    errorCVV = result.ErrorMessage;
-            }
-        }
-    }
-
-    private void FormatearNumeroTarjeta()
-    {
-        if (string.IsNullOrEmpty(Input.NumeroTarjeta)) return;
-
-        // Remover todos los espacios
-        var numero = new string(Input.NumeroTarjeta.Where(char.IsDigit).ToArray());
+        // Limitar a 16 dígitos
+        numeros = numeros.Length > 16 ? numeros.Substring(0, 16) : numeros;
         
         // Formatear con espacios cada 4 dígitos
         var formateado = "";
-        for (int i = 0; i < numero.Length; i++)
+        for (int i = 0; i < numeros.Length; i++)
         {
             if (i > 0 && i % 4 == 0)
                 formateado += " ";
-            formateado += numero[i];
+            formateado += numeros[i];
         }
-
+        
         Input.NumeroTarjeta = formateado;
     }
 
-    private void FormatearFechaVencimiento()
+    private void FormatearFechaVencimiento(ChangeEventArgs e)
     {
-        if (string.IsNullOrEmpty(Input.FechaVencimiento)) return;
-
-        // Remover caracteres no numéricos
-        var fecha = new string(Input.FechaVencimiento.Where(char.IsDigit).ToArray());
+        var valor = e.Value?.ToString() ?? "";
+        // Remover todos los caracteres no numéricos
+        var numeros = new string(valor.Where(char.IsDigit).ToArray());
         
-        if (fecha.Length > 2)
+        // Limitar a 4 dígitos
+        numeros = numeros.Length > 4 ? numeros.Substring(0, 4) : numeros;
+        
+        // Formatear como MM/AA
+        var formateado = "";
+        for (int i = 0; i < numeros.Length; i++)
         {
-            Input.FechaVencimiento = $"{fecha.Substring(0, 2)}/{fecha.Substring(2, Math.Min(2, fecha.Length - 2))}";
+            if (i == 2)
+                formateado += "/";
+            formateado += numeros[i];
         }
-        else
+        
+        Input.FechaVencimiento = formateado;
+        mostrarErrorFechaVencimiento = false;
+    }
+
+    private void ValidarFechaVencimiento()
+    {
+        ErrorFechaVencimiento = null;
+        mostrarErrorFechaVencimiento = false;
+
+        if (string.IsNullOrWhiteSpace(Input.FechaVencimiento) || 
+            !Input.FechaVencimiento.Contains("/") || 
+            Input.FechaVencimiento.Length != 5)
         {
-            Input.FechaVencimiento = fecha;
+            return;
+        }
+
+        var partes = Input.FechaVencimiento.Split('/');
+        if (partes.Length != 2 || 
+            !int.TryParse(partes[0], out int mes) || 
+            !int.TryParse(partes[1], out int año) ||
+            mes < 1 || mes > 12)
+        {
+            return;
+        }
+
+        var fechaActual = DateTime.Now;
+        var añoActual = fechaActual.Year % 100;
+        var mesActual = fechaActual.Month;
+
+        // Convertir a año completo para comparación más precisa
+        var añoCompleto = 2000 + año; // Asumimos que las tarjetas no son de antes del 2000
+        var añoActualCompleto = fechaActual.Year;
+
+        if (añoCompleto < añoActualCompleto || 
+            (añoCompleto == añoActualCompleto && mes < mesActual))
+        {
+            ErrorFechaVencimiento = "La tarjeta está vencida. Por favor, ingrese una fecha válida.";
+            mostrarErrorFechaVencimiento = true;
+        }
+    }
+
+    private void FormatearCVV(ChangeEventArgs e)
+    {
+        var valor = e.Value?.ToString() ?? "";
+        // Remover todos los caracteres no numéricos
+        var numeros = new string(valor.Where(char.IsDigit).ToArray());
+        
+        // Limitar a 3 dígitos
+        numeros = numeros.Length > 3 ? numeros.Substring(0, 3) : numeros;
+        
+        Input.CVV = numeros;
+    }
+
+    private async Task ValidarFormulario()
+    {
+        ValidarFechaVencimiento();
+        if (!mostrarErrorFechaVencimiento)
+        {
+            await OnSubmit.InvokeAsync();
         }
     }
 
@@ -168,4 +199,65 @@
         [RegularExpression(@"^\d{3}$", ErrorMessage = "El CVV debe tener 3 dígitos")]
         public string CVV { get; set; } = "";
     }
-} 
+}
+
+<style>
+    .form-container {
+        max-width: 100%;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .form-group label i {
+        margin-right: 0.5rem;
+        color: #0d6efd;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-control:focus {
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -0.5rem;
+        margin-left: -0.5rem;
+    }
+
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+
+    .form-actions {
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .validation-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style> 
