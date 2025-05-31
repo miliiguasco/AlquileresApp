@@ -207,7 +207,9 @@
     private decimal CalcularTotal()
     {
         if (propiedad == null) return 0;
-        return propiedad.PrecioPorNoche * CalcularNoches();
+        var noches = CalcularNoches();
+        if (noches <= 0) return 0;
+        return propiedad.PrecioPorNoche * noches;
     }
 
     private void ActualizarFechas()
