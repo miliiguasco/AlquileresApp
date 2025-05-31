@@ -1,3 +1,4 @@
+@page "/Perfil"
 @page "/Perfil/{userId:int}"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
@@ -6,6 +7,7 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
 @using AlquileresApp.Core.CasosDeUso.Tarjeta
+@using AlquileresApp.Core.CasosDeUso.Reserva
 @using AlquileresApp.UI.Components
 @inject AuthenticationStateProvider ServicioAutenticacion
 @inject IUsuarioRepositorio UsuarioRepositorio
@@ -13,9 +15,9 @@
 @inject NavigationManager NavigationManager
 @inject CasoDeUsoVisualizarTarjeta CUVisualizarTarjeta
 @inject CasoDeUsoEliminarTarjeta CUEliminarTarjeta
+@inject CasoDeUsoVisualizarReserva CUVisualizarReserva
 @inject IJSRuntime JS
 @attribute [Authorize]
-
 
 <PageTitle>Mi Perfil</PageTitle>
 
@@ -192,38 +194,88 @@
                     }
                     else if (tabActiva == "pagos")
                     {
-                        <div class="tab-pane">
-                            <h3>Métodos de Pago</h3>
+                        <div class="tab-pane active" style="display: block;">
                             <div class="profile-section">
-                                <p class="text-muted">Próximamente: Aquí podrás gestionar tus métodos de pago.</p>
+                                <h3>Métodos de Pago</h3>
+                                <div class="profile-actions" style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap;">   
+                                    <button type="button" class="btn btn-info" @onclick="IrAVerTarjeta">
+                                        <i class="fas fa-credit-card"></i> Ver Tarjeta
+                                    </button>
+                                    <button type="button" class="btn btn-success" @onclick="IrAEditarTarjeta">
+                                        <i class="fas fa-edit"></i> Editar Tarjeta
+                                    </button>
+                                    <button type="button" class="btn btn-danger" @onclick="IniciarEliminacion">
+                                        <i class="fas fa-trash"></i> Eliminar Tarjeta
+                                    </button>
+                                    <button type="button" class="btn btn-warning" @onclick="IrARegistrarTarjeta">
+                                        <i class="fas fa-plus-circle"></i> Registrar Nueva Tarjeta
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     }
                     else if (tabActiva == "reservas")
                     {
-                        <div class="tab-pane">
-                            <h3>Mis Reservas</h3>
+                        <div class="tab-pane active" style="display: block;">
                             <div class="profile-section">
-                                <p class="text-muted">Próximamente: Aquí podrás ver el historial de tus reservas.</p>
+                                <h3>Mis Reservas</h3>
+                                @if (reservas == null)
+                                {
+                                    <div class="d-flex justify-content-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </div>
+                                }
+                                else if (!reservas.Any())
+                                {
+                                    <div class="alert alert-info">
+                                        No tienes reservas activas.
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Propiedad</th>
+                                                    <th>Estado</th>
+                                                    <th>Fecha Inicio</th>
+                                                    <th>Fecha Fin</th>
+                                                    <th>Precio Total</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var reserva in reservas)
+                                                {
+                                                    <tr>
+                                                        <td>@reserva.Id</td>
+                                                        <td>@reserva.Propiedad?.Titulo</td>
+                                                        <td>
+                                                            <span class="badge @ObtenerClaseEstado(reserva.Estado.ToString())">
+                                                                @reserva.Estado
+                                                            </span>
+                                                        </td>
+                                                        <td>@reserva.FechaInicio.ToShortDateString()</td>
+                                                        <td>@reserva.FechaFin.ToShortDateString()</td>
+                                                        <td>$@reserva.PrecioTotal.ToString("N2")</td>
+                                                        <td>
+                                                            <button class="btn btn-primary btn-sm" @onclick="() => VerDetalleReserva(reserva.Id)">
+                                                                <i class="fas fa-eye"></i> Ver Detalles
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
                             </div>
                         </div>
                     }
-                <div class="profile-actions">   
-                    <button type="button" class="btn btn-primary" @onclick="IniciarEdicion">
-                        <i class="fas fa-user-edit"></i> Editar Perfil
-                    </button>
-                    <button type="button" class="btn btn-info" @onclick="IrAVerTarjeta">
-                        <i class="fas fa-credit-card"></i> Ver Tarjeta
-                    </button>
-                    <button type="button" class="btn btn-success" @onclick="IrAEditarTarjeta">
-                        <i class="fas fa-edit"></i> Editar Tarjeta
-                    </button>
-                    <button type="button" class="btn btn-danger" @onclick="IniciarEliminacion">
-                        <i class="fas fa-trash"></i> Eliminar Tarjeta
-                    </button>
-                    <button type="button" class="btn btn-warning" @onclick="IrARegistrarTarjeta">
-                        <i class="fas fa-plus-circle"></i> Registrar Nueva Tarjeta
-                    </button>
                 </div>
             </div>
         }
@@ -244,62 +296,77 @@
 </div>
 
 @code {
+    [Parameter]
+    public int? userId { get; set; }
+
     private Usuario? usuario;
     private string? _error;
     private bool modoEdicion = false;
-    private bool mostrarCambioPassword = false;
-    private DatosFormEdicion.InputModel datosForm = new();
     private string? mensajeExito;
+    private bool esAdministrador = false;
     private string tabActiva = "datos";
-    private bool esAdministrador;
-    [Parameter]
-    public int userId { get; set; }
     private bool mostrarEliminarTarjeta = false;
     private List<Tarjeta>? tarjetas;
     private int tarjetaSeleccionada = 0;
+    private DatosFormEdicion.InputModel datosForm = new();
+    private List<Reserva>? reservas;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
-            
-            // Verificar si el usuario es administrador
-            esAdministrador = authState.User.IsInRole("Administrador");
+            var user = authState.User;
 
-            var email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
-            
-            if (email != null)
+            if (user.Identity?.IsAuthenticated != true)
             {
-                usuario = await Task.Run(() => UsuarioRepositorio.ObtenerUsuarioPorEmail(email));
-                
-                if (usuario == null)
-                {
-                    _error = $"No se encontró usuario con email: {email}";
-                }
-                else
-                {
-                    // Establecer la pestaña activa por defecto
-                    tabActiva = "datos";
-                }
+                NavigationManager.NavigateTo("/login");
+                return;
             }
-            else
+
+            var userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(userEmail))
             {
-                _error = "No se pudo obtener el email del usuario autenticado";
+                NavigationManager.NavigateTo("/login");
+                return;
             }
+
+            usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(userEmail);
+            if (usuario == null)
+            {
+                _error = "No se pudo cargar la información del usuario.";
+                return;
+            }
+
+            // Si se proporcionó un userId en la URL, verificar que coincida con el usuario actual
+            if (userId.HasValue && userId.Value != usuario.Id)
+            {
+                NavigationManager.NavigateTo($"/Perfil/{usuario.Id}");
+                return;
+            }
+
+            esAdministrador = user.IsInRole("Administrador");
+            await CargarTarjetas();
+            await CargarReservas();
         }
         catch (Exception ex)
         {
-            _error = $"Error al cargar el perfil: {ex.Message}";
+            Logger.LogError(ex, "Error al cargar el perfil del usuario");
+            _error = "Ocurrió un error al cargar el perfil.";
         }
     }
 
-    private void CambiarTab(string tab)
+    private async Task CambiarTab(string tab)
     {
         tabActiva = tab;
         if (modoEdicion)
         {
             CancelarEdicion();
+        }
+        
+        if (tab == "reservas")
+        {
+            await CargarReservas();
         }
     }
 
@@ -319,7 +386,6 @@
     private void CancelarEdicion()
     {
         modoEdicion = false;
-        mostrarCambioPassword = false;
         datosForm = new();
     }
 
@@ -347,8 +413,10 @@
 
     private void IrAVerTarjeta()
     {
-        var usuarioId = usuario!.Id;
-        NavigationManager.NavigateTo($"/visualizar-tarjeta/{usuarioId}");
+        if (usuario != null)
+        {
+            NavigationManager.NavigateTo($"/visualizar-tarjeta");
+        }
     }
 
     private void IrAEditarTarjeta()
@@ -403,6 +471,46 @@
     private void IrARegistrarTarjeta()
     {
         NavigationManager.NavigateTo("/registrar-tarjeta");
+    }
+
+    private async Task CargarTarjetas()
+    {
+        // Implementa la lógica para cargar las tarjetas del usuario
+    }
+
+    private async Task CargarReservas()
+    {
+        if (usuario != null)
+        {
+            try
+            {
+                reservas = await Task.Run(() => CUVisualizarReserva.Ejecutar(usuario.Id));
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error al cargar las reservas del usuario");
+                _error = "Error al cargar las reservas";
+            }
+        }
+    }
+
+    private void VerDetalleReserva(int reservaId)
+    {
+        NavigationManager.NavigateTo($"/reserva/{reservaId}");
+    }
+
+    private string ObtenerClaseEstado(string estado)
+    {
+        return estado.ToLower() switch
+        {
+            "pendiente" => "bg-warning",
+            "confirmada" => "bg-success",
+            "cancelada" => "bg-danger",
+            "activa" => "bg-info",
+            "finalizada" => "bg-secondary",
+            _ => "bg-secondary"
+        };
     }
 }
 
@@ -527,5 +635,127 @@
     .form-check-label {
         font-weight: 500;
         color: #495057;
+    }
+
+    .reservas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .reserva-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+
+    .reserva-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .reserva-header {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .reserva-header h4 {
+        margin: 0;
+        color: #495057;
+    }
+
+    .estado-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .estado-badge.pendiente {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .estado-badge.confirmada {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .estado-badge.cancelada {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .estado-badge.finalizada {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .reserva-body {
+        padding: 1rem;
+    }
+
+    .reserva-footer {
+        padding: 1rem;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .reserva-footer .btn {
+        padding: 0.5rem 1rem;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+    .badge {
+        padding: 0.5em 1em;
+        font-size: 0.9em;
+    }
+
+    .btn {
+        border-radius: 5px;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn i {
+        margin-right: 0.5rem;
+    }
+
+    .table {
+        margin-top: 1rem;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
     }
 </style> 
