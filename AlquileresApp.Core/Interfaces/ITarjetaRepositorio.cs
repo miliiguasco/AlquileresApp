@@ -8,5 +8,7 @@ public interface ITarjetaRepositorio
     Tarjeta? ObtenerTarjetaPorId(int id);
     bool Pagar(Tarjeta tarjeta, decimal monto);
     bool ValidarSaldo(Tarjeta tarjeta, decimal monto);
+    void Reembolsar(Tarjeta tarjeta, decimal monto);
+    Tarjeta ObtenerPorClienteId(int clienteId);
 }
 

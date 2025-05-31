@@ -1,0 +1,78 @@
+.container_misreservas {
+        margin-top: 80px; /* margen grande arriba */
+        max-width: 900px; /* para no ocupar todo el ancho */
+        margin-left: auto;
+        margin-right: auto; /* centra horizontalmente */
+    }
+
+    .h2 {
+        text-align: center;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #0A3D62;
+    margin-top: 3rem;
+    margin-bottom: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(to right, #1F3F48, #4a9cb5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeIn 1s ease-in-out;
+    }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+    .table_misreservas {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    background-color: #f9fafb;
+    border-radius: 12px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #3b3b3b;
+    overflow: hidden;
+}
+
+.table_misreservas thead tr {
+    background-color: #f3f9ff;
+    color: #565757;
+    font-weight: 700;
+    text-align: left;
+    border-bottom: 2px solid #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table_misreservas th, .table_misreservas td {
+    padding: 14px 20px;
+    border: none;
+    vertical-align: middle;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Tarjeta efecto */
+.table_misreservas tbody tr {
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 10px;
+}
+
+.table_misreservas tbody tr:hover {
+    background-color: #e8f1fd;
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Efecto sutil al pasar por celda */
+.table_misreservas td:hover {
+    background-color: #f0f8ff;
+    cursor: default;
+}
+
+

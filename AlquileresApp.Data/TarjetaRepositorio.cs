@@ -53,4 +53,22 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
         Console.WriteLine("Saldo suficiente");
         return true;
     }
+    public void Reembolsar(Tarjeta tarjeta, decimal monto)
+{
+    Console.WriteLine($"Reembolsando monto: {monto} a la tarjeta ID: {tarjeta.Id}");
+
+    tarjeta.Saldo += monto;
+
+    dbContext.Tarjetas.Update(tarjeta); // opcional, ya que está siendo rastreada por el contexto
+    dbContext.SaveChanges();
+
+    Console.WriteLine($"Reembolso realizado. Nuevo saldo: {tarjeta.Saldo}");
+}
+public Tarjeta ObtenerPorClienteId(int clienteId)
+{
+    var tarjeta = dbContext.Tarjetas.FirstOrDefault(t => t.ClienteId == clienteId);
+    if (tarjeta == null)
+        throw new Exception("No se encontró una tarjeta para este cliente.");
+    return tarjeta;
+}
 }

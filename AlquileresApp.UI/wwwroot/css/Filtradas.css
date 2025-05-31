@@ -1,7 +1,6 @@
 
 .container_listar_propiedades {
     max-width: 1200px;
-    margin: 0 auto;
     padding: 2rem 1rem;
     background: linear-gradient(
         135deg,
@@ -21,6 +20,7 @@
     font-size: 3rem;
     font-weight: bold;
     color: #0A3D62;
+    margin-top: 6rem;
     margin-bottom: 2.5rem;
     text-transform: uppercase;
     letter-spacing: 2px;

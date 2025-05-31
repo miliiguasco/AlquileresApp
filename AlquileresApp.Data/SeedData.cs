@@ -54,7 +54,7 @@ namespace AlquileresApp.Data
                     Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
                     Direccion = "Av. Costanera 123",
                     Localidad = "Mar del Plata",
-                    PrecioPorNoche = 150.00m,
+                    PrecioPorNoche = 750.00m,
                     Capacidad = 6,
                     ServiciosDisponibles = new List<ServiciosPropiedad> 
                     { 
@@ -136,31 +136,33 @@ namespace AlquileresApp.Data
                     PropiedadId = propiedades[0].Id,
                     FechaInicio = DateTime.Now.AddDays(10),
                     FechaFin = DateTime.Now.AddDays(15),
-                    //PrecioTotal = 750.00m, // 5 noches * 150
+                    PrecioTotal = 3750,
+                    MontoAPagar = 3750, // 5 noches * 150
                 },
                 new Reserva
                 {
-                    ClienteId = usuarios[1].Id,
-                    PropiedadId = propiedades[1].Id,
+                    ClienteId = usuarios[0].Id,
+                    PropiedadId = propiedades[0].Id,
                     FechaInicio = DateTime.Now.AddDays(20),
                     FechaFin = DateTime.Now.AddDays(25),
-                    //PrecioTotal = 600.00m, // 5 noches * 120
+                    PrecioTotal = 3750, 
+                    MontoAPagar = 3750,
                 },
                 new Reserva
                 {
-                    ClienteId = usuarios[1].Id,
-                    PropiedadId = propiedades[2].Id,
+                    ClienteId = usuarios[0].Id,
+                    PropiedadId = propiedades[0].Id,
                     FechaInicio = DateTime.Now.AddDays(5),
                     FechaFin = DateTime.Now.AddDays(7),
-                    //PrecioTotal = 160.00m, // 2 noches * 80
+                    PrecioTotal = 160,
                 },
                 new Reserva
                 {
                     ClienteId = usuarios[0].Id,
                     PropiedadId = propiedades[3].Id,
-                    FechaInicio = DateTime.Now.AddDays(30),
+                    FechaInicio = DateTime.Now.AddDays(2),
                     FechaFin = DateTime.Now.AddDays(35),
-                    //PrecioTotal = 1000.00m, // 5 noches * 200
+                    PrecioTotal = 1000,
                 }
             };
             context.Reservas.AddRange(reservas);
@@ -175,7 +177,7 @@ namespace AlquileresApp.Data
                     Titular = "Juan Pérez", 
                     FechaVencimiento = "12/2025",
                     CVV = "123",
-                    Saldo = 1000.00m,
+                    Saldo = 0.00m,
                     ClienteId = usuarios[0].Id
                 },
                 new Tarjeta

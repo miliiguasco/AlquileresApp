@@ -68,8 +68,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
         }
 
-        if (filtros.FechaInicio.HasValue && filtros.FechaFin.HasValue)
-        {
+    
             query = query.Where(p =>
                 !(p.Reservas.Any(r =>
                     (filtros.FechaInicio >= r.FechaInicio && filtros.FechaInicio < r.FechaFin) ||
@@ -77,7 +76,6 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
                     (filtros.FechaInicio <= r.FechaInicio && filtros.FechaFin >= r.FechaFin)
                 ))
             );
-        }
 
         return query.ToList();
     }
@@ -95,6 +93,17 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             throw new Exception("La propiedad no está disponible en las fechas seleccionadas.");
         }
     }
+    public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId)
+{
+    return !dbContext.Reservas.Any(r =>
+        r.Propiedad.Id == propiedadId &&
+        r.Id != reservaId &&
+        r.FechaInicio <= fechaFin &&
+        r.FechaFin >= fechaInicio);
+
+    
+}
+
 
     public void ValidarDisponibilidad(DateTime fechaInicio, DateTime fechaFin){ //verificar este metodo
         var reservasExistentes = dbContext.Reservas

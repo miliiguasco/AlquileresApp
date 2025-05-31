@@ -1,0 +1,97 @@
+@page "/modificarreserva/{ReservaId:int}"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Enumerativos
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@inject CasoDeUsoModificarReserva CasoDeUsoModificarReserva
+@inject CasoDeUsoObtenerReserva CasoDeUsoObtenerReserva
+@inject NavigationManager NavigationManager
+<link href="css/ModificarReserva.css" rel="stylesheet" />
+<div class="container_modificar  mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="h2_modificar mb-4 text-primary">Modificar Reserva</h2>
+        @if (mostrarMensaje)
+{
+    <div class="alert @(mensajeResultado.Contains("exitosa") ? "alert-success" : "alert-danger") mt-3" role="alert">
+        @mensajeResultado
+    </div>
+}
+
+        <EditForm Model="Filtros" OnValidSubmit="GuardarCambios">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger mb-3" />
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Fecha de Inicio:</label>
+                <InputDate @bind-Value="Filtros.FechaInicio" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Fecha de Fin:</label>
+                <InputDate @bind-Value="Filtros.FechaFin" class="form-control" />
+            </div>
+
+            <div class="d-flex gap-3 mt-4">
+                <button class="btn btn-primary" type="submit">Guardar</button>
+                <button class="btn btn-secondary" type="button" @onclick="Cancelar">Cancelar</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int ReservaId { get; set; }
+    private SearchFilters Filtros = new();
+    private Reserva reserva;
+    private string mensajeResultado;
+    private bool mostrarMensaje = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            reserva = CasoDeUsoObtenerReserva.Ejecutar(ReservaId);
+            if (reserva != null)
+            {
+                Filtros.FechaInicio = reserva.FechaInicio;
+                Filtros.FechaFin = reserva.FechaFin;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/misreservas");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener la reserva: {ex.Message}");
+            NavigationManager.NavigateTo("/misreservas");
+        }
+    }
+
+    private async Task GuardarCambios()
+    {
+        if (reserva == null)
+        {
+            Console.WriteLine("Reserva no encontrada.");
+            NavigationManager.NavigateTo("/misreservas");
+            return;
+        }
+        Console.WriteLine($"FechaInicio: {Filtros.FechaInicio}, FechaFin: {Filtros.FechaFin}");
+        var resultado = CasoDeUsoModificarReserva.Ejecutar(ReservaId, Filtros.FechaInicio, Filtros.FechaFin);
+            mensajeResultado = resultado.Mensaje;
+    mostrarMensaje = true;
+
+    if (resultado.EsExitosa)
+    {
+        // Podés esperar unos segundos antes de redirigir, o eliminar esta parte si querés quedarte en la misma vista
+        await Task.Delay(5000); 
+        NavigationManager.NavigateTo("/misreservas");
+    }
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/misreservas");
+    }
+}

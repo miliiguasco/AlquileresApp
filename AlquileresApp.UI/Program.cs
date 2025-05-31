@@ -71,6 +71,10 @@ builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
 builder.Services.AddScoped<ITarjetaRepositorio, TarjetaRepositorio>();
 builder.Services.AddScoped<IFechaReservaValidador, FechaReservaValidador>();
 builder.Services.AddScoped<CasoDeUsoObtenerPropiedad>();
+builder.Services.AddScoped<CasoDeUsoListarMisReservas>();
+builder.Services.AddScoped<CasoDeUsoCancelarReserva>();
+builder.Services.AddScoped<CasoDeUsoModificarReserva>();
+builder.Services.AddScoped<CasoDeUsoObtenerReserva>();
 
 
 var app = builder.Build();
