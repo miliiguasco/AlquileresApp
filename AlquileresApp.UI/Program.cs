@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Core.CasosDeUso.Imagen;
 using AlquileresApp.Core.CasosDeUso.Reserva;
+using AlquileresApp.Core.CasosDeUso.Tarjeta;
 using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Authentication;
@@ -35,8 +36,9 @@ builder.Services.AddServerSideBlazor(options =>
 
 builder.Services.AddCascadingAuthenticationState();
 
-builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseSqlite("Data Source=../AlquileresApp.Data/Alquilando.db"));
+// Configurar DbContext
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure HTTPS
 builder.WebHost.UseUrls("https://localhost:7234", "http://localhost:5234");
@@ -83,10 +85,15 @@ builder.Services.AddScoped<CasoDeUsoCrearReserva>();
 builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
 builder.Services.AddScoped<ITarjetaRepositorio, TarjetaRepositorio>();
 builder.Services.AddScoped<IFechaReservaValidador, FechaReservaValidador>();
+builder.Services.AddScoped<ITarjetaValidador, TarjetaValidador>();
+builder.Services.AddScoped<CasoDeUsoRegistrarTarjeta>();
 builder.Services.AddScoped<CasoDeUsoObtenerPropiedad>();
+builder.Services.AddScoped<CasoDeUsoVisualizarReserva>();
+builder.Services.AddScoped<CasoDeUsoVisualizarTarjeta>();
+builder.Services.AddScoped<CasoDeUsoEliminarTarjeta>();
+builder.Services.AddScoped<CasoDeUsoModificarTarjeta>();
 builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
 builder.Services.AddScoped<CasoDeUsoMarcarPropiedadComoNoHabitable>();
-
 
 var app = builder.Build();
 
@@ -147,7 +154,7 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
 else

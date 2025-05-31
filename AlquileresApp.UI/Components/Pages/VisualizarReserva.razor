@@ -1,0 +1,142 @@
+@page "/reserva/{ReservaId:int}"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Enumerativos
+@inject CasoDeUsoVisualizarReserva CUVisualizarReserva
+@inject NavigationManager NavigationManager
+
+<div class="reserva-detalle-container">
+    <div class="reserva-detalle-card">
+        <div class="reserva-header">
+            <h2>Detalles de la Reserva</h2>
+            <span class="estado-badge @GetEstadoClass(reserva?.Estado ?? EstadoReserva.Pendiente)">
+                @(reserva?.Estado ?? EstadoReserva.Pendiente)
+            </span>
+        </div>
+
+        @if (reserva != null)
+        {
+            <div class="reserva-detalle-info">
+                <div class="info-section">
+                    <h3><i class="fas fa-home"></i> Propiedad</h3>
+                    <div class="info-content">
+                        <div class="info-item">
+                            <label>Título:</label>
+                            <p>@reserva.Propiedad?.Titulo</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Dirección:</label>
+                            <p>@reserva.Propiedad?.Direccion</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Localidad:</label>
+                            <p>@reserva.Propiedad?.Localidad</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-calendar-alt"></i> Fechas</h3>
+                    <div class="info-content">
+                        <div class="info-item">
+                            <label>Fecha de Inicio:</label>
+                            <p>@reserva.FechaInicio.ToShortDateString()</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Fecha de Fin:</label>
+                            <p>@reserva.FechaFin.ToShortDateString()</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Duración:</label>
+                            <p>@((reserva.FechaFin - reserva.FechaInicio).Days) días</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-users"></i> Huéspedes</h3>
+                    <div class="info-content">
+                        <div class="info-item">
+                            <label>Cantidad de Huéspedes:</label>
+                            <p>@reserva.CantidadHuespedes personas</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-money-bill-wave"></i> Información de Pago</h3>
+                    <div class="info-content">
+                        <div class="info-item">
+                            <label>Precio Total:</label>
+                            <p>$@reserva.PrecioTotal.ToString("N2")</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Tipo de Pago:</label>
+                            <p>@reserva.TipoPago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reserva-actions">
+                <button class="btn-volver" @onclick="Volver">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver
+                </button>
+            </div>
+        }
+        else if (errorMensaje != null)
+        {
+            <div class="alert alert-danger">
+                @errorMensaje
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int ReservaId { get; set; }
+
+    private Reserva? reserva;
+    private string? errorMensaje;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Aquí asumimos que el usuario actual es el que está viendo la reserva
+            // En una implementación real, deberías obtener el ID del usuario actual
+            var usuarioId = 1; // Esto debería venir de la autenticación
+            var reservas = CUVisualizarReserva.Ejecutar(usuarioId);
+            reserva = reservas.FirstOrDefault(r => r.Id == ReservaId);
+            
+            if (reserva == null)
+            {
+                errorMensaje = "No se encontró la reserva especificada.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = ex.Message;
+        }
+    }
+
+    private string GetEstadoClass(EstadoReserva estado)
+    {
+        return estado switch
+        {
+            EstadoReserva.Pendiente => "estado-pendiente",
+            EstadoReserva.Confirmada => "estado-confirmada",
+            EstadoReserva.Cancelada => "estado-cancelada",
+            EstadoReserva.Finalizada => "estado-finalizada",
+            _ => ""
+        };
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/visualizar-reservas/1"); // El 1 debería ser el ID del usuario actual
+    }
+} 

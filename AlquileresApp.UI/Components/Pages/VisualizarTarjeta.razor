@@ -1,0 +1,114 @@
+@page "/visualizar-tarjeta/{UsuarioId:int}"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.CasosDeUso.Tarjeta
+@using AlquileresApp.Core.Entidades
+@inject CasoDeUsoVisualizarTarjeta CUVisualizarTarjeta
+@inject NavigationManager NavigationManager
+
+<div class="modal-overlay">
+    <div class="reserva-container">
+        <div class="reserva-form">
+            <h3>Mis Tarjetas</h3>
+            
+            @if (tarjetas != null && tarjetas.Any())
+            {
+                <div class="tarjetas-grid">
+                    @foreach (var tarjeta in tarjetas)
+                    {
+                        <div class="card-info">
+                            <div class="form-group">
+                                <label><i class="fas fa-credit-card"></i> Número de Tarjeta:</label>
+                                <p>**** **** **** @tarjeta.NumeroTarjeta.Substring(tarjeta.NumeroTarjeta.Length - 4)</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Titular:</label>
+                                <p>@tarjeta.Titular</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Fecha de Vencimiento:</label>
+                                <p>@tarjeta.FechaVencimiento</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-wallet"></i> Saldo Disponible:</label>
+                                <p>$@tarjeta.Saldo.ToString("N2")</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (errorMensaje != null)
+            {
+                <div class="alert alert-danger">
+                    @errorMensaje
+                </div>
+            }
+            else
+            {
+                <div class="no-tarjetas">
+                    <i class="fas fa-credit-card"></i>
+                    <p>No tienes tarjetas registradas</p>
+                </div>
+            }
+
+            <button class="btn-reservar" @onclick="Volver">
+                <i class="fas fa-arrow-left"></i>
+                <span>Volver</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tarjetas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .no-tarjetas {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+
+    .no-tarjetas i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int UsuarioId { get; set; }
+
+    private List<Tarjeta>? tarjetas;
+    private string? errorMensaje;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            tarjetas = CUVisualizarTarjeta.Ejecutar(UsuarioId);
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = ex.Message;
+        }
+    }
+
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/Perfil");
+    }
+} 

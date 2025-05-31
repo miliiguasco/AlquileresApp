@@ -1,0 +1,171 @@
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using AlquileresApp.Core.Entidades
+@using System.Collections.Generic
+
+@namespace AlquileresApp.UI.Components
+
+<EditForm Model="Input" OnValidSubmit="OnSubmit" OnInvalidSubmit="ManejarInvalidSubmit" FormName="@FormName">
+    <DataAnnotationsValidator />
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="Input.NumeroTarjeta" 
+                  class="form-control" 
+                  aria-required="true" 
+                  @oninput="@(() => { 
+                      errorNumeroTarjeta = null; 
+                      FormatearNumeroTarjeta();
+                      StateHasChanged(); 
+                  })"
+                  maxlength="19" />
+        <label for="numeroTarjeta" class="form-label">Número de Tarjeta</label>
+        <Error Mensaje="@errorNumeroTarjeta" />
+    </div>
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="Input.Titular" 
+                  class="form-control" 
+                  aria-required="true" 
+                  @oninput="@(() => { errorTitular = null; StateHasChanged(); })" />
+        <label for="titular" class="form-label">Nombre del Titular</label>
+        <Error Mensaje="@errorTitular" />
+    </div>
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="Input.FechaVencimiento" 
+                  class="form-control" 
+                  aria-required="true" 
+                  @oninput="@(() => { 
+                      errorFechaVencimiento = null; 
+                      FormatearFechaVencimiento();
+                      StateHasChanged(); 
+                  })"
+                  maxlength="5" />
+        <label for="fechaVencimiento" class="form-label">Fecha de Vencimiento (MM/AA)</label>
+        <Error Mensaje="@errorFechaVencimiento" />
+    </div>
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="Input.CVV" 
+                  class="form-control" 
+                  aria-required="true" 
+                  @oninput="@(() => { errorCVV = null; StateHasChanged(); })"
+                  type="password"
+                  maxlength="3" />
+        <label for="cvv" class="form-label">CVV</label>
+        <Error Mensaje="@errorCVV" />
+    </div>
+    
+    <div class="btn-container">
+        <button type="submit" class="@ButtonClass">@SubmitButtonText</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public InputModel Input { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    [Parameter]
+    public string FormName { get; set; } = "DatosFormEdicionTarjeta";
+
+    [Parameter]
+    public string SubmitButtonText { get; set; } = "Guardar";
+
+    [Parameter]
+    public string ButtonClass { get; set; } = "";
+
+    private string? errorNumeroTarjeta;
+    private string? errorTitular;
+    private string? errorFechaVencimiento;
+    private string? errorCVV;
+
+    public void LimpiarErrores()
+    {
+        errorNumeroTarjeta = null;
+        errorTitular = null;
+        errorFechaVencimiento = null;
+        errorCVV = null;
+        StateHasChanged();
+    }
+
+    private void ManejarInvalidSubmit()
+    {
+        ValidarCampos();
+        StateHasChanged();
+    }
+
+    private void ValidarCampos()
+    {
+        var context = new ValidationContext(Input);
+        var results = new List<ValidationResult>();
+        
+        if (!Validator.TryValidateObject(Input, context, results, true))
+        {
+            foreach (var result in results)
+            {
+                if (result.MemberNames.Contains(nameof(Input.NumeroTarjeta)))
+                    errorNumeroTarjeta = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.Titular)))
+                    errorTitular = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.FechaVencimiento)))
+                    errorFechaVencimiento = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.CVV)))
+                    errorCVV = result.ErrorMessage;
+            }
+        }
+    }
+
+    private void FormatearNumeroTarjeta()
+    {
+        if (string.IsNullOrEmpty(Input.NumeroTarjeta)) return;
+
+        // Remover todos los espacios
+        var numero = new string(Input.NumeroTarjeta.Where(char.IsDigit).ToArray());
+        
+        // Formatear con espacios cada 4 dígitos
+        var formateado = "";
+        for (int i = 0; i < numero.Length; i++)
+        {
+            if (i > 0 && i % 4 == 0)
+                formateado += " ";
+            formateado += numero[i];
+        }
+
+        Input.NumeroTarjeta = formateado;
+    }
+
+    private void FormatearFechaVencimiento()
+    {
+        if (string.IsNullOrEmpty(Input.FechaVencimiento)) return;
+
+        // Remover caracteres no numéricos
+        var fecha = new string(Input.FechaVencimiento.Where(char.IsDigit).ToArray());
+        
+        if (fecha.Length > 2)
+        {
+            Input.FechaVencimiento = $"{fecha.Substring(0, 2)}/{fecha.Substring(2, Math.Min(2, fecha.Length - 2))}";
+        }
+        else
+        {
+            Input.FechaVencimiento = fecha;
+        }
+    }
+
+    public class InputModel
+    {
+        [Required(ErrorMessage = "El número de tarjeta es requerido")]
+        [RegularExpression(@"^\d{4}\s\d{4}\s\d{4}\s\d{4}$", ErrorMessage = "El número de tarjeta debe tener 16 dígitos")]
+        public string NumeroTarjeta { get; set; } = "";
+
+        [Required(ErrorMessage = "El nombre del titular es requerido")]
+        [StringLength(100, ErrorMessage = "El nombre del titular no puede exceder los 100 caracteres")]
+        public string Titular { get; set; } = "";
+
+        [Required(ErrorMessage = "La fecha de vencimiento es requerida")]
+        [RegularExpression(@"^(0[1-9]|1[0-2])/([0-9]{2})$", ErrorMessage = "La fecha debe tener el formato MM/AA")]
+        public string FechaVencimiento { get; set; } = "";
+
+        [Required(ErrorMessage = "El CVV es requerido")]
+        [RegularExpression(@"^\d{3}$", ErrorMessage = "El CVV debe tener 3 dígitos")]
+        public string CVV { get; set; } = "";
+    }
+} 

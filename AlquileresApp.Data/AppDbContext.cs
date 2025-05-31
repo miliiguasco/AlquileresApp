@@ -58,6 +58,11 @@ namespace AlquileresApp.Data
                 .Property(p => p.Localidad)
                 .IsRequired();
 
+            // Configuración de Propiedad
+            modelBuilder.Entity<Propiedad>()
+                .Property(p => p.TipoPago)
+                .IsRequired();
+
             // Configuración de Reserva
             modelBuilder.Entity<Reserva>()
                 .HasOne(r => r.Cliente)

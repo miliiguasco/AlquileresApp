@@ -14,7 +14,10 @@ public class Reserva
     public TipoPago TipoPago { get; set; }
     public decimal PrecioTotal { get; set; }
     public decimal MontoAPagar { get; set; }
+    public decimal MontoRestante { get; set; }
     public int CantidadHuespedes { get; set; }
+    public DateTime? FechaCheckOut { get; set; }
+    public int? EmpleadoQueRealizoCheckOutId { get; set; }
 
     public Reserva() { }
 
@@ -33,7 +36,7 @@ public class Reserva
         //falta monto restante
     }
 
-    public bool seSuperpone(DateTime inicio, DateTime fin)
+ /* public bool seSuperpone(DateTime inicio, DateTime fin)
     {
         // Caso 1: La nueva reserva empieza durante una existente
         if (inicio >= FechaInicio && inicio < FechaFin)
@@ -49,6 +52,8 @@ public class Reserva
 
         return false;
     }
-}
+}*/
 
+
+}
 

@@ -11,8 +11,204 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
 
-<link href="css/NavMenu.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<style>
+    .navbar {
+        background-color: #1F3F48 !important;
+        width: 100%;
+        padding: 0.5rem 0;
+        height: auto;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+
+    .container {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+        max-width: 100%;
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .logo {
+        height: 45px;
+        width: auto;
+    }
+
+    .brand-text {
+        color: white;
+        font-size: 1.4rem;
+        font-weight: 500;
+    }
+
+    .auth-buttons {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .auth-buttons .btn {
+        padding: 0.4rem 1.2rem;
+        border-radius: 4px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        cursor: pointer;
+        background-color: #f1771f;
+        color: white;
+        white-space: nowrap;
+        font-size: 0.95rem;
+        width: 130px;
+        text-align: center;
+        display: inline-block;
+    }
+
+    .auth-buttons .btn-dropdown {
+        width: 160px;
+        padding: 0.4rem 1.2rem
+    }
+
+    .auth-buttons .btn-icon {
+        width: 35px;
+        height: 35px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .auth-buttons .btn-icon i {
+        font-size: 1.2rem;
+    }
+
+    .auth-buttons .btn:hover {
+        background-color: #f37820;
+        color: white;
+    }
+
+    .user-info {
+        color: #ffffff;
+        font-weight: 400;
+        font-size: 14px;
+        align-self: center;
+    }
+
+    @@media (max-width: 768px) {
+        .navbar {
+            padding: 0.4rem 0;
+        }
+
+        .container {
+            padding: 0 1rem;
+        }
+
+        .navbar-start {
+            padding-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+
+        .navbar-end {
+            padding-left: 0.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .navbar-brand {
+            gap: 0.8rem;
+        }
+
+        .logo {
+            height: 35px;
+        }
+
+        .brand-text {
+            font-size: 1.1rem;
+        }
+
+        .auth-buttons {
+            gap: 0.5rem;
+        }
+
+        .auth-buttons .btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.9rem;
+            width: 110px;
+        }
+
+        .auth-buttons .btn-icon {
+            width: 35px;
+            height: 35px;
+        }
+
+        .auth-buttons .btn-icon i {
+            font-size: 1.2rem;
+        }
+    }
+
+    .dropdown-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 999;
+    }
+
+    .dropdown {
+        position: relative;
+        z-index: 1000;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        z-index: 1001;
+        background-color: white;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        max-width: 160px;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0 0.5rem;
+        color: #333;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+        font-size: 0.9rem;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+        color: #FF6B00;
+    }
+
+    .dropdown-item i {
+        font-size: 1rem;
+        color: #666;
+    }
+
+    .dropdown-item:hover i {
+        color: #FF6B00;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background-color: #e9ecef;
+        margin: 0.5rem 0;
+    }
+</style>
 
 @if (isDropdownOpen)
 {
