@@ -14,11 +14,11 @@
 @inject IJSRuntime JsRuntime
 
 
-<link href="css/AltaUsuario.css" rel="stylesheet" />
+<link href="css/VerPropiedad.css" rel="stylesheet" />
 
 <PageTitle>Publicar Propiedad - Alquilando</PageTitle>
-    
-<div class="registro-container">
+
+<div class="propiedad-container bg-light p-4 rounded shadow-sm my-5">
     <h1 class="registro-title">Publicar Nueva Propiedad</h1>
     <div class="registro-form">
         <section>
@@ -110,8 +110,8 @@
                 </div>
 
                 <div class="button-group">
-                    <button type="submit" class="registro-button">Publicar Propiedad</button>
-                    <button type="button" class="btn btn-secondary" @onclick="NavigateToHome">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Publicar Propiedad</button>
+                    <button type="button" class="btn btn-primary" @onclick="NavigateToHome">Cancelar</button>
                 </div>
             </EditForm>
             @if (!string.IsNullOrEmpty(errorMensaje))

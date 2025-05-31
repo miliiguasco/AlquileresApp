@@ -145,7 +145,13 @@
                             </button>
                         </div>
 
+                <div class="info-grupo">
+                    <button class="btn btn-primary" @onclick="() => IrAPublicarPropiedad()">
+                        <i class="fas fa-calendar-check"></i> Publicar propiedad
+                    </button>
+                </div>
                 </li>
+
             }
         </ul>
     }
@@ -184,5 +190,10 @@
             PoliticasDeCancelacion.PagoTotal_48hs_50 => "Pago total por adelantado, permite cancelación hasta 48hs antes con 50% de reintegro.",
             _ => "No especificada."
         };
+    }
+    
+    private void IrAPublicarPropiedad()
+    {
+        NavigationManager.NavigateTo("/Publish");
     }
 }

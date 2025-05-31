@@ -15,6 +15,7 @@ using AlquileresApp.Core.CasosDeUso.Reserva;
 using AlquileresApp.Core;
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -73,6 +74,7 @@ builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
 builder.Services.AddScoped<ITarjetaRepositorio, TarjetaRepositorio>();
 builder.Services.AddScoped<IFechaReservaValidador, FechaReservaValidador>();
 builder.Services.AddScoped<CasoDeUsoObtenerPropiedad>();
+builder.Services.AddScoped<CasoDeUsoMarcarPropiedadComoNoHabitable>();
 
 
 var app = builder.Build();
