@@ -7,6 +7,7 @@
 @inject CasoDeUsoListarPropiedades CUListarPropiedades
 @inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
 @inject CasoDeUsoModificarPropiedad CUModificarPropiedad
+
 @attribute [Authorize(Roles = "Administrador")] 
 
 <PageTitle>Administración</PageTitle>
@@ -52,6 +53,7 @@
             }
             else if (tabActiva == "propiedades")
             {
+
                 <Propiedades />
             }
         </div>
