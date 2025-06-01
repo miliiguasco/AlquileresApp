@@ -36,7 +36,7 @@ public class Reserva
         //falta monto restante
     }
 
- /* public bool seSuperpone(DateTime inicio, DateTime fin)
+ public bool seSuperpone(DateTime inicio, DateTime fin)
     {
         // Caso 1: La nueva reserva empieza durante una existente
         if (inicio >= FechaInicio && inicio < FechaFin)
@@ -52,8 +52,8 @@ public class Reserva
 
         return false;
     }
-}*/
-
-
 }
+
+
+
 

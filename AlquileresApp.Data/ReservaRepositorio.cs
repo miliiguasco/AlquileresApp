@@ -9,9 +9,9 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
     public void CrearReserva(Reserva reserva)
     {
         try
-        {         
-            dbContext.Reservas.Add(reserva);      
-            dbContext.SaveChanges();            
+        {
+            dbContext.Reservas.Add(reserva);
+            dbContext.SaveChanges();
         }
         catch (Exception ex)
         {
@@ -19,29 +19,29 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         }
     }
 
-        public async Task EliminarAsync(int id)
+    public async Task EliminarAsync(int id)
+    {
+        var reserva = await dbContext.Reservas.FindAsync(id);
+        if (reserva != null)
         {
-            var reserva = await dbContext.Reservas.FindAsync(id);
-            if (reserva != null)
-            {
-                dbContext.Reservas.Remove(reserva);
-                await dbContext.SaveChangesAsync();
-            }
+            dbContext.Reservas.Remove(reserva);
+            await dbContext.SaveChangesAsync();
         }
-        public void Actualizar(Reserva reserva)
+    }
+    public void Actualizar(Reserva reserva)
     {
         // Asegura que la entidad está siendo rastreada por el contexto
         dbContext.Reservas.Update(reserva);
         dbContext.SaveChanges();
     }
-    public void ModificarReserva(Reserva reserva){ 
+    public void ModificarReserva(Reserva reserva) {
         var reservaExistente = dbContext.Reservas
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
             .FirstOrDefault(r => r.Id == reserva.Id);
         if (reservaExistente == null)
             throw new Exception("Reserva no encontrada");
-            
+
         dbContext.Entry(reservaExistente).CurrentValues.SetValues(reserva);
         dbContext.SaveChanges();
     }
@@ -72,8 +72,8 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
             // Manejar el caso en que la reserva no existe
             throw new Exception($"No se encontró la reserva con ID: {reserva.Id}");
         }
-    } 
-    
+    }
+
 
     public List<Reserva> ListarReservas()
     {
@@ -84,27 +84,29 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         if (reservas.Count == 0)
             throw new Exception("No se encontraron reservas.");
         return reservas;
-    }                           
+    }
 
-    public List<Reserva> ListarMisReservas(int usuario){
+    public List<Reserva> ListarMisReservas(int usuario) {
         var reservas = dbContext.Reservas
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
             .Where(r => r.Cliente.Id == usuario)
-            .ToList();  
-        return reservas;    
+            .ToList();
+        return reservas;
     }
 
     public async Task<bool> SeSuperponeAsync(int propiedadId, DateTime inicio, DateTime fin)
-        {
-            return await dbContext.Reservas
-                .Where(r => r.PropiedadId == propiedadId)
-                .AnyAsync(r => r.seSuperpone(inicio, fin));
-        }
+    {
+        return await dbContext.Reservas
+            .Where(r => r.PropiedadId == propiedadId)
+            .AnyAsync(r => r.seSuperpone(inicio, fin));
+    }
+}
      /*
     public List<Reserva> ListarMisReservas(Usuario usuario){
         throw new NotImplementedException();
     }
+
 
     
 
@@ -114,6 +116,7 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         // TODO: Implementa la lógica para cancelar una reserva
         throw new NotImplementedException();
     }
+    */
 
 
 
@@ -134,12 +137,3 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
 
 
 
-
-
-
-
-
-
-
-
-}
