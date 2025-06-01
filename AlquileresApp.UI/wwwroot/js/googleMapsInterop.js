@@ -26,10 +26,16 @@ window.initPlacePicker = (containerId, blazorObjectReference, initialAddress) =>
 
     console.log('Input creado, inicializando autocomplete...');
 
+    const defaultBounds = new google.maps.LatLngBounds(
+    new google.maps.LatLng(-90, -180), // Suroeste (Polo Sur, -180 longitud)
+    new google.maps.LatLng(90, 180)    // Noreste (Polo Norte, +180 longitud)
+    );
+
     // Inicializar el autocompletado de Google Places
     const autocomplete = new google.maps.places.Autocomplete(input, {
         types: ['address'],
-        componentRestrictions: { country: 'AR' }
+        bounds: defaultBounds,
+        strictBounds: false
     });
 
     // Escuchar el evento de selección de lugar

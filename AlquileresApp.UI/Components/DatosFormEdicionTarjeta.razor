@@ -54,7 +54,7 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="@ButtonClass" @onclick="ValidarFormulario">
+            <button type="submit" class="@ButtonClass" @onclick="ValidarFormulario" disabled="@EstaProcesando">
                 <i class="fas fa-save"></i> @SubmitButtonText
             </button>
         </div>
@@ -76,6 +76,9 @@
 
     [Parameter]
     public string ButtonClass { get; set; } = "btn btn-primary";
+
+    [Parameter]
+    public bool EstaProcesando { get; set; } = false;
 
     private string? ErrorFechaVencimiento { get; set; }
     private bool mostrarErrorFechaVencimiento = false;
@@ -174,6 +177,8 @@
 
     private async Task ValidarFormulario()
     {
+        if (EstaProcesando) return;  // Evitar múltiples envíos
+        
         ValidarFechaVencimiento();
         if (!mostrarErrorFechaVencimiento)
         {

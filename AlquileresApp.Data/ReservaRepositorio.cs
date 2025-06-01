@@ -108,15 +108,13 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
     }
 
 
-    
 
 
-    public void CancelarReserva(Reserva reserva)
-    {
-        // TODO: Implementa la lógica para cancelar una reserva
-        throw new NotImplementedException();
-    }
-    */
+
+
+
+
+
 
 
 

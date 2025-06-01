@@ -336,7 +336,7 @@
                 propiedadEditada.Localidad = locality;
                 // No forzar StateHasChanged aquí, solo actualizar el modelo
                 await GetCoordinatesForAddressAsync(); // Actualizar coordenadas
-                 await Js.InvokeVoidAsync("mostrarMapa", "map", propiedadEditada.Latitud, propiedadEditada.Longitud);
+                await Js.InvokeVoidAsync("mostrarMapa", "map", propiedadEditada.Latitud, propiedadEditada.Longitud);
             }
         }
         catch (Exception ex)
@@ -569,7 +569,7 @@ private async Task GuardarCambios()
         }
         private void VolverAInicio()
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/Administrar");
         }
 
         

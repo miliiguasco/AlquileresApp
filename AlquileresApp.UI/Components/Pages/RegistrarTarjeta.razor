@@ -36,7 +36,8 @@
                                     OnSubmit="OnRegistrarTarjeta"
                                     FormName="registrarTarjeta"
                                     SubmitButtonText="Registrar Tarjeta"
-                                    ButtonClass="btn" />          
+                                    ButtonClass="btn"
+                                    EstaProcesando="@estaProcesando" />          
             </div>
         </div>
     }
@@ -91,6 +92,7 @@
     private string? _error;
     private DatosFormEdicionTarjeta.InputModel datosForm = new();
     private string? mensajeExito;
+    private bool estaProcesando = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -126,10 +128,15 @@
         NavigationManager.NavigateTo("/Perfil");
     }
 
-    private void OnRegistrarTarjeta()
+    private async Task OnRegistrarTarjeta()
     {
+        if (estaProcesando) return;
+
         try
         {
+            estaProcesando = true;
+            StateHasChanged();
+
             if (usuario == null)
             {
                 throw new Exception("No se ha encontrado el usuario");
@@ -151,7 +158,9 @@
         {
             _error = $"Error al registrar la tarjeta: {ex.Message}";
             Logger.LogError(_error);
-            JS.InvokeVoidAsync("alert", _error);
+            await JS.InvokeVoidAsync("alert", _error);
+            estaProcesando = false;
+            StateHasChanged();
         }
     }
 

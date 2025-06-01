@@ -196,7 +196,7 @@
                         <div class="tab-pane active" style="display: block;">
                             <div class="profile-section">
                                 <h3>Métodos de Pago</h3>
-                                <div class="profile-actions" style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap;">   
+                                <div class="payment-methods-actions">   
                                     <button type="button" class="btn btn-info" @onclick="IrAVerTarjeta">
                                         <i class="fas fa-credit-card"></i> Ver Tarjeta
                                     </button>
@@ -788,5 +788,69 @@
     .btn-sm {
         padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
+    }
+
+    .payment-methods-actions {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .payment-methods-actions button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        color: white;
+        border: none;
+        min-width: 180px;
+    }
+
+    .payment-methods-actions button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .payment-methods-actions .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+
+    .payment-methods-actions .btn-info:hover {
+        background-color: #138496;
+    }
+
+    .payment-methods-actions .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .payment-methods-actions .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .payment-methods-actions .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .payment-methods-actions .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .payment-methods-actions .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+
+    .payment-methods-actions .btn-warning:hover {
+        background-color: #e0a800;
     }
 </style> 

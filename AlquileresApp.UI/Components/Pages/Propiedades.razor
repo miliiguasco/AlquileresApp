@@ -10,8 +10,17 @@
 @inject NavigationManager NavigationManager
 
 <div class="admin-section">
+
     @if (propiedades != null && propiedades.Any())
     {
+    @if (!string.IsNullOrEmpty(mensajeExito))
+    {
+        <div class="alert alert-success">@mensajeExito</div>
+    }
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">@mensajeError</div>
+    }
         <div class="table-container">
             <table class="property-table">
                 <thead>
@@ -66,10 +75,35 @@
         <p>No hay propiedades disponibles.</p>
     }
 </div>
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Cancelación</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que querés eliminar esta propiedad?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-secondary" @onclick="@(async () => await ConfirmarCancelacion())">Sí, eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     private List<Propiedad>? propiedades;
     private bool cargando = true;
+
+    private Propiedad propiedadAEliminar;
+    private string mensajeError;
+    private string mensajeExito;
+    private bool mostrarConfirmacion = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,18 +123,39 @@
         NavigationManager.NavigateTo($"/EditarPropiedad/{propiedad.Id}");
     }
 
-    private async Task EliminarPropiedad(Propiedad propiedad)
+    private void EliminarPropiedad(Propiedad propiedad)
+    {
+        propiedadAEliminar = propiedad;
+        mostrarConfirmacion = true;
+        mensajeError = null;
+        mensajeExito = null;
+    }
+    private async Task ConfirmarCancelacion()
     {
         try
-        {
-            CUEliminarPropiedad.Ejecutar(propiedad);
+        {   
+            if (CUEliminarPropiedad.Ejecutar(propiedadAEliminar)){
+                mensajeExito = $" Propiedad eliminada: ${propiedadAEliminar.Titulo}.";
+            }
+            else
+            {
+                mensajeError = $"Error al eliminar la propiedad: {propiedadAEliminar.Titulo}. Tiene reservas hechas";
+            }
             propiedades = CUListarPropiedades.Ejecutar();
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
+            }
+            catch (Exception ex)
+            {
             // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
         }
+        finally
+        {
+            mostrarConfirmacion = false;
+        }
+    }
+
+    private void CancelarConfirmacion()
+    {
+        mostrarConfirmacion = false;
     }
 
     private void NuevaPropiedad() {

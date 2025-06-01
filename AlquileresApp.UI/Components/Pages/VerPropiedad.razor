@@ -59,6 +59,7 @@
             <p><strong>Localidad:</strong> @propiedad.Localidad</p>
             <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
             <p><strong>Precio por noche:</strong> <span class="text-success fw-semibold">$@propiedad.PrecioPorNoche</span></p>
+            <p id="map" style="width: 100%; height: 300px; margin: 10px 0;"></p>
 
             <h4 class="mt-4 mb-3">Servicios</h4>
             @if (propiedad.ServiciosDisponibles is not null && propiedad.ServiciosDisponibles.Any())
@@ -101,7 +102,6 @@
         Contraseña = "123456",
         FechaNacimiento = new DateTime(1990, 1, 1)
     };
-    
     private Propiedad? propiedad;
     private string carouselId => $"carousel-{PropiedadId}";
 
@@ -110,6 +110,14 @@
         propiedad = CUObtenerPropiedad.Ejecutar(PropiedadId);
     }
 
+    [JSInvokable]
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (propiedad != null)
+        {
+            await JS.InvokeVoidAsync("mostrarMapa", "map", propiedad.Latitud, propiedad.Longitud);
+        }
+    }
 
     private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
     {
