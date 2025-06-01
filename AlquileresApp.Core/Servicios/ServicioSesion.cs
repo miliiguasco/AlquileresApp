@@ -85,6 +85,7 @@ public class ServicioSesion(ServicioCookies servicioCookies, ILogger<ServicioSes
         {
             new Claim(ClaimTypes.Email, usuario.Email),
             new Claim(ClaimTypes.Name, usuario.Nombre),
+            new Claim(ClaimTypes.UserData, usuario.Id.ToString()),
             new Claim(ClaimTypes.Role, usuario.Rol.ToString())
         };
 
