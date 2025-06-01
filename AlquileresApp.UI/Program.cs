@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authentication;
 
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -95,6 +96,18 @@ builder.Services.AddScoped<CasoDeUsoModificarTarjeta>();
 builder.Services.AddScoped<ICasoDeUsoVerReserva, CasoDeUsoVerReserva>();
 builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
 builder.Services.AddScoped<CasoDeUsoMarcarPropiedadComoNoHabitable>();
+builder.Services.AddScoped<CasoDeUsoListarMisReservas>();
+builder.Services.AddScoped<CasoDeUsoCancelarReserva>();
+builder.Services.AddScoped<CasoDeUsoModificarReserva>();
+builder.Services.AddScoped<CasoDeUsoObtenerReserva>();
+builder.Services.AddTransient<INotificadorEmail>(provider =>
+    new NotificadorEmail(
+        "reservaenalquilando@gmail.com",
+        "fxsl hsck basy pamv"
+    )
+);
+
+
 
 var app = builder.Build();
 

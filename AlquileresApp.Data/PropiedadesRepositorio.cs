@@ -95,6 +95,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
         }
 
+    
         var propiedades = query.ToList();
         //Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
         return propiedades;
@@ -107,11 +108,36 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
                     (filtros.FechaInicio <= r.FechaInicio && filtros.FechaFin >= r.FechaFin)
                 ))
             );
-        }
 
         return query.ToList();
     }
 
+    public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin) //
+    {
+        var reservasExistentes = dbContext.Reservas
+            .Where(r => r.Propiedad.Id == propiedad.Id &&
+                        r.FechaInicio <= fechaFin &&
+                        r.FechaFin >= fechaInicio)
+            .ToList();
+
+        if (reservasExistentes.Any())
+        {
+            throw new Exception("La propiedad no está disponible en las fechas seleccionadas.");
+        }
+    }
+    public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId)
+{
+    return !dbContext.Reservas.Any(r =>
+        r.Propiedad.Id == propiedadId &&
+        r.Id != reservaId &&
+        r.FechaInicio <= fechaFin &&
+        r.FechaFin >= fechaInicio);
+
+    
+}
+
+
+    public void ValidarDisponibilidad(DateTime fechaInicio, DateTime fechaFin){ //verificar este metodo
     public void ValidarDisponibilidad(DateTime fechaInicio, DateTime fechaFin) { //verificar este metodo
         var reservasExistentes = dbContext.Reservas
             .Where(r => r.FechaInicio <= fechaFin && r.FechaFin >= fechaInicio)

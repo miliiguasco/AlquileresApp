@@ -152,7 +152,11 @@
 </div>
 
 @code {
-    private SearchFilters Filtros = new();
+    private SearchFilters Filtros = new()
+{
+    FechaInicio = DateTime.Today,
+    FechaFin = DateTime.Today.AddDays(1)
+};
     private List<Propiedad>? Propiedades;
     private Usuario UsuarioActual = new Cliente
     {

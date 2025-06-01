@@ -24,9 +24,9 @@ namespace AlquileresApp.Data
             {
                 new Administrador
                 {
-                    Nombre = "Juan",
-                    Apellido = "Pérez",
-                    Email = "admin@gmail.com",
+                    Nombre = "Milagros",
+                    Apellido = "Guasco",
+                    Email = "milagrosguasco11@gmail.com",
                     Telefono = "123456789",
                     Contraseña = hashService.HashPassword("password123"),
                     FechaNacimiento = new DateTime(1990, 1, 1),
@@ -53,7 +53,7 @@ namespace AlquileresApp.Data
                     Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
                     Direccion = "Av. Costanera 123",
                     Localidad = "Mar del Plata",
-                    PrecioPorNoche = 150.00m,
+                    PrecioPorNoche = 750.00m,
                     Capacidad = 6,
                     ServiciosDisponibles = new List<ServiciosPropiedad> 
                     { 
@@ -70,7 +70,7 @@ namespace AlquileresApp.Data
                     Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
                     Direccion = "Av. Costanera 123",
                     Localidad = "Mar del Plata",
-                    PrecioPorNoche = 150.00m,
+                    PrecioPorNoche = 750.00m,
                     Capacidad = 6,
                     ServiciosDisponibles = new List<ServiciosPropiedad> 
                     { 
@@ -152,31 +152,33 @@ namespace AlquileresApp.Data
                     PropiedadId = context.Propiedades.First().Id,
                     FechaInicio = DateTime.Now.AddDays(10),
                     FechaFin = DateTime.Now.AddDays(15),
-                    //PrecioTotal = 750.00m, // 5 noches * 150
-                },
-                new Reserva
-                {
-                    ClienteId = context.Usuarios.Skip(1).First().Id,
-                    PropiedadId = context.Propiedades.Skip(1).First().Id,
-                    FechaInicio = DateTime.Now.AddDays(20),
-                    FechaFin = DateTime.Now.AddDays(25),
-                    //PrecioTotal = 600.00m, // 5 noches * 120
-                },
-                new Reserva
-                {
-                    ClienteId = usuarios[1].Id,
-                    PropiedadId = propiedades[2].Id,
-                    FechaInicio = DateTime.Now.AddDays(5),
-                    FechaFin = DateTime.Now.AddDays(7),
-                    //PrecioTotal = 160.00m, // 2 noches * 80
+                    PrecioTotal = 3750,
+                    MontoAPagar = 3750, // 5 noches * 150
                 },
                 new Reserva
                 {
                     ClienteId = usuarios[0].Id,
-                    PropiedadId = propiedades[3].Id,
-                    FechaInicio = DateTime.Now.AddDays(30),
+                    PropiedadId = propiedades[0].Id,
+                    FechaInicio = DateTime.Now.AddDays(20),
+                    FechaFin = DateTime.Now.AddDays(25),
+                    PrecioTotal = 3750, 
+                    MontoAPagar = 3750,
+                },
+                new Reserva
+                {
+                    ClienteId = usuarios[0].Id,
+                    PropiedadId = propiedades[2].Id,
+                    FechaInicio = DateTime.Now.AddDays(5),
+                    FechaFin = DateTime.Now.AddDays(7),
+                    PrecioTotal = 160,
+                },
+                new Reserva
+                {
+                    ClienteId = usuarios[0].Id,
+                    PropiedadId = propiedades[2].Id,
+                    FechaInicio = DateTime.Now.AddDays(2),
                     FechaFin = DateTime.Now.AddDays(35),
-                    //PrecioTotal = 1000.00m, // 5 noches * 200
+                    PrecioTotal = 1000,
                 }
             };
             context.Reservas.AddRange(reservas);
@@ -185,15 +187,15 @@ namespace AlquileresApp.Data
             //Tarjetas de prueba
             var tarjetas = new List<Tarjeta>
             {
-                new Tarjeta
+                /*new Tarjeta
                 {
                     NumeroTarjeta = "1234567890123456",
                     Titular = "Juan Pérez", 
                     FechaVencimiento = "12/2025",
                     CVV = "123",
-                    Saldo = 1000.00m,
+                    Saldo = 4000.00m,
                     ClienteId = usuarios[0].Id
-                },
+                },*/
                 new Tarjeta
                 {
                     NumeroTarjeta = "9876543210987654",

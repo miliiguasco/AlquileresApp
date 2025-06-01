@@ -19,6 +19,21 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         }
     }
 
+        public async Task EliminarAsync(int id)
+        {
+            var reserva = await dbContext.Reservas.FindAsync(id);
+            if (reserva != null)
+            {
+                dbContext.Reservas.Remove(reserva);
+                await dbContext.SaveChangesAsync();
+            }
+        }
+        public void Actualizar(Reserva reserva)
+    {
+        // Asegura que la entidad está siendo rastreada por el contexto
+        dbContext.Reservas.Update(reserva);
+        dbContext.SaveChanges();
+    }
     public void ModificarReserva(Reserva reserva){ 
         var reservaExistente = dbContext.Reservas
             .Include(r => r.Cliente)
@@ -71,20 +86,24 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         return reservas;
     }                           
 
-    public List<Reserva> ListarMisReservas(Usuario usuario){
+    public List<Reserva> ListarMisReservas(int usuario){
         var reservas = dbContext.Reservas
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
-            .Where(r => r.Cliente.Id == usuario.Id)
+            .Where(r => r.Cliente.Id == usuario)
             .ToList();  
         return reservas;    
     }
 
-    public void RegistrarCheckout(Reserva reserva)
-    {
-        reserva.Estado = EstadoReserva.Finalizada;
-        reserva.FechaCheckOut = DateTime.Now;
-        dbContext.SaveChanges();
+    public async Task<bool> SeSuperponeAsync(int propiedadId, DateTime inicio, DateTime fin)
+        {
+            return await dbContext.Reservas
+                .Where(r => r.PropiedadId == propiedadId)
+                .AnyAsync(r => r.seSuperpone(inicio, fin));
+        }
+     /*
+    public List<Reserva> ListarMisReservas(Usuario usuario){
+        throw new NotImplementedException();
     }
 
     

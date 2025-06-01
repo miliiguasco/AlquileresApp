@@ -12,6 +12,7 @@ public interface IPropiedadRepositorio{
     public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin);
     //public List<Propiedad> BuscarDisponiblesAsync(SearchFilters filtros);
     Propiedad? ObtenerPorId(int id);
+    public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId);
 }
 
 

@@ -12,6 +12,8 @@ public interface IReservaRepositorio{
     public void ModificarReserva2(Reserva reserva);
 
     public List<Reserva> ListarReservas();
+    public List<Reserva> ListarMisReservas(int usuario);
+    void Actualizar(Reserva reserva);
     public List<Reserva> ListarMisReservas(Usuario usuario);
     public void RegistrarCheckout(Reserva reserva);
 

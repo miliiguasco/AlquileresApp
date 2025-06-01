@@ -11,5 +11,7 @@ public interface ITarjetaRepositorio
     void EliminarTarjeta(Tarjeta tarjeta);
     List<Tarjeta> ObtenerTarjetasPorUsuario(int usuarioId);
     void PagarMontoRestante(Tarjeta tarjeta, decimal monto);
+    void Reembolsar(Tarjeta tarjeta, decimal monto);
+    Tarjeta ObtenerPorClienteId(int clienteId);
 }
 
