@@ -33,7 +33,7 @@ window.initPlacePicker = (containerId, blazorObjectReference, initialAddress) =>
 
     // Inicializar el autocompletado de Google Places
     const autocomplete = new google.maps.places.Autocomplete(input, {
-        types: ['address'],
+        types: ['geocode'],
         bounds: defaultBounds,
         strictBounds: false
     });

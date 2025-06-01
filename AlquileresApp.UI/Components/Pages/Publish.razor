@@ -245,7 +245,7 @@
         {
             cargarPoliticaCancelacion(nuevaPropiedad.TipoPago);
             await Task.Run(() => CUAgregarPropiedad.Ejecutar(nuevaPropiedad));
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/Administrar");
         }
         catch (Exception ex)
         {
