@@ -7,7 +7,7 @@ public interface IReservaRepositorio{
     //cancelar reserva
     public Reserva? ObtenerReservaPorId(int id);
     // void CancelarReserva(Reserva reserva);
-    void RegistrarCheckout(Reserva reserva);
+    //void RegistrarCheckout(Reserva reserva);
    
     public void ModificarReserva2(Reserva reserva);
 

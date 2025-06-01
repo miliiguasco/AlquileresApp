@@ -34,7 +34,8 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         dbContext.Reservas.Update(reserva);
         dbContext.SaveChanges();
     }
-    public void ModificarReserva(Reserva reserva) {
+    public void ModificarReserva(Reserva reserva)
+    {
         var reservaExistente = dbContext.Reservas
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
@@ -86,7 +87,8 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         return reservas;
     }
 
-    public List<Reserva> ListarMisReservas(int usuario) {
+    public List<Reserva> ListarMisReservas(int usuario)
+    {
         var reservas = dbContext.Reservas
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
@@ -101,11 +103,13 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
             .Where(r => r.PropiedadId == propiedadId)
             .AnyAsync(r => r.seSuperpone(inicio, fin));
     }
+    
 }
      /*
     public List<Reserva> ListarMisReservas(Usuario usuario){
         throw new NotImplementedException();
     }
+    */
 
 
 

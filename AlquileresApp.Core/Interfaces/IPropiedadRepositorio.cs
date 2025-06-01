@@ -4,7 +4,7 @@ using AlquileresApp.Core.Entidades;
 public interface IPropiedadRepositorio{
     void CargarPropiedad(Propiedad propiedad);
     void ModificarPropiedad(Propiedad propiedad);
-    void EliminarPropiedad(Propiedad propiedad);
+    bool EliminarPropiedad(Propiedad propiedad);
     void MarcarPropiedadComoNoHabitable(Propiedad propiedad);
     public List<Propiedad> ListarPropiedades();
     public Propiedad? ObtenerPropiedadPorId(int id);

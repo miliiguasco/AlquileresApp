@@ -12,17 +12,21 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         dbContext.SaveChanges();
     }
 
-    public void EliminarPropiedad(Propiedad propiedad) {
+    public bool EliminarPropiedad(Propiedad propiedad)
+    {
         var propiedadExistente = dbContext.Propiedades.FirstOrDefault(p => p.Id == propiedad.Id);
         if (propiedadExistente == null)
             throw new Exception("La propiedad no existe");
 
         var tieneReserva = dbContext.Reservas.Any(r => r.PropiedadId == propiedad.Id);
         if (tieneReserva)
-            throw new Exception("No se puede eliminar una propiedad con reserva activa");
+        {
+            return false;
+        }
 
         dbContext.Propiedades.Remove(propiedadExistente);
         dbContext.SaveChanges();
+        return true;
     }
 
     public List<Propiedad> ListarPropiedades(){

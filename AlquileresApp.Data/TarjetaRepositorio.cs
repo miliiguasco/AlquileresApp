@@ -62,9 +62,24 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
 
     Console.WriteLine($"Reembolso realizado. Nuevo saldo: {tarjeta.Saldo}");
 }
-public Tarjeta ObtenerPorClienteId(int clienteId)
-{
-    var tarjeta = dbContext.Tarjetas.FirstOrDefault(t => t.ClienteId == clienteId);
-    return tarjeta;
-}
+
+    public List<Tarjeta> ObtenerTarjetasPorUsuario(int usuarioId){
+        return dbContext.Tarjetas.Where(t => t.ClienteId == usuarioId).ToList();
+    }
+
+    public void EliminarTarjeta(Tarjeta tarjeta){
+        dbContext.Tarjetas.Remove(tarjeta);
+        dbContext.SaveChanges();
+    }
+
+    public void PagarMontoRestante(Tarjeta tarjeta, decimal monto){
+        tarjeta.Saldo -= monto;
+        dbContext.SaveChanges();
+    }
+
+    public Tarjeta ObtenerPorClienteId(int clienteId)
+    {
+        var tarjeta = dbContext.Tarjetas.FirstOrDefault(t => t.ClienteId == clienteId);
+        return tarjeta;
+    }
 }

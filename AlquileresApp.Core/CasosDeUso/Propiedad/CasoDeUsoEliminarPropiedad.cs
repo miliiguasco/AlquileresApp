@@ -4,8 +4,8 @@ using AlquileresApp.Core.Interfaces;
 
 public class CasoDeUsoEliminarPropiedad(IPropiedadRepositorio propiedadesRepositorio)
 {
-    public void Ejecutar(Propiedad propiedad)
+    public bool Ejecutar(Propiedad propiedad)
     {
-        propiedadesRepositorio.EliminarPropiedad(propiedad);
+        return propiedadesRepositorio.EliminarPropiedad(propiedad);
     }
 }
