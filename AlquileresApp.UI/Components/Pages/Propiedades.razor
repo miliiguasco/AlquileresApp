@@ -7,6 +7,7 @@
 @inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
 @inject CasoDeUsoModificarPropiedad CUModificarPropiedad
 @inject ILogger<Propiedades> Logger
+@inject NavigationManager NavigationManager
 
 <div class="admin-section">
     @if (propiedades != null && propiedades.Any())
@@ -85,7 +86,7 @@
 
     private async Task EditarPropiedad(Propiedad propiedad)
     {
-        // Implementar edición
+        NavigationManager.NavigateTo($"/EditarPropiedad/{propiedad.Id}");
     }
 
     private async Task EliminarPropiedad(Propiedad propiedad)
@@ -103,6 +104,7 @@
     }
 
     private void NuevaPropiedad() {
-        // Implementar nueva propiedad
+
+        NavigationManager.NavigateTo("/PublicarPropiedad");
     }
 } 

@@ -1,4 +1,4 @@
-@page "/propiedadd/{Id:int}"
+@page "/EditarPropiedad/{Id:int}"
 @using AlquileresApp.Core.CasosDeUso.Imagen
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
@@ -23,6 +23,7 @@
 @inject IConfiguration Configuration
 @using Microsoft.AspNetCore.Components.Forms
 @using System.IO
+@using System.ComponentModel.DataAnnotations
 @inject IJSRuntime Js
 
 <link href="css/VerPropiedad.css" rel="stylesheet" />
@@ -149,7 +150,7 @@
                     </div>
                 }
             </div>
-            <EditForm Model="@propiedadEditada" OnValidSubmit="GuardarCambios" class="form-horizontal">
+            <EditForm Model="@propiedadEditada" OnValidSubmit="HandleSubmitWithGeocoding" class="form-horizontal">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
@@ -170,17 +171,13 @@
                     <InputNumber id="precio" class="form-control" @bind-Value="propiedadEditada.PrecioPorNoche" />
                     <ValidationMessage For="@(() => propiedadEditada.PrecioPorNoche)" />
                 </div>
+                
+                 <p id="map" style="width: 100%; height: 300px; margin: 10px 0;"></p>
 
                 <div class="form-group">
                     <label for="direccion">Dirección</label>
                     <div id="direccion-autocomplete-container"></div>
                     <ValidationMessage For="@(() => propiedadEditada.Direccion)" />
-                </div>
-
-                <div class="form-group">
-                    <label for="localidad">Localidad</label>
-                    <InputText id="localidad" class="form-control" @bind-Value="propiedadEditada.Localidad" />
-                    <ValidationMessage For="@(() => propiedadEditada.Localidad)" />
                 </div>
 
                 <div class="form-group">
@@ -191,18 +188,23 @@
 
                 <div class="form-group">
                     <label for="pagoAnticipado">Porcentaje de pago anticipado</label>
-                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="propiedadEditada.TipoPago">
-                        <option value="@TipoPago.SinAnticipo">0% - Sin pago anticipado</option>
-                        <option value="@TipoPago.Parcial">20% - Pago parcial anticipado</option>
-                        <option value="@TipoPago.Total">100% - Pago total anticipado</option>
+                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="propiedadEditada.TipoPago" @oninput="OnTipoPagoChanged">
+                        <option value="SinAnticipo">0% - Sin pago anticipado</option>
+                        <option value="Parcial">20% - Pago parcial anticipado</option>
+                        <option value="Total">100% - Pago total anticipado</option>
                     </InputSelect>
                     <ValidationMessage For="@(() => propiedadEditada.TipoPago)" />
                 </div>
 
+                <div class="form-group">
+                <label for="politicaCancelacion">Política de cancelación</label>
+                <p class="form-control-plaintext">@ObtenerDescripcionPolitica(propiedadEditada.PoliticaCancelacion)</p>
+                </div>
+
                 <div class="button-group">
-                    <InputCheckbox class="form-check-input" id="NoHabitable"
+                    <!--<InputCheckbox class="form-check-input" id="NoHabitable"
                                    @bind-Value="propiedadEditada.NoHabitable" />
-                    <label class="form-check-label" for="NoHabitable">No habitable</label>
+                    <label class="form-check-label" for="NoHabitable">No habitable</label> -->
                     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                     <button type="button" class="btn btn-secondary" @onclick="CancelarEdicion">Cancelar</button>
                 </div>
@@ -225,6 +227,8 @@
     private string? errorMensaje;
     //  private ElementReference fileInput;
 
+
+    
     private string? googleMapsApiKey;
     private bool modoEdicion = false;
     private string carouselId => $"carousel-{Id}";
@@ -241,35 +245,37 @@
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
+{
+    if (modoEdicion && propiedadEditada != null)
     {
-        if (modoEdicion && propiedadEditada != null)
+        try
         {
-            try
-            {
-                await Js.InvokeVoidAsync(
-                    "initPlacePicker",
-                    "direccion-autocomplete-container",
-                    DotNetObjectReference.Create(this)
-                );
-                // El input se crea por JS, así que no lo dupliques en el markup
-            }
-            catch (Exception ex)
-            {
-                errorMensaje = $"Error al inicializar el autocompletado: {ex.Message}";
-            }
+            await Js.InvokeVoidAsync(
+                "initPlacePicker",
+                "direccion-autocomplete-container",
+                DotNetObjectReference.Create(this),
+                propiedadEditada.Direccion
+            );
+            await Js.InvokeVoidAsync("mostrarMapa", "map", propiedadEditada.Latitud, propiedadEditada.Longitud);
         }
-        if (firstRender && propiedad != null && !modoEdicion)
+        catch (Exception ex)
         {
-            try
-            {
-                await Js.InvokeVoidAsync("mostrarMapa", "map", propiedad.Latitud, propiedad.Longitud);
-            }
-            catch (Exception ex)
-            {
-                errorMensaje = $"Error al mostrar el mapa: {ex.Message}";
-            }
+            errorMensaje = $"Error al inicializar el autocompletado: {ex.Message}";
         }
     }
+    // Mostrar el mapa siempre que NO estés en modo edición y la propiedad exista
+    if (!modoEdicion && propiedad != null)
+    {
+        try
+        {
+            await Js.InvokeVoidAsync("mostrarMapa", "map", propiedad.Latitud, propiedad.Longitud);
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al mostrar el mapa: {ex.Message}";
+        }
+    }
+}
 
     private void CargarImagenes()
     {
@@ -279,7 +285,7 @@
         }
         catch (Exception ex)
         {
-
+            Console.WriteLine($"Error en CargarImagenes: {ex.Message}");
         }
     }
 
@@ -320,15 +326,17 @@
     }
 
     [JSInvokable]
-    public async Task SetAddressFromPicker(string address)
+    public async Task SetAddressAndLocalityFromPicker(string address, string locality)
     {
         try
         {
             if (!string.IsNullOrEmpty(address))
             {
                 propiedadEditada.Direccion = address;
+                propiedadEditada.Localidad = locality;
                 // No forzar StateHasChanged aquí, solo actualizar el modelo
                 await GetCoordinatesForAddressAsync(); // Actualizar coordenadas
+                 await Js.InvokeVoidAsync("mostrarMapa", "map", propiedadEditada.Latitud, propiedadEditada.Longitud);
             }
         }
         catch (Exception ex)
@@ -425,7 +433,7 @@ private async Task GuardarCambios()
         propiedad = CUObtenerPropiedad.Ejecutar(propiedadEditada.Id);
 
         // Cambiar el estado de NoHabitable según el valor del checkbox
-        if (propiedad.NoHabitable)
+        /*if (propiedad.NoHabitable)
         {
             // Marcar como no habitable
             Console.WriteLine("Intentando marcar propiedad como no habitable...");
@@ -439,11 +447,11 @@ private async Task GuardarCambios()
             propiedad.NoHabitable = false;
             await Task.Run(() => CUModificarPropiedad.Ejecutar(propiedad));
             propiedad = CUObtenerPropiedad.Ejecutar(propiedad.Id);
-        }
+        }   */
 
         modoEdicion = false;
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(100);
+        //await Task.Delay(100);
         await Js.InvokeVoidAsync("mostrarMapa", "map", propiedad.Latitud, propiedad.Longitud);
     }
     catch (Exception ex)
@@ -453,10 +461,11 @@ private async Task GuardarCambios()
     }
 }
 
-        private void CancelarEdicion()
+        private async Task CancelarEdicion()
         {
             modoEdicion = false;
             errorMensaje = null;
+            await InvokeAsync(StateHasChanged);
         }
 
         private void OnClickUpload()
@@ -514,6 +523,29 @@ private async Task GuardarCambios()
                 Console.WriteLine($"Error en CargarImagen: {ex.Message}");
             }
         }
+
+        private void OnTipoPagoChanged(ChangeEventArgs e)
+        {
+            if (Enum.TryParse<TipoPago>(e.Value?.ToString(), out var tipoPago))
+            {
+                Console.Write($"Tipo de pago seleccionado: {tipoPago}");
+                propiedadEditada.TipoPago = tipoPago;
+                // Asigna la política de cancelación según el tipo de pago
+                switch (tipoPago)
+                {
+                    case TipoPago.SinAnticipo:
+                        propiedadEditada.PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable;
+                        break;
+                    case TipoPago.Parcial:
+                        propiedadEditada.PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs;
+                        break;
+                    case TipoPago.Total:
+                        propiedadEditada.PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50;
+                        break;
+                }
+            }
+            StateHasChanged();
+        }
         private async Task EliminarImagen(int imagenId)
         {
             try
@@ -539,4 +571,7 @@ private async Task GuardarCambios()
         {
             NavigationManager.NavigateTo("/");
         }
+
+        
+
 }

@@ -92,6 +92,7 @@ builder.Services.AddScoped<CasoDeUsoVisualizarReserva>();
 builder.Services.AddScoped<CasoDeUsoVisualizarTarjeta>();
 builder.Services.AddScoped<CasoDeUsoEliminarTarjeta>();
 builder.Services.AddScoped<CasoDeUsoModificarTarjeta>();
+builder.Services.AddScoped<ICasoDeUsoVerReserva, CasoDeUsoVerReserva>();
 builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
 builder.Services.AddScoped<CasoDeUsoMarcarPropiedadComoNoHabitable>();
 

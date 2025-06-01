@@ -1,4 +1,4 @@
-@page "/Publish"
+@page "/PublicarPropiedad"
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
 @using AlquileresApp.Core.CasosDeUso.Propiedad
@@ -50,12 +50,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="localidad">Localidad</label>
-                    <InputText id="localidad" class="form-control" @bind-Value="nuevaPropiedad.Localidad" />
-                    <ValidationMessage For="@(() => nuevaPropiedad.Localidad)" />
-                </div>
-
-                <div class="form-group">
                     <label for="capacidad">Capacidad de personas</label>
                     <InputNumber id="capacidad" class="form-control" @bind-Value="nuevaPropiedad.Capacidad" />
                     <ValidationMessage For="@(() => nuevaPropiedad.Capacidad)" />
@@ -97,17 +91,24 @@
                             <label class="form-check-label" for="television">Televisión</label>
                         </div>
                     </div>
+    using System.ComponentModel.DataAnnotations;
                 </div>
 
                 <div class="form-group">
                     <label for="pagoAnticipado">Porcentaje de pago anticipado</label>
-                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="nuevaPropiedad.TipoPago">
+                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="nuevaPropiedad.TipoPago" @oninput="OnTipoPagoChanged">
                         <option value="@TipoPago.SinAnticipo">0% - Sin pago anticipado</option>
                         <option value="@TipoPago.Parcial">20% - Pago parcial anticipado</option>
                         <option value="@TipoPago.Total">100% - Pago total anticipado</option>
                     </InputSelect>
                     <ValidationMessage For="@(() => nuevaPropiedad.TipoPago)" />
                 </div>
+
+                
+                <div class="alert alert-info mt-2">
+                <strong>Política de cancelación:</strong> @ObtenerDescripcionPolitica(nuevaPropiedad.PoliticaCancelacion)
+                </div>
+                
 
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary">Publicar Propiedad</button>
@@ -127,7 +128,7 @@
     private string? errorMensaje;
     private string? googleMapsApiKey;
     private Dictionary<ServiciosPropiedad, bool> serviciosSeleccionados = new();
-
+    
     protected override void OnInitialized()
     {
         googleMapsApiKey = Configuration["GoogleMaps:ApiKey"];
@@ -163,16 +164,18 @@
     }
 
     [JSInvokable]
-    public async Task SetAddressFromPicker(string address)
+    public async Task SetAddressAndLocalityFromPicker(string address, string locality)
     {
         try
         {
-            Console.WriteLine($"Recibida dirección: {address}");
+            Console.WriteLine($"Recibida dirección: {address},, Localidad: {locality}");
             if (!string.IsNullOrEmpty(address))
             {
                 nuevaPropiedad.Direccion = address;
+                nuevaPropiedad.Localidad = locality;
                 await InvokeAsync(StateHasChanged);
                 Console.WriteLine($"Dirección actualizada en el modelo: {nuevaPropiedad.Direccion}");
+                await GetCoordinatesForAddressAsync();
             }
         }
         catch (Exception ex)
@@ -201,10 +204,43 @@
         }
     }
 
+    private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
+    {
+        return politica switch
+        {
+            PoliticasDeCancelacion.Anticipo20_72hs => "Requiere 20% de anticipo y permite cancelación hasta 72hs antes.",
+            PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No requiere anticipo, pero no permite cancelaciones.",
+            PoliticasDeCancelacion.PagoTotal_48hs_50 => "Pago total por adelantado, permite cancelación hasta 48hs antes con 50% de reintegro.",
+            _ => "No especificada."
+        };
+    }
+
+    private void cargarPoliticaCancelacion(TipoPago tipoPago)
+    {
+        nuevaPropiedad.TipoPago = tipoPago;
+        // Asigna la política de cancelación según el tipo de pago
+        switch (tipoPago)
+        {
+            case TipoPago.SinAnticipo:
+                nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable;
+                break;
+            case TipoPago.Parcial:
+                nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs;
+                break;
+            case TipoPago.Total:
+                nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50;
+                break;
+            default:
+                nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable;
+            break;
+        }
+    }
+
     private async Task SavePropertyAsync()
     {
         try
         {
+            cargarPoliticaCancelacion(nuevaPropiedad.TipoPago);
             await Task.Run(() => CUAgregarPropiedad.Ejecutar(nuevaPropiedad));
             NavigationManager.NavigateTo("/");
         }
@@ -217,8 +253,31 @@
 
     private void NavigateToHome()
     {
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/Administrar");
     }
+
+    private void OnTipoPagoChanged(ChangeEventArgs e)
+        {
+            if (Enum.TryParse<TipoPago>(e.Value?.ToString(), out var tipoPago))
+            {
+                Console.Write($"Tipo de pago seleccionado: {tipoPago}");
+                nuevaPropiedad.TipoPago = tipoPago;
+                // Asigna la política de cancelación según el tipo de pago
+                switch (tipoPago)
+                {
+                    case TipoPago.SinAnticipo:
+                        nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable;
+                        break;
+                    case TipoPago.Parcial:
+                        nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs;
+                        break;
+                    case TipoPago.Total:
+                        nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50;
+                        break;
+                }
+            }
+            StateHasChanged();
+        }
 
     private async Task<bool> GetCoordinatesForAddressAsync()
     {

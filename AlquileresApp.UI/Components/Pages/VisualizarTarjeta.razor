@@ -1,114 +1,412 @@
-@page "/visualizar-tarjeta/{UsuarioId:int}"
+@page "/visualizar-tarjeta"
 @rendermode InteractiveServer
-@using AlquileresApp.Core.CasosDeUso.Tarjeta
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 @using AlquileresApp.Core.Entidades
-@inject CasoDeUsoVisualizarTarjeta CUVisualizarTarjeta
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.Tarjeta
+@inject AuthenticationStateProvider ServicioAutenticacion
+@inject IUsuarioRepositorio UsuarioRepositorio
+@inject ILogger<VisualizarTarjeta> Logger
 @inject NavigationManager NavigationManager
+@inject CasoDeUsoVisualizarTarjeta CUVisualizarTarjeta
+@inject CasoDeUsoEliminarTarjeta CUEliminarTarjeta
+@inject IJSRuntime JS
+@attribute [Authorize]
 
-<div class="modal-overlay">
-    <div class="reserva-container">
-        <div class="reserva-form">
-            <h3>Mis Tarjetas</h3>
-            
-            @if (tarjetas != null && tarjetas.Any())
+<PageTitle>Visualizar Tarjeta</PageTitle>
+
+<div class="profile-container">
+    @if (usuario != null)
+    {
+        <div class="profile-header">
+            <h1>Visualizar Tarjeta</h1>
+        </div>
+
+        <div class="profile-content">
+            @if (!mostrarDetalleTarjeta)
             {
-                <div class="tarjetas-grid">
-                    @foreach (var tarjeta in tarjetas)
+                <div class="profile-section">
+                    <div class="btn-container">
+                        <h2>Seleccionar Tarjeta</h2>
+                        <button class="btn-outline" @onclick="CancelarVisualizacion">
+                            <i class="fas fa-times"></i> 
+                        </button>
+                    </div>
+                    @if (tarjetas != null && tarjetas.Any())
                     {
-                        <div class="card-info">
-                            <div class="form-group">
-                                <label><i class="fas fa-credit-card"></i> Número de Tarjeta:</label>
-                                <p>**** **** **** @tarjeta.NumeroTarjeta.Substring(tarjeta.NumeroTarjeta.Length - 4)</p>
-                            </div>
-
-                            <div class="form-group">
-                                <label><i class="fas fa-user"></i> Titular:</label>
-                                <p>@tarjeta.Titular</p>
-                            </div>
-
-                            <div class="form-group">
-                                <label><i class="fas fa-calendar"></i> Fecha de Vencimiento:</label>
-                                <p>@tarjeta.FechaVencimiento</p>
-                            </div>
-
-                            <div class="form-group">
-                                <label><i class="fas fa-wallet"></i> Saldo Disponible:</label>
-                                <p>$@tarjeta.Saldo.ToString("N2")</p>
-                            </div>
+                        <div class="tarjetas-lista">
+                            @foreach (var tarjeta in tarjetas)
+                            {
+                                <div class="tarjeta-item" @onclick="() => SeleccionarTarjeta(tarjeta)">
+                                    <i class="fas fa-credit-card"></i>
+                                    <div class="tarjeta-info">
+                                        <span>**** **** **** @tarjeta.NumeroTarjeta.Substring(tarjeta.NumeroTarjeta.Length - 4)</span>
+                                        <small>Titular: @tarjeta.Titular</small>
+                                        <small>Vence: @tarjeta.FechaVencimiento</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            No tienes tarjetas registradas.
                         </div>
                     }
                 </div>
             }
-            else if (errorMensaje != null)
+            else if (tarjetaSeleccionada != null)
             {
-                <div class="alert alert-danger">
-                    @errorMensaje
+                <div class="profile-section">
+                    <div class="btn-container">
+                        <h2>Detalles de la Tarjeta</h2>
+                        <button class="btn-outline" @onclick="VolverALista">
+                            <i class="fas fa-arrow-left"></i> 
+                        </button>
+                    </div>
+                    <div class="tarjeta-detalle">
+                        <div class="tarjeta-info-detalle">
+                            <div class="info-item">
+                                <i class="fas fa-credit-card"></i>
+                                <div>
+                                    <label>Número de Tarjeta</label>
+                                    <p>**** **** **** @tarjetaSeleccionada.NumeroTarjeta.Substring(tarjetaSeleccionada.NumeroTarjeta.Length - 4)</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-user"></i>
+                                <div>
+                                    <label>Titular</label>
+                                    <p>@tarjetaSeleccionada.Titular</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-calendar"></i>
+                                <div>
+                                    <label>Fecha de Vencimiento</label>
+                                    <p>@tarjetaSeleccionada.FechaVencimiento</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tarjeta-acciones">
+                            <button class="btn btn-danger" @onclick="() => EliminarTarjeta(tarjetaSeleccionada.Id)">
+                                <i class="fas fa-trash"></i> Eliminar Tarjeta
+                            </button>
+                        </div>
+                    </div>
                 </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            @if (_error != null)
+            {
+                <p>Error: @_error</p>
             }
             else
             {
-                <div class="no-tarjetas">
-                    <i class="fas fa-credit-card"></i>
-                    <p>No tienes tarjetas registradas</p>
-                </div>
+                <p>Cargando información...</p>
             }
+        </div>
+    }
+</div>
 
-            <button class="btn-reservar" @onclick="Volver">
-                <i class="fas fa-arrow-left"></i>
-                <span>Volver</span>
+@if (!string.IsNullOrEmpty(mensajeExito))
+{
+    <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle me-2"></i>
+            <div>
+                <h4 class="alert-heading">¡Operación Exitosa!</h4>
+                <p>@mensajeExito</p>
+            </div>
+        </div>
+        <div class="mt-3">
+            <button class="btn btn-primary" @onclick="VolverAPerfil">
+                <i class="fas fa-arrow-left"></i> Volver al Perfil
             </button>
         </div>
     </div>
-</div>
-
-<style>
-    .tarjetas-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .card-info {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .no-tarjetas {
-        text-align: center;
-        padding: 2rem;
-        color: #6c757d;
-    }
-
-    .no-tarjetas i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-    }
-</style>
+}
 
 @code {
-    [Parameter]
-    public int UsuarioId { get; set; }
-
+    private Usuario? usuario;
+    private string? _error;
     private List<Tarjeta>? tarjetas;
-    private string? errorMensaje;
+    private bool mostrarDetalleTarjeta = false;
+    private Tarjeta? tarjetaSeleccionada;
+    private string? mensajeExito;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            tarjetas = CUVisualizarTarjeta.Ejecutar(UsuarioId);
+            var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+            var email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
+            
+            if (email != null)
+            {
+                usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(email);
+                if (usuario == null)
+                {
+                    _error = $"No se encontró usuario con email: {email}";
+                    Logger.LogWarning(_error);
+                }
+                else
+                {
+                    tarjetas = CUVisualizarTarjeta.Ejecutar(usuario.Id);
+                }
+            }
+            else
+            {
+                _error = "No se pudo obtener el email del usuario autenticado";
+                Logger.LogWarning(_error);
+            }
         }
         catch (Exception ex)
         {
-            errorMensaje = ex.Message;
+            _error = $"Error al cargar la información: {ex.Message}";
+            Logger.LogError(_error);
         }
     }
 
-    private void Volver()
+    private void SeleccionarTarjeta(Tarjeta tarjeta)
+    {
+        tarjetaSeleccionada = tarjeta;
+        mostrarDetalleTarjeta = true;
+    }
+
+    private void VolverALista()
+    {
+        mostrarDetalleTarjeta = false;
+        tarjetaSeleccionada = null;
+    }
+
+    private void CancelarVisualizacion()
     {
         NavigationManager.NavigateTo("/Perfil");
     }
-} 
+
+    private async Task EliminarTarjeta(int tarjetaId)
+    {
+        try
+        {
+            if (await JS.InvokeAsync<bool>("confirm", "¿Está seguro que desea eliminar esta tarjeta?"))
+            {
+                await CUEliminarTarjeta.Ejecutar(tarjetaId);
+                mensajeExito = "La tarjeta ha sido eliminada exitosamente";
+                tarjetas = CUVisualizarTarjeta.Ejecutar(usuario!.Id);
+                mostrarDetalleTarjeta = false;
+                tarjetaSeleccionada = null;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error al eliminar la tarjeta: {ex.Message}";
+            Logger.LogError(_error);
+            await JS.InvokeVoidAsync("alert", _error);
+        }
+    }
+
+    private void VolverAPerfil()
+    {
+        NavigationManager.NavigateTo("/Perfil");
+    }
+}
+
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .profile-header h1 {
+        color: #333;
+        font-size: 2rem;
+        margin: 0;
+    }
+
+    .profile-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .profile-section {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 10px;
+    }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-container h2 {
+        margin: 0;
+        color: #333;
+        font-size: 1.5rem;
+    }
+
+    .btn-outline {
+        background: none;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline:hover {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .tarjetas-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .tarjeta-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid #dee2e6;
+    }
+
+    .tarjeta-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tarjeta-item i {
+        font-size: 1.5rem;
+        color: #0d6efd;
+    }
+
+    .tarjeta-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .tarjeta-info span {
+        font-weight: 500;
+    }
+
+    .tarjeta-info small {
+        color: #6c757d;
+    }
+
+    .tarjeta-detalle {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        border: 1px solid #dee2e6;
+    }
+
+    .tarjeta-info-detalle {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .info-item i {
+        font-size: 1.5rem;
+        color: #0d6efd;
+        margin-top: 0.25rem;
+    }
+
+    .info-item label {
+        display: block;
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-item p {
+        margin: 0;
+        font-size: 1.125rem;
+        color: #333;
+    }
+
+    .tarjeta-acciones {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+        padding: 1rem;
+        border-radius: 0.375rem;
+        margin-top: 1rem;
+    }
+
+    .alert-success i {
+        font-size: 1.5rem;
+        color: #28a745;
+    }
+
+    .alert-heading {
+        margin-bottom: 0.5rem;
+        font-size: 1.25rem;
+    }
+</style> 

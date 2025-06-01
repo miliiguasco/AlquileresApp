@@ -1,4 +1,4 @@
-window.initPlacePicker = (containerId, blazorObjectReference) => {
+window.initPlacePicker = (containerId, blazorObjectReference, initialAddress) => {
     console.log('Inicializando place picker...');
     const placePickerContainer = document.getElementById(containerId);
     if (!placePickerContainer) {
@@ -16,6 +16,12 @@ window.initPlacePicker = (containerId, blazorObjectReference) => {
     input.placeholder = 'Ingrese una dirección';
     input.style.width = '100%';
     input.style.height = '100%';
+
+    // Establecer el valor inicial si se proporciona una dirección
+    if (initialAddress) {
+        input.value = initialAddress;
+    }
+
     placePickerContainer.appendChild(input);
 
     console.log('Input creado, inicializando autocomplete...');
@@ -30,10 +36,30 @@ window.initPlacePicker = (containerId, blazorObjectReference) => {
     autocomplete.addListener('place_changed', function() {
         console.log('Lugar seleccionado');
         const place = autocomplete.getPlace();
-        console.log('Place:', place);
+        console.log('Place object from Google Maps:', place);
+
         if (place && place.formatted_address) {
+            let locality = ''; // Variable para almacenar la localidad
+
+            // Iterar sobre los componentes de la dirección para encontrar la localidad
+            for (let i = 0; i < place.address_components.length; i++) {
+                const component = place.address_components[i];
+                // Los tipos comunes para localidad son 'locality' o a veces 'political' y 'sublocality'
+                if (component.types.includes('locality') || component.types.includes('sublocality') || component.types.includes('administrative_area_level_3')) {
+                    locality = component.long_name;
+                    break; // Una vez encontrada, salimos del bucle
+                }
+            }
+
             console.log('Dirección seleccionada:', place.formatted_address);
-            blazorObjectReference.invokeMethodAsync('SetAddressFromPicker', place.formatted_address);
+            console.log('Localidad extraída:', locality);
+
+            // Invocar el método Blazor con la dirección formateada y la localidad
+            blazorObjectReference.invokeMethodAsync('SetAddressAndLocalityFromPicker', place.formatted_address, locality);
+        } else {
+            console.warn('No se pudo obtener la dirección formateada o el lugar es nulo.');
+            // Si no hay dirección formateada, envía cadenas vacías a Blazor
+            blazorObjectReference.invokeMethodAsync('SetAddressAndLocalityFromPicker', '', '');
         }
     });
 
