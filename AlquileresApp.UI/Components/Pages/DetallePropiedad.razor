@@ -4,6 +4,7 @@
 @using AlquileresApp.Core.CasosDeUso.Reserva
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.Enumerativos
 @using Microsoft.JSInterop
 @inject IPropiedadRepositorio PropiedadesRepo
 @inject IImagenesRepositorio ImagenesRepo
@@ -21,7 +22,7 @@
 
  
 <!-- <link href="css/AltaUsuario.css" rel="stylesheet" /> -->
-<link href="css/DetallePropiedad.css" rel="stylesheet" />
+<link href="css/DetalleProp" rel="stylesheet" />
 
 <PageTitle>Detalles de Propiedad - Alquilando</PageTitle>
 
@@ -87,7 +88,7 @@
                             <h3>Características</h3>
                             <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
                             <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
-                            <p><strong>Pago anticipado:</strong> @propiedad.PagoAnticipado%</p>
+                            <p><strong>Tipo de pago:</strong> @propiedad.TipoPago</p>
                         </div>
 
                         <div class="info-grupo">
@@ -142,12 +143,12 @@
 
                             <div class="form-group">
                                 <label for="pagoAnticipado">Porcentaje de pago anticipado</label>
-                                <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="propiedadEditada.PagoAnticipado">
-                                    <option value="0">0% - Sin pago anticipado</option>
-                                    <option value="20">20% - Pago parcial anticipado</option>
-                                    <option value="100">100% - Pago total anticipado</option>
+                                <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="propiedadEditada.TipoPago">
+                                    <option value="@TipoPago.SinAnticipo">0% - Sin pago anticipado</option>
+                                    <option value="@TipoPago.Parcial">20% - Pago parcial anticipado</option>
+                                    <option value="@TipoPago.Total">100% - Pago total anticipado</option>
                                 </InputSelect>
-                                <ValidationMessage For="@(() => propiedadEditada.PagoAnticipado)" />
+                                <ValidationMessage For="@(() => propiedadEditada.TipoPago)" />
                             </div>
 
                             <div class="button-group">
@@ -241,7 +242,7 @@
                     PrecioPorNoche = propiedad.PrecioPorNoche,
                     Capacidad = propiedad.Capacidad,
                     EncargadoId = propiedad.EncargadoId,
-                    PagoAnticipado = propiedad.PagoAnticipado,
+                    TipoPago = propiedad.TipoPago,
                     ServiciosDisponibles = propiedad.ServiciosDisponibles,
                     Imagenes = propiedad.Imagenes
                 };

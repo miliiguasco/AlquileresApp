@@ -1,0 +1,108 @@
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@inject CasoDeUsoListarPropiedades CUListarPropiedades
+@inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
+@inject CasoDeUsoModificarPropiedad CUModificarPropiedad
+@inject ILogger<Propiedades> Logger
+
+<div class="admin-section">
+    @if (propiedades != null && propiedades.Any())
+    {
+        <div class="table-container">
+            <table class="property-table">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Título</th>
+                        <th>Ubicación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var prop in propiedades)
+                    {
+                        <tr>
+                            <td class="image-cell">
+                                @{
+                                    var imagenUrl = "/Imagenes/Propiedades/iconoimagen.jpg";
+                                    if (prop.Imagenes != null && prop.Imagenes.Any())
+                                    {
+                                        var primeraImagen = prop.Imagenes.FirstOrDefault();
+                                        if (primeraImagen != null && !string.IsNullOrEmpty(primeraImagen.Url))
+                                        {
+                                            imagenUrl = primeraImagen.Url.StartsWith("/") ? 
+                                                primeraImagen.Url : 
+                                                $"/Imagenes/Propiedades/{primeraImagen.Url}";
+                                        }
+                                    }
+                                }
+                                <img src="@imagenUrl" alt="@prop.Titulo" />
+                            </td>
+                            <td>@prop.Titulo</td>
+                            <td>@prop.Localidad</td>
+                            <td class="actions-cell">
+                                <button class="btn btn-primary" @onclick="() => EditarPropiedad(prop)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" @onclick="() => EliminarPropiedad(prop)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="btn" @onclick="() => NuevaPropiedad()">
+                Nueva propiedad
+            </button>
+        </div>
+    }
+    else
+    {
+        <p>No hay propiedades disponibles.</p>
+    }
+</div>
+
+@code {
+    private List<Propiedad>? propiedades;
+    private bool cargando = true;
+
+    protected void OnInitializedAsync()
+    {
+        try
+        {
+            propiedades = CUListarPropiedades.Ejecutar();
+        }
+        finally
+        {
+            cargando = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task EditarPropiedad(Propiedad propiedad)
+    {
+        // Implementar edición
+    }
+
+    private async Task EliminarPropiedad(Propiedad propiedad)
+    {
+        try
+        {
+            CUEliminarPropiedad.Ejecutar(propiedad);
+            propiedades = CUListarPropiedades.Ejecutar();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
+        }
+    }
+
+    private void NuevaPropiedad() {
+        // Implementar nueva propiedad
+    }
+} 

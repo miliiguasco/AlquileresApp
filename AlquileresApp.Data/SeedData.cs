@@ -1,10 +1,9 @@
-
 using AlquileresApp.Core.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using AlquileresApp.Core.Enumerativos;
-
+using AlquileresApp.Core.Servicios;
 
 namespace AlquileresApp.Data
 {
@@ -18,18 +17,22 @@ namespace AlquileresApp.Data
                 return; // La base de datos ya está inicializada
             }
 
+            var hashService = new ServicioHashPassword();
+
             // Crear usuarios registrados
-            var usuarios = new List<Cliente>
+            var usuarios = new List<Usuario>
             {
                 new Cliente
                 {
+
                     Nombre = "Milagros",
                     Apellido = "Guasco",
                     Email = "milagrosguasco11@gmail.com",
+
+ 
                     Telefono = "123456789",
-                    Contraseña = "password123", // En producción, debe estar hasheada
+                    Contraseña = hashService.HashPassword("password123"),
                     FechaNacimiento = new DateTime(1990, 1, 1),
-                    //Rol = RolUsuario.Cliente
                 },
                 new Cliente
                 {
@@ -37,9 +40,8 @@ namespace AlquileresApp.Data
                     Apellido = "García",
                     Email = "maria.garcia@test.com",
                     Telefono = "987654321",
-                    Contraseña = "password456",
+                    Contraseña = hashService.HashPassword("password456"),
                     FechaNacimiento = new DateTime(1985, 5, 15),
-                    //Rol = RolUsuario.Cliente
                 }
             };
             context.Usuarios.AddRange(usuarios);
@@ -119,8 +121,8 @@ namespace AlquileresApp.Data
             propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa1.jpg" });
             propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta1.jpg" });
 
- propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
- propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta2.jpg" });
+            propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
+            propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta2.jpg" });
 
              context.Propiedades.AddRange(propiedades);
             context.SaveChanges();
@@ -158,7 +160,7 @@ namespace AlquileresApp.Data
                 },
                 new Reserva
                 {
-                    ClienteId = usuarios[0].Id,
+                    ClienteId = usuarios[1].Id,
                     PropiedadId = propiedades[2].Id,
                     FechaInicio = DateTime.Now.AddDays(2),
                     FechaFin = DateTime.Now.AddDays(35),
@@ -171,7 +173,7 @@ namespace AlquileresApp.Data
             //Tarjetas de prueba
             var tarjetas = new List<Tarjeta>
             {
-                /*new Tarjeta
+                new Tarjeta
                 {
                     NumeroTarjeta = "1234567890123456",
                     Titular = "Juan Pérez", 
@@ -179,7 +181,7 @@ namespace AlquileresApp.Data
                     CVV = "123",
                     Saldo = 4000.00m,
                     ClienteId = usuarios[0].Id
-                },*/
+                },
                 new Tarjeta
                 {
                     NumeroTarjeta = "9876543210987654",

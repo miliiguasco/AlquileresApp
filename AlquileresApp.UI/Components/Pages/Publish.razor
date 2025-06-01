@@ -2,6 +2,7 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
 @using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.Enumerativos
 @inject IPropiedadRepositorio PropiedadesRepositorio
 @inject CasoDeUsoAgregarPropiedad CUAgregarPropiedad
 @inject NavigationManager NavigationManager
@@ -51,12 +52,12 @@
 
                 <div class="form-group">
                     <label for="pagoAnticipado">Porcentaje de pago anticipado</label>
-                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="nuevaPropiedad.MontoPagoAnticipado">
-                        <option value="0">0% - Sin pago anticipado</option>
-                        <option value="20">20% - Pago parcial anticipado</option>
-                        <option value="100">100% - Pago total anticipado</option>
+                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="nuevaPropiedad.TipoPago">
+                        <option value="@TipoPago.SinAnticipo">0% - Sin pago anticipado</option>
+                        <option value="@TipoPago.Parcial">20% - Pago parcial anticipado</option>
+                        <option value="@TipoPago.Total">100% - Pago total anticipado</option>
                     </InputSelect>
-                    <ValidationMessage For="@(() => nuevaPropiedad.MontoPagoAnticipado)" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.TipoPago)" />
                 </div>
 
                 <div class="button-group">
