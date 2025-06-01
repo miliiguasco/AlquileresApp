@@ -23,9 +23,9 @@ namespace AlquileresApp.Data
             {
                 new Cliente
                 {
-                    Nombre = "Juan",
-                    Apellido = "Pérez",
-                    Email = "juan.perez@test.com",
+                    Nombre = "Milagros",
+                    Apellido = "Guasco",
+                    Email = "milagrosguasco11@gmail.com",
                     Telefono = "123456789",
                     Contraseña = "password123", // En producción, debe estar hasheada
                     FechaNacimiento = new DateTime(1990, 1, 1),
@@ -151,7 +151,7 @@ namespace AlquileresApp.Data
                 new Reserva
                 {
                     ClienteId = usuarios[0].Id,
-                    PropiedadId = propiedades[0].Id,
+                    PropiedadId = propiedades[2].Id,
                     FechaInicio = DateTime.Now.AddDays(5),
                     FechaFin = DateTime.Now.AddDays(7),
                     PrecioTotal = 160,
@@ -159,7 +159,7 @@ namespace AlquileresApp.Data
                 new Reserva
                 {
                     ClienteId = usuarios[0].Id,
-                    PropiedadId = propiedades[3].Id,
+                    PropiedadId = propiedades[2].Id,
                     FechaInicio = DateTime.Now.AddDays(2),
                     FechaFin = DateTime.Now.AddDays(35),
                     PrecioTotal = 1000,
@@ -171,15 +171,15 @@ namespace AlquileresApp.Data
             //Tarjetas de prueba
             var tarjetas = new List<Tarjeta>
             {
-                new Tarjeta
+                /*new Tarjeta
                 {
                     NumeroTarjeta = "1234567890123456",
                     Titular = "Juan Pérez", 
                     FechaVencimiento = "12/2025",
                     CVV = "123",
-                    Saldo = 0.00m,
+                    Saldo = 4000.00m,
                     ClienteId = usuarios[0].Id
-                },
+                },*/
                 new Tarjeta
                 {
                     NumeroTarjeta = "9876543210987654",

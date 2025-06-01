@@ -99,8 +99,6 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
             .Include(r => r.Propiedad)
             .Where(r => r.Cliente.Id == usuario)
             .ToList();  
-        if (reservas.Count == 0)
-            throw new Exception("No se encontraron reservas.");
         return reservas;    
     }
 

@@ -17,8 +17,6 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
     
     public Tarjeta ObtenerTarjetaPorId(int id){
         var tarjeta = dbContext.Tarjetas.Find(id);
-        if (tarjeta == null)
-            throw new Exception("La tarjeta no existe");
         return tarjeta;
 
     }
@@ -67,8 +65,6 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
 public Tarjeta ObtenerPorClienteId(int clienteId)
 {
     var tarjeta = dbContext.Tarjetas.FirstOrDefault(t => t.ClienteId == clienteId);
-    if (tarjeta == null)
-        throw new Exception("No se encontró una tarjeta para este cliente.");
     return tarjeta;
 }
 }
