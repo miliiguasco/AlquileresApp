@@ -22,7 +22,7 @@
 
     @if (!reservas.Any())
     {
-        <div class="alert alert-info">No tenés reservas activas.</div>
+        <div class="alert alert-info">No se encontraron reservas registradas.</div>
     }
     else
     {
@@ -30,6 +30,7 @@
             <thead class="table-dark">
                 <tr>
                     <th>Propiedad</th>
+                    <th>Politica De Cancelacion</th>
                     <th>Fecha inicio</th>
                     <th>Fecha fin</th>
                     <th>Estado</th>
@@ -41,7 +42,8 @@
                 @foreach (var reserva in reservas)
                 {
                     <tr>
-                        <td>@reserva.Propiedad.Id</td>
+                        <td>@reserva.Propiedad.Titulo</td>
+                       <td>@ObtenerDescripcionPolitica(reserva.Propiedad.PoliticaCancelacion)</td>
                         <td>@reserva.FechaInicio.ToShortDateString()</td>
                         <td>@reserva.FechaFin.ToShortDateString()</td>
                         <td>
@@ -53,11 +55,11 @@
                         <td>
                             @if (reserva.Estado == EstadoReserva.Pendiente)
                             {
-                                <button class="btn btn-sm btn-primary me-2" @onclick="@(() => ModificarReserva(reserva.Id))">
-                                    <i class="bi bi-pencil"></i> Modificar
+                                <button class=" boton boton-modificar " @onclick="@(() => ModificarReserva(reserva.Id))">
+                                    <i class="bi bi-pencil  "></i> Modificar
                                 </button>
-                                <button class="btn btn-sm btn-danger" @onclick="@(() => CancelarReserva(reserva.Id))">
-                                    <i class="bi bi-x-circle"></i> Cancelar
+                                <button class="boton boton-cancelar" @onclick="@(() => CancelarReserva(reserva.Id))">
+                                    <i class="bi bi-x-circle "></i> Cancelar
                                 </button>
                             }
                             else
@@ -135,22 +137,48 @@
     }
 
     private void ConfirmarCancelacion()
+{
+    try
     {
-        try
+        var resultado = casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
+
+        if (resultado.EsExitosa)
         {
-            casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
-            mensajeExito = "Reserva cancelada correctamente.";
+            mensajeExito = resultado.Mensaje;
+
+            if (resultado.MontoReembolsado.HasValue)
+            {
+                mensajeExito += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
+            }
+
             CargarReservas();
         }
-        catch (Exception ex)
+        else
         {
-            mensajeError = ex.Message;
-        }
-        finally
-        {
-            mostrarConfirmacion = false;
+            mensajeError = resultado.Mensaje;
         }
     }
+    catch (Exception ex)
+    {
+        mensajeError = $"Ocurrió un error inesperado: {ex.Message}";
+    }
+    finally
+    {
+        mostrarConfirmacion = false;
+    }
+}
+
+
+    private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
+{
+    return politica switch
+    {
+        PoliticasDeCancelacion.Anticipo20_72hs => "Se puede cancelar con 72 horas de anticipación. Se reembolsa el 20%.",
+        PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No se puede cancelar.",
+        PoliticasDeCancelacion.PagoTotal_48hs_50 => "Se puede cancelar con 48 horas de anticipación. Se reembolsa el 50%.",
+        _ => "Política desconocida"
+    };
+}
 
     private void CancelarConfirmacion()
     {

@@ -6,7 +6,7 @@
     }
 
     .h2 {
-        text-align: center;
+    text-align: center;
     font-size: 3rem;
     font-weight: bold;
     color: #0A3D62;
@@ -74,5 +74,35 @@
     background-color: #f0f8ff;
     cursor: default;
 }
+button {
+  padding: 10px 20px!important;
+  font-weight: bold!important;
+  border: none!important;
+  border-radius: 8px!important;
+  color: white!important;
+  font-size: 1rem!important;
+  cursor: pointer!important;
+  transition: all 0.3s ease!important;
+  margin-bottom: 1rem!important;
+}
 
+.boton-cancelar {
+  background-color: #ab2e2e;
+}
+
+.boton-cancelar:hover {
+  background-color: #c0392b;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+}
+
+.boton-modificar {
+  background-color: #3498db;
+}
+
+.boton-modificar:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
 
