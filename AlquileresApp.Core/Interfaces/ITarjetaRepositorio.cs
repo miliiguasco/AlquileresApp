@@ -14,6 +14,7 @@ public interface ITarjetaRepositorio
     void EliminarTarjeta(Tarjeta tarjeta);
 
     void PagarMontoRestante(Tarjeta tarjeta, decimal monto);
-
 }
+
+
 

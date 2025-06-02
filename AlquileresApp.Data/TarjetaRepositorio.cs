@@ -24,7 +24,6 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
     public bool Pagar(Tarjeta tarjeta, decimal monto)
     {
         Console.WriteLine($"Verificando saldo: Saldo actual={tarjeta.Saldo}, Monto a pagar={monto}");
-        
         // Validar fecha de vencimiento
         var fechaActual = DateTime.Now;
         var fechaVencimiento = DateTime.ParseExact(tarjeta.FechaVencimiento, "MM/yy", null);
@@ -83,14 +82,8 @@ public Tarjeta ObtenerPorClienteId(int clienteId)
         dbContext.SaveChanges();
     }
 
-    public List<Tarjeta> ObtenerTarjetasPorUsuario(int usuarioId){
-        return dbContext.Tarjetas.Where(t => t.ClienteId == usuarioId).ToList();
-    }
-
-
     public void PagarMontoRestante(Tarjeta tarjeta, decimal monto){
         tarjeta.Saldo -= monto;
         dbContext.SaveChanges();
     }
-    
 }

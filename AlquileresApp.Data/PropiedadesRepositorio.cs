@@ -110,6 +110,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
                 ))
             );
 
+        
         return query.ToList();
     } 
 

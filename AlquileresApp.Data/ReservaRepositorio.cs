@@ -112,12 +112,7 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         reserva.FechaCheckOut = DateTime.Now;
         dbContext.SaveChanges();
     }
-
-
 }
-
-
-
 
 
 

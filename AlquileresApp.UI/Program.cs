@@ -100,7 +100,6 @@ builder.Services.AddTransient<INotificadorEmail>(provider =>
     )
 );
 
-
 builder.Services.AddScoped<CasoDeUsoVisualizarReserva>();
 builder.Services.AddScoped<CasoDeUsoVisualizarTarjeta>();
 builder.Services.AddScoped<CasoDeUsoEliminarTarjeta>();
