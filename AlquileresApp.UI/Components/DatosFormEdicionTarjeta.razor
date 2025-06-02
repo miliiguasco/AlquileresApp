@@ -12,12 +12,12 @@
         <div class="form-group">
             <label><i class="fas fa-credit-card"></i> Número de Tarjeta:</label>
             <InputText @bind-Value="Input.NumeroTarjeta" 
-                      class="form-control" 
-                      placeholder="XXXX XXXX XXXX XXXX"
-                      maxlength="19"
-                      @oninput="FormatearNumeroTarjeta" />
+                    class="form-control" 
+                    placeholder="XXXX XXXX XXXX XXXX"
+                    maxlength="19" />
             <ValidationMessage For="@(() => Input.NumeroTarjeta)" />
         </div>
+
 
         <div class="form-group">
             <label><i class="fas fa-user"></i> Nombre del Titular:</label>
@@ -52,9 +52,11 @@
                 <ValidationMessage For="@(() => Input.CVV)" />
             </div>
         </div>
-
-        <div class="form-actions">
-            <button type="submit" class="@ButtonClass" @onclick="ValidarFormulario" disabled="@EstaProcesando">
+        <div class="btn-container">
+            <button class="btn btn-primary" @onclick="@CancelarEdicion">
+                Volver
+            </button>
+            <button type="submit" class="btn btn-primary" @onclick="ValidarFormulario" disabled="@EstaProcesando">
                 <i class="fas fa-save"></i> @SubmitButtonText
             </button>
         </div>
@@ -75,14 +77,12 @@
     public string SubmitButtonText { get; set; } = "Guardar";
 
     [Parameter]
-    public string ButtonClass { get; set; } = "btn btn-primary";
-
-    [Parameter]
     public bool EstaProcesando { get; set; } = false;
-
+    [Parameter]
+    public EventCallback CancelarEdicion { get; set; }
     private string? ErrorFechaVencimiento { get; set; }
     private bool mostrarErrorFechaVencimiento = false;
-
+   
     private void FormatearNumeroTarjeta(ChangeEventArgs e)
     {
         var valor = e.Value?.ToString() ?? "";
@@ -189,9 +189,10 @@
     public class InputModel
     {
         [Required(ErrorMessage = "El número de tarjeta es requerido")]
-        [RegularExpression(@"^\d{4}\s\d{4}\s\d{4}\s\d{4}$", ErrorMessage = "El número de tarjeta debe tener 16 dígitos")]
+        [RegularExpression(@"^(\d{16}|\d{4}\s\d{4}\s\d{4}\s\d{4})$", 
+        ErrorMessage = "El número de tarjeta debe tener 16 dígitos")]
         public string NumeroTarjeta { get; set; } = "";
-
+        
         [Required(ErrorMessage = "El nombre del titular es requerido")]
         [StringLength(100, ErrorMessage = "El nombre del titular no puede exceder los 100 caracteres")]
         public string Titular { get; set; } = "";

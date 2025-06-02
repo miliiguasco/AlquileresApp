@@ -36,8 +36,8 @@
                                     OnSubmit="OnRegistrarTarjeta"
                                     FormName="registrarTarjeta"
                                     SubmitButtonText="Registrar Tarjeta"
-                                    ButtonClass="btn"
-                                    EstaProcesando="@estaProcesando" />          
+                                    EstaProcesando="@estaProcesando" 
+                                    CancelarEdicion="VolverAPerfil"/>          
             </div>
         </div>
     }
@@ -51,9 +51,6 @@
                         <div class="d-flex flex-column align-items-center">
                             <i class="fas fa-exclamation-circle mb-3" style="font-size: 2rem;"></i>
                             <p class="text-center">@_error</p>
-                            <button class="btn btn-primary mt-3" @onclick="VolverAPerfil">
-                                <i class="fas fa-arrow-left"></i> Volver al Perfil
-                            </button>
                         </div>
                     }
                     else
@@ -78,11 +75,6 @@
                 <h4 class="alert-heading">¡Operación Exitosa!</h4>
                 <p>@mensajeExito</p>
             </div>
-        </div>
-        <div class="mt-3">
-            <button class="btn btn-primary" @onclick="VolverAPerfil">
-                <i class="fas fa-arrow-left"></i> Volver al Perfil
-            </button>
         </div>
     </div>
 }
@@ -164,9 +156,12 @@
         }
     }
 
-    private void VolverAPerfil()
-    {
-        NavigationManager.NavigateTo("/Perfil");
+    private async Task VolverAPerfil()
+    {   
+        var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        NavigationManager.NavigateTo($"/Perfil/{userId}");
     }
 }
 

@@ -97,12 +97,15 @@ public class CasoDeUsoCrearReserva(
             // Realizar pago (que incluye la validación de saldo)
             if (!tarjetaRepositorio.Pagar(tarjeta, montoTotal))
             {
-                throw new Exception($"Saldo insuficiente. Saldo actual: {tarjeta.Saldo}, Monto requerido: {montoTotal}");
+                throw new Exception($"Saldo insuficiente.");
             }
 
             Console.WriteLine("Pago procesado correctamente");
             Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes);
-            reserva.Estado = EstadoReserva.Activa;
+            if (reserva.FechaInicio == DateTime.Today) 
+                reserva.Estado = EstadoReserva.Activa;
+            else    
+                reserva.Estado = EstadoReserva.Pendiente; 
             reserva.MontoRestante = propiedad.TipoPago switch
             {
                 TipoPago.SinAnticipo => montoBase,

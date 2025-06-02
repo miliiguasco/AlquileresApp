@@ -30,22 +30,6 @@
     gap: 1rem;
 }
 
-.btn-outline {
-    background: none;
-    border: 1px solid #f1771f;
-    color: #f1771f;
-    padding: 0.4rem 1.2rem;
-    width: 130px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-outline:hover {
-    background-color: #f1771f;
-    color: white;
-}
-
 ::deep button.btn,
 ::deep input[type="submit"].btn {
     padding: 0.4rem 1.2rem;
