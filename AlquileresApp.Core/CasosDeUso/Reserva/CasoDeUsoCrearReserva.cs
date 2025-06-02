@@ -102,7 +102,10 @@ public class CasoDeUsoCrearReserva(
 
             Console.WriteLine("Pago procesado correctamente");
             Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes);
-            reserva.Estado = EstadoReserva.Pendiente;
+            if (reserva.FechaInicio == DateTime.Today) 
+                reserva.Estado = EstadoReserva.Activa;
+            else    
+                reserva.Estado = EstadoReserva.Pendiente; 
             reserva.MontoRestante = propiedad.TipoPago switch
             {
                 TipoPago.SinAnticipo => montoBase,
