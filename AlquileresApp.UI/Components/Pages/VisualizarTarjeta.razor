@@ -34,11 +34,9 @@
                             <i class="fas fa-times"></i> 
                         </button>
                     </div>
-                    @if (tarjetas != null && tarjetas.Any())
+                    @if (tarjeta != null )
                     {
-                        <div class="tarjetas-lista">
-                            @foreach (var tarjeta in tarjetas)
-                            {
+                        
                                 <div class="tarjeta-item" @onclick="() => SeleccionarTarjeta(tarjeta)">
                                     <i class="fas fa-credit-card"></i>
                                     <div class="tarjeta-info">
@@ -47,13 +45,11 @@
                                         <small>Vence: @tarjeta.FechaVencimiento</small>
                                     </div>
                                 </div>
-                            }
-                        </div>
                     }
                     else
                     {
                         <div class="alert alert-info">
-                            No tienes tarjetas registradas.
+                            No tienes tarjeta registrada.
                         </div>
                     }
                 </div>
@@ -137,7 +133,7 @@
 @code {
     private Usuario? usuario;
     private string? _error;
-    private List<Tarjeta>? tarjetas;
+    private Tarjeta tarjeta;
     private bool mostrarDetalleTarjeta = false;
     private Tarjeta? tarjetaSeleccionada;
     private string? mensajeExito;
@@ -159,7 +155,7 @@
                 }
                 else
                 {
-                    tarjetas = CUVisualizarTarjeta.Ejecutar(usuario.Id);
+                    tarjeta = CUVisualizarTarjeta.Ejecutar(usuario.Id);
                 }
             }
             else
@@ -200,7 +196,7 @@
             {
                 await CUEliminarTarjeta.Ejecutar(tarjetaId);
                 mensajeExito = "La tarjeta ha sido eliminada exitosamente";
-                tarjetas = CUVisualizarTarjeta.Ejecutar(usuario!.Id);
+                tarjeta = CUVisualizarTarjeta.Ejecutar(usuario!.Id);
                 mostrarDetalleTarjeta = false;
                 tarjetaSeleccionada = null;
                 StateHasChanged();

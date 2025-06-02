@@ -28,9 +28,56 @@ public class NotificadorEmail: INotificadorEmail
 
         var mensaje = new MailMessage(_remitente, para, asunto, cuerpo)
         {
-            IsBodyHtml = false // ponelo en true si querés enviar HTML
+            IsBodyHtml = true 
         };
 
         cliente.Send(mensaje);
     }
-}
+
+    public void EnviarCorreoBienvenida(string destinatario, string nombreUsuario)
+    {
+        string asunto = "¡Bienvenido a Alquilando!";
+        string cuerpo = @$"
+        <!DOCTYPE html>
+        <html lang='es'>
+        <head>
+            <meta charset='UTF-8'>
+        </head>
+        <body style='margin:0; padding:0; background-color:#fafafa;'>
+            <table width='100%' cellpadding='0' cellspacing='0' border='0' style='font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;'>
+                <tr>
+                    <td align='center'>
+                        <table width='600' cellpadding='0' cellspacing='0' border='0' style='box-shadow: 0 4px 10px rgba(31, 63, 72, 0.2);'>
+                            <!-- Encabezado -->
+                            <tr>
+                                <td style='background-color:#1F3F48; padding:20px; text-align:center; color:#F0F0E1;'>
+                                    <h1 style='margin:0; font-size:24px;'>¡Bienvenido/a, {nombreUsuario}!</h1>
+                                </td>
+                            </tr>
+
+                            <!-- Cuerpo -->
+                            <tr>
+                                <td style='padding:20px; text-align:center; color:#000000;'>
+                                    <p style='margin-bottom:8px;'>
+                                        Gracias por registrarte en <strong>Alquilando</strong>.</p>
+                                    <p> Ahora sos parte de una comunidad que facilita el alquiler temporal de propiedades de forma segura y simple.</p>
+                                    <p style='margin-bottom:22px;'>🏠 ¡Comenzá a explorar propiedades para encontrar tu lugar ideal!</p>
+                                    <p style='margin-bottom:8px;'>Si no creaste una cuenta en Alquilando, podés ignorar este correo.</p>
+                                </td>
+                            </tr>
+
+                            <!-- Footer / Ayuda -->
+                            <tr>
+                                <td style='background-color:#f1771f; color:#F0F0E1; text-align:center; padding:14px; font-size:14px;'>
+                                    <p style='margin:0;'>¿Necesitás ayuda? Contactanos en cualquier momento.</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>";
+        EnviarEmail(destinatario, asunto, cuerpo);
+    }       
+}   

@@ -4868,7 +4868,7 @@
       "code": "Undefined",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Problem reading the cache file C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Data\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0."
+      "message": "Problema al leer el archivo de caché C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Data\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0."
     }
   ]
 }

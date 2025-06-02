@@ -2,12 +2,17 @@
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+
 @using System.Security.Claims
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
 @using AlquileresApp.Core.CasosDeUso.Tarjeta
 @using AlquileresApp.Core.CasosDeUso.Reserva
 @using AlquileresApp.UI.Components
+@using AlquileresApp.Core.Enumerativos
+@using AlquileresApp.Data
+@inject CasoDeUsoListarMisReservas casoDeUsoListarMisReservas
+@inject CasoDeUsoCancelarReserva casoDeUsoCancelarReserva
 @inject AuthenticationStateProvider ServicioAutenticacion
 @inject IUsuarioRepositorio UsuarioRepositorio
 @inject ILogger<Perfil> Logger
@@ -96,17 +101,9 @@
                 @if (mostrarEliminarTarjeta)
                 {
                     <div class="profile-section">
-                        <div class="btn-container">
-                            <h2>Seleccionar Tarjeta a Eliminar</h2>
-                            <button class="btn-outline" @onclick="CancelarEliminacion">
-                                <i class="fas fa-times"></i> 
-                            </button>
-                        </div>
-                        @if (tarjetas != null && tarjetas.Any())
+                 @if (tarjeta != null )
                         {
-                            <div class="tarjetas-list">
-                                @foreach (var tarjeta in tarjetas)
-                                {
+
                                     <div class="tarjeta-item">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" 
@@ -123,8 +120,7 @@
                                             <small>Vence: @tarjeta.FechaVencimiento</small>
                                         </div>
                                     </div>
-                                }
-                            </div>
+                                
                             <div class="mt-3">
                                 <button class="btn btn-danger" @onclick="ConfirmarEliminacion" disabled="@(tarjetaSeleccionada == 0)">
                                     <i class="fas fa-trash"></i> Eliminar Tarjeta Seleccionada
@@ -134,7 +130,7 @@
                         else
                         {
                             <div class="alert alert-info">
-                                No tienes tarjetas registradas.
+                                No tiene tarjeta registrada.
                             </div>
                         }
                     </div>
@@ -206,9 +202,12 @@
                                     <button type="button" class="btn btn-danger" @onclick="IniciarEliminacion">
                                         <i class="fas fa-trash"></i> Eliminar Tarjeta
                                     </button>
-                                    <button type="button" class="btn btn-warning" @onclick="IrARegistrarTarjeta">
-                                        <i class="fas fa-plus-circle"></i> Registrar Nueva Tarjeta
-                                    </button>
+                                    @if (!TieneTarjeta())
+{
+    <button type="button" class="btn btn-warning" @onclick="IrARegistrarTarjeta">
+        <i class="fas fa-plus-circle"></i> Registrar Nueva Tarjeta
+    </button>
+}
                                 </div>
                             </div>
                         </div>
@@ -217,69 +216,92 @@
                     {
                         <div class="tab-pane active" style="display: block;">
                             <div class="profile-section">
-                                <h3>Mis Reservas</h3>
-                                @if (reservas == null)
-                                {
-                                    <div class="d-flex justify-content-center">
-                                        <div class="spinner-border text-primary" role="status">
-                                            <span class="visually-hidden">Cargando...</span>
-                                        </div>
-                                    </div>
-                                }
-                                else if (!reservas.Any())
-                                {
-                                    <div class="alert alert-info">
-                                        No tienes reservas activas.
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Propiedad</th>
-                                                    <th>Estado</th>
-                                                    <th>Fecha Inicio</th>
-                                                    <th>Fecha Fin</th>
-                                                    <th>Precio Total</th>
-                                                    <th>Acciones</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach (var reserva in reservas)
-                                                {
-                                                    <tr>
-                                                        <td>@reserva.Id</td>
-                                                        <td>@reserva.Propiedad?.Titulo</td>
-                                                        <td>
-                                                            <span class="badge @ObtenerClaseEstado(reserva.Estado.ToString())">
-                                                                @reserva.Estado
-                                                            </span>
-                                                        </td>
-                                                        <td>@reserva.FechaInicio.ToShortDateString()</td>
-                                                        <td>@reserva.FechaFin.ToShortDateString()</td>
-                                                        <td>$@reserva.PrecioTotal.ToString("N2")</td>
-                                                        <td>
-                                                            <div class="btn-group" role="group">
-                                                                <button class="btn btn-primary btn-sm" @onclick="() => VerDetalleReserva(reserva.Id)">
-                                                                    <i class="fas fa-eye"></i> Ver
-                                                                </button>
-                                                                <button class="btn btn-warning btn-sm" @onclick="() => EditarReserva(reserva.Id)">
-                                                                    <i class="fas fa-edit"></i> Editar
-                                                                </button>
-                                                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarReserva(reserva.Id)">
-                                                                    <i class="fas fa-trash"></i> Eliminar
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                }
+                                 <h2 class="h2 mb-4">Mis Reservas</h2>
+
+    @if (!string.IsNullOrEmpty(mensajeExito_misReservas))
+    {
+        <div class="alert alert-success">@mensajeExito_misReservas</div>
+    }
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">@mensajeError</div>
+    }
+
+    @if (!reservas.Any())
+    {
+        <div class="alert alert-info">No se encontraron reservas registradas.</div>
+    }
+    else
+    {
+        <table class="table_misreservas table-hover table-bordered shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Propiedad</th>
+                    <th>Politica De Cancelacion</th>
+                    <th>Fecha inicio</th>
+                    <th>Fecha fin</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var reserva in reservas)
+                {
+                    <tr>
+                        <td>@reserva.Propiedad?.Titulo</td>
+                       <td>@ObtenerDescripcionPolitica(reserva.Propiedad.PoliticaCancelacion)</td>
+                        <td>@reserva.FechaInicio.ToShortDateString()</td>
+                        <td>@reserva.FechaFin.ToShortDateString()</td>
+                        <td>
+                            <span class="badge bg-@GetBadgeColor(reserva.Estado)">
+                                @reserva.Estado
+                            </span>
+                        </td>
+                        <td>$@reserva.PrecioTotal.ToString("N2")</td>
+                        <td>
+                            @if (reserva.Estado == EstadoReserva.Pendiente)
+                            {
+                                <button class=" boton boton-modificar " @onclick="@(() => ModificarReserva(reserva.Id))">
+                                    <i class="bi bi-pencil  "></i> Modificar
+                                </button>
+                                <button class="boton boton-cancelar" @onclick="@(() => CancelarReserva(reserva.Id))">
+                                    <i class="bi bi-x-circle "></i> Cancelar
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Sin acciones</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+    using System.Configuration;
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Cancelación</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que querés cancelar esta reserva?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-danger" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+                                
                             </div>
                         </div>
                     }
@@ -313,15 +335,22 @@
     private bool esAdministrador = false;
     private string tabActiva = "datos";
     private bool mostrarEliminarTarjeta = false;
-    private List<Tarjeta>? tarjetas;
+    private Tarjeta tarjeta;
     private int tarjetaSeleccionada = 0;
     private DatosFormEdicion.InputModel datosForm = new();
-    private List<Reserva>? reservas;
+    private List<Reserva>? reservas=new();
+    private bool mostrarConfirmacion = false;
+    private int reservaAEliminarId;
+    private string mensajeError ;
+    private string mensajeExito_misReservas;
+
+
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            await CargarmisReservas();
             var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
             var user = authState.User;
 
@@ -353,8 +382,7 @@
             }
 
             esAdministrador = user.IsInRole("Administrador");
-            await CargarTarjetas();
-            await CargarReservas();
+            await CargarTarjeta();
         }
         catch (Exception ex)
         {
@@ -373,7 +401,7 @@
         
         if (tab == "reservas")
         {
-            await CargarReservas();
+            await CargarmisReservas();
         }
     }
 
@@ -417,7 +445,31 @@
             _error = $"Error al actualizar el perfil: {ex.Message}";
         }
     }
+    private  async Task CargarTarjeta(){
+        var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+    var user = authState.User;
 
+    if (user.Identity != null && user.Identity.IsAuthenticated)
+    {
+        var userId = user.FindFirst(c => c.Type == "sub")?.Value 
+                  ?? user.FindFirst(c => c.Type == "userid")?.Value 
+                  ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int id))
+        {
+            tarjeta = CUVisualizarTarjeta.Ejecutar(id);
+        }
+        else
+        {
+            mensajeError = "No se pudo obtener el ID del usuario.";
+        }
+    }
+    else
+    {
+        mensajeError = "Usuario no autenticado.";
+    }
+    
+    }
     private void IrAVerTarjeta()
     {
         if (usuario != null)
@@ -434,14 +486,14 @@
     private void IniciarEliminacion()
     {
         mostrarEliminarTarjeta = true;
-        tarjetas = CUVisualizarTarjeta.Ejecutar(usuario!.Id);
+        tarjeta = CUVisualizarTarjeta.Ejecutar(usuario!.Id);
         tarjetaSeleccionada = 0;
     }
 
     private void CancelarEliminacion()
     {
         mostrarEliminarTarjeta = false;
-        tarjetas = null;
+        tarjeta = null;
         tarjetaSeleccionada = 0;
     }
 
@@ -449,6 +501,10 @@
     {
         tarjetaSeleccionada = tarjetaId;
         StateHasChanged();
+    }
+    private bool TieneTarjeta()
+    {
+        return  UsuarioRepositorio.tieneTarjeta(usuario);
     }
 
     private async Task ConfirmarEliminacion()
@@ -480,56 +536,6 @@
         NavigationManager.NavigateTo("/registrar-tarjeta");
     }
 
-    private async Task CargarTarjetas()
-    {
-        // Implementa la lógica para cargar las tarjetas del usuario
-    }
-
-    private async Task CargarReservas()
-    {
-        if (usuario != null)
-        {
-            try
-            {
-                reservas = await Task.Run(() => CUVisualizarReserva.Ejecutar(usuario.Id));
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Error al cargar las reservas del usuario");
-                _error = "Error al cargar las reservas";
-            }
-        }
-    }
-
-    private void VerDetalleReserva(int reservaId)
-    {
-        NavigationManager.NavigateTo($"/reserva/{reservaId}");
-    }
-
-    private void EditarReserva(int reservaId)
-    {
-        NavigationManager.NavigateTo($"/editar-reserva/{reservaId}");
-    }
-
-    private async Task EliminarReserva(int reservaId)
-    {
-        var confirmacion = await JS.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar esta reserva?");
-        if (confirmacion)
-        {
-            try
-            {
-                // Aquí deberías llamar al caso de uso para eliminar la reserva
-                // await CUEliminarReserva.Ejecutar(reservaId);
-                await JS.InvokeVoidAsync("alert", "Reserva eliminada exitosamente");
-                await CargarReservas(); // Recargar la lista de reservas
-            }
-            catch (Exception ex)
-            {
-                await JS.InvokeVoidAsync("alert", $"Error al eliminar la reserva: {ex.Message}");
-            }
-        }
-    }
 
     private string ObtenerClaseEstado(string estado)
     {
@@ -542,6 +548,105 @@
             "finalizada" => "bg-secondary",
             _ => "bg-secondary"
         };
+    }
+    private  async Task CargarmisReservas()
+{
+    var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+    var user = authState.User;
+
+    if (user.Identity != null && user.Identity.IsAuthenticated)
+    {
+        var userId = user.FindFirst(c => c.Type == "sub")?.Value 
+                  ?? user.FindFirst(c => c.Type == "userid")?.Value 
+                  ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int id))
+        {
+            reservas = casoDeUsoListarMisReservas.Ejecutar(id);
+        }
+        else
+        {
+            mensajeError = "No se pudo obtener el ID del usuario.";
+        }
+    }
+    else
+    {
+        mensajeError = "Usuario no autenticado.";
+    }
+    
+}
+
+    private string GetBadgeColor(EstadoReserva estado)
+    {
+        return estado switch
+        {
+            EstadoReserva.Pendiente => "warning",
+            EstadoReserva.Confirmada => "success",
+            EstadoReserva.Cancelada => "secondary",
+            _ => "light"
+        };
+    }
+
+    private void ModificarReserva(int id)
+    {
+        NavigationManager.NavigateTo($"/modificarreserva/{id}");
+    }
+
+    private void CancelarReserva(int id)
+    {
+        reservaAEliminarId = id;
+        mostrarConfirmacion = true;
+        mensajeError = null;
+        mensajeExito = null;
+    }
+
+    private void ConfirmarCancelacion()
+{
+    try
+    {
+        var resultado = casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
+
+        if (resultado.EsExitosa)
+        {
+            mensajeExito_misReservas = resultado.Mensaje;
+
+            if (resultado.MontoReembolsado.HasValue)
+            {
+                mensajeExito_misReservas += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
+            }
+
+            CargarmisReservas();
+        }
+        else
+        {
+            mensajeError = resultado.Mensaje;
+        }
+    }
+    catch (Exception ex)
+    {
+        mensajeError = $"Ocurrió un error inesperado: {ex.Message}";
+    }
+    finally
+    {
+        mostrarConfirmacion = false;
+    }
+}
+
+
+    private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
+{
+    return politica switch
+    {
+        PoliticasDeCancelacion.Anticipo20_72hs => "Se puede cancelar con 72 horas de anticipación. Se reembolsa el 20%.",
+        PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No se puede cancelar.",
+        PoliticasDeCancelacion.PagoTotal_48hs_50 => "Se puede cancelar con 48 horas de anticipación. Se reembolsa el 50%.",
+        _ => "Política desconocida"
+    };
+}
+
+    private void CancelarConfirmacion()
+    {
+        mostrarConfirmacion = false;
     }
 }
 

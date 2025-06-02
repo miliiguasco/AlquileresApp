@@ -97,26 +97,24 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         return reservas;
     }
 
+
     public async Task<bool> SeSuperponeAsync(int propiedadId, DateTime inicio, DateTime fin)
     {
         return await dbContext.Reservas
             .Where(r => r.PropiedadId == propiedadId)
             .AnyAsync(r => r.seSuperpone(inicio, fin));
     }
-    
-}
-     /*
-    public List<Reserva> ListarMisReservas(Usuario usuario){
-        throw new NotImplementedException();
+
+
+    public void RegistrarCheckout(Reserva reserva)
+    {
+        reserva.Estado = EstadoReserva.Finalizada;
+        reserva.FechaCheckOut = DateTime.Now;
+        dbContext.SaveChanges();
     }
-    */
 
 
-
-
-
-
-
+}
 
 
 

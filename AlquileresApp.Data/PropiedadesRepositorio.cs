@@ -91,10 +91,10 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         .Include(p => p.Imagenes)
         .AsQueryable();
 
-        //if (!string.IsNullOrWhiteSpace(filtros.Localidad))
-        //{
-        //    query = query.Where(p => p.Localidad.ToLower().Contains(filtros.Localidad.ToLower()));
-        //}
+        if (!string.IsNullOrWhiteSpace(filtros.Localidad))
+        {
+            query = query.Where(p => p.Localidad.ToLower().Contains(filtros.Localidad.ToLower()));
+        }
 
 
         if (filtros.CantidadHuespedes.HasValue)
@@ -102,12 +102,6 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
         }
 
-
-        var propiedades = query.ToList();
-        //Console.WriteLine($"📊 Propiedades encontradas: {propiedades.Count}");
-
-        if (filtros.FechaInicio != null && filtros.FechaFin != null)
-        {
             query = query.Where(p =>
                 !(p.Reservas.Any(r =>
                     (filtros.FechaInicio >= r.FechaInicio && filtros.FechaInicio < r.FechaFin) ||
@@ -116,9 +110,8 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
                 ))
             );
 
-        }
         return query.ToList();
-    }
+        }
 
     public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId)
     {

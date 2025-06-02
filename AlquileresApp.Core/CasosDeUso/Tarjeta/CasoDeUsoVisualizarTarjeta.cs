@@ -4,9 +4,9 @@ using AlquileresApp.Core.Interfaces;
 
 public class CasoDeUsoVisualizarTarjeta(ITarjetaRepositorio tarjetaRepositorio)
 {
-    public List<Tarjeta> Ejecutar(int usuarioId)
+    public Tarjeta Ejecutar(int id)
     {
-        var tarjetas = tarjetaRepositorio.ObtenerTarjetasPorUsuario(usuarioId);
-        return tarjetas ?? new List<Tarjeta>();
+        var tarjeta = tarjetaRepositorio.ObtenerPorClienteId(id);
+        return tarjeta;
     }
 }

@@ -6,6 +6,9 @@
 @inject NavigationManager NavigationManager
 @inject CasoDeUsoListarMisReservas casoDeUsoListarMisReservas
 @inject CasoDeUsoCancelarReserva casoDeUsoCancelarReserva
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 
 <link href="css/MisReservas.css" rel="stylesheet" />
 <div class="container_misreservas py-5">
@@ -42,7 +45,7 @@
                 @foreach (var reserva in reservas)
                 {
                     <tr>
-                        <td>@reserva.Propiedad.Titulo</td>
+                        <td>@reserva.Propiedad?.Titulo ?? "Propiedad no disponible"</td>
                        <td>@ObtenerDescripcionPolitica(reserva.Propiedad.PoliticaCancelacion)</td>
                         <td>@reserva.FechaInicio.ToShortDateString()</td>
                         <td>@reserva.FechaFin.ToShortDateString()</td>
@@ -78,6 +81,7 @@
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
         <div class="modal-dialog">
+    using System.Configuration;
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Confirmar Cancelación</h5>
@@ -99,18 +103,40 @@
     private List<Reserva> reservas = new();
     private bool mostrarConfirmacion = false;
     private int reservaAEliminarId;
-    private string mensajeError;
+    private string mensajeError ;
     private string mensajeExito;
 
     protected override async Task OnInitializedAsync()
     {
-        CargarReservas();
+        await CargarReservas();
     }
 
-    private void CargarReservas()
+    private  async Task CargarReservas()
+{
+    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    var user = authState.User;
+
+    if (user.Identity != null && user.Identity.IsAuthenticated)
     {
-        reservas = casoDeUsoListarMisReservas.Ejecutar(1);
+        var userId = user.FindFirst(c => c.Type == "sub")?.Value 
+                  ?? user.FindFirst(c => c.Type == "userid")?.Value 
+                  ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int id))
+        {
+            reservas = casoDeUsoListarMisReservas.Ejecutar(id);
+        }
+        else
+        {
+            mensajeError = "No se pudo obtener el ID del usuario.";
+        }
     }
+    else
+    {
+        mensajeError = "Usuario no autenticado.";
+    }
+    
+}
 
     private string GetBadgeColor(EstadoReserva estado)
     {
@@ -151,7 +177,7 @@
                 mensajeExito += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
             }
 
-            CargarReservas();
+            CargarReservas( );
         }
         else
         {

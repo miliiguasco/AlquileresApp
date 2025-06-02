@@ -14,12 +14,12 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
         dbContext.SaveChanges();
     }
 
-    public void ModificarUsuario(Usuario usuario) 
+    public void ModificarUsuario(Usuario usuario)
     {
         var usuarioExistente = dbContext.Usuarios.Find(usuario.Id);
         if (usuarioExistente == null)
             throw new Exception("Usuario no encontrado");
-            
+
         dbContext.Entry(usuarioExistente).CurrentValues.SetValues(usuario);
         dbContext.SaveChanges();
     }
@@ -27,7 +27,7 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
     public Usuario? ObtenerUsuarioPorId(int id)
     {
         return dbContext.Usuarios.Find(id);
-    }   
+    }
 
     public List<Usuario> ListarUsuarios()
     {
@@ -57,7 +57,7 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
         var usuario = dbContext.Usuarios
             .SingleOrDefault(u => u.Email.ToLower() == correo.ToLower());
         if (usuario == null)
-           return null;
+            return null;
         else if (usuario.Contraseña != hashedContraseña)
             return null;
         return usuario;
@@ -77,5 +77,11 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
         {
             throw new Exception("El correo ya se encuentra registrado");
         }
+    }
+     public bool tieneTarjeta(Usuario cliente)
+    {
+
+        return dbContext.Tarjetas.Any(t => t.ClienteId == cliente.Id);
+;
     }
 }

@@ -14,9 +14,8 @@ using AlquileresApp.Core.CasosDeUso.Reserva;
 using AlquileresApp.Core.CasosDeUso.Tarjeta;
 using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Authentication;
 
-
+ 
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,6 +73,7 @@ builder.Services.AddScoped<IPropiedadRepositorio, PropiedadesRepositorio>();
 builder.Services.AddScoped<IImagenesRepositorio, ImagenesRepositorio>();
 builder.Services.AddScoped<IPropiedadValidador, PropiedadValidador>();
 builder.Services.AddScoped<IReservaRepositorio, ReservaRepositorio>();
+builder.Services.AddScoped<IServicioAutenticacion, ServicioAutenticacion>();
 builder.Services.AddScoped<CasoDeUsoListarPropiedades>();
 builder.Services.AddScoped<CasoDeUsoAgregarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoCargarImagen>();
@@ -89,13 +89,6 @@ builder.Services.AddScoped<IFechaReservaValidador, FechaReservaValidador>();
 builder.Services.AddScoped<ITarjetaValidador, TarjetaValidador>();
 builder.Services.AddScoped<CasoDeUsoRegistrarTarjeta>();
 builder.Services.AddScoped<CasoDeUsoObtenerPropiedad>();
-builder.Services.AddScoped<CasoDeUsoVisualizarReserva>();
-builder.Services.AddScoped<CasoDeUsoVisualizarTarjeta>();
-builder.Services.AddScoped<CasoDeUsoEliminarTarjeta>();
-builder.Services.AddScoped<CasoDeUsoModificarTarjeta>();
-builder.Services.AddScoped<ICasoDeUsoVerReserva, CasoDeUsoVerReserva>();
-builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
-builder.Services.AddScoped<CasoDeUsoMarcarPropiedadComoNoHabitable>();
 builder.Services.AddScoped<CasoDeUsoListarMisReservas>();
 builder.Services.AddScoped<CasoDeUsoCancelarReserva>();
 builder.Services.AddScoped<CasoDeUsoModificarReserva>();
@@ -107,6 +100,21 @@ builder.Services.AddTransient<INotificadorEmail>(provider =>
     )
 );
 
+
+builder.Services.AddScoped<CasoDeUsoVisualizarReserva>();
+builder.Services.AddScoped<CasoDeUsoVisualizarTarjeta>();
+builder.Services.AddScoped<CasoDeUsoEliminarTarjeta>();
+builder.Services.AddScoped<CasoDeUsoModificarTarjeta>();
+builder.Services.AddScoped<ICasoDeUsoVerReserva, CasoDeUsoVerReserva>();
+builder.Services.AddScoped<CasoDeUsoCerrarSesion>();
+
+builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
+builder.Services.AddTransient<INotificadorEmail>(provider =>
+    new NotificadorEmail(
+        "reservaenalquilando@gmail.com",
+        "fxsl hsck basy pamv"
+    )
+);
 
 
 var app = builder.Build();

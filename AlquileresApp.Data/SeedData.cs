@@ -22,11 +22,14 @@ namespace AlquileresApp.Data
             // Crear usuarios registrados
             var usuarios = new List<Usuario>
             {
-                new Administrador
+                new Cliente
                 {
+
                     Nombre = "Milagros",
                     Apellido = "Guasco",
                     Email = "milagrosguasco11@gmail.com",
+
+ 
                     Telefono = "123456789",
                     Contraseña = hashService.HashPassword("password123"),
                     FechaNacimiento = new DateTime(1990, 1, 1),
@@ -174,7 +177,7 @@ namespace AlquileresApp.Data
                 },
                 new Reserva
                 {
-                    ClienteId = usuarios[0].Id,
+                    ClienteId = usuarios[1].Id,
                     PropiedadId = propiedades[2].Id,
                     FechaInicio = DateTime.Now.AddDays(2),
                     FechaFin = DateTime.Now.AddDays(35),
@@ -187,20 +190,20 @@ namespace AlquileresApp.Data
             //Tarjetas de prueba
             var tarjetas = new List<Tarjeta>
             {
-                /*new Tarjeta
+                new Tarjeta
                 {
                     NumeroTarjeta = "1234567890123456",
                     Titular = "Juan Pérez", 
-                    FechaVencimiento = "12/2025",
+                    FechaVencimiento = "12/25",
                     CVV = "123",
                     Saldo = 4000.00m,
                     ClienteId = usuarios[0].Id
-                },*/
+                },
                 new Tarjeta
                 {
                     NumeroTarjeta = "9876543210987654",
                     Titular = "María García",
-                    FechaVencimiento = "12/2025",
+                    FechaVencimiento = "12/25",
                     CVV = "456",
                     Saldo = 500.00m,
                     ClienteId = usuarios[1].Id

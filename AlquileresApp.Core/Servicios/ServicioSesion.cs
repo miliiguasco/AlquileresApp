@@ -87,6 +87,8 @@ public class ServicioSesion(ServicioCookies servicioCookies, ILogger<ServicioSes
             new Claim(ClaimTypes.Name, usuario.Nombre),
             new Claim(ClaimTypes.Role, usuario.Rol.ToString()),
             new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString())
+
+
         };
 
         logger.LogInformation("Claims generados:");
