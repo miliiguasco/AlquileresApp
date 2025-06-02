@@ -188,7 +188,7 @@ namespace AlquileresApp.Data
                     Titular = "María García",
                     FechaVencimiento = "12/25",
                     CVV = "456",
-                    Saldo = 500.00m,
+                    Saldo = 5000.00m,
                     ClienteId = usuarios[1].Id
                 }
             };
