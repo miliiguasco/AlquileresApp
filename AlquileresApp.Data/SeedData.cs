@@ -22,6 +22,16 @@ namespace AlquileresApp.Data
             // Crear usuarios registrados
             var usuarios = new List<Usuario>
             {
+                new Administrador{
+                    Nombre = "fran",
+                    Apellido = "admi",
+                    Email = "admi@gmail.com",
+
+ 
+                    Telefono = "123456789",
+                    Contraseña = hashService.HashPassword("password123"),
+                    FechaNacimiento = new DateTime(1990, 1, 1),
+                },
                 new Cliente
                 {
 
