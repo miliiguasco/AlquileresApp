@@ -14,7 +14,7 @@
             <InputText @bind-Value="Input.NumeroTarjeta" 
                       class="form-control" 
                       placeholder="XXXX XXXX XXXX XXXX"
-                      maxlength="19"
+                      maxlength="16"
                       @oninput="FormatearNumeroTarjeta" />
             <ValidationMessage For="@(() => Input.NumeroTarjeta)" />
         </div>
@@ -52,9 +52,11 @@
                 <ValidationMessage For="@(() => Input.CVV)" />
             </div>
         </div>
-
-        <div class="form-actions">
-            <button type="submit" class="@ButtonClass" @onclick="ValidarFormulario" disabled="@EstaProcesando">
+        <div class="btn-container">
+            <button class="btn btn-primary" @onclick="@CancelarEdicion">
+                Volver
+            </button>
+            <button type="submit" class="btn btn-primary" @onclick="ValidarFormulario" disabled="@EstaProcesando">
                 <i class="fas fa-save"></i> @SubmitButtonText
             </button>
         </div>
@@ -75,14 +77,12 @@
     public string SubmitButtonText { get; set; } = "Guardar";
 
     [Parameter]
-    public string ButtonClass { get; set; } = "btn btn-primary";
-
-    [Parameter]
     public bool EstaProcesando { get; set; } = false;
-
+    [Parameter]
+    public EventCallback CancelarEdicion { get; set; }
     private string? ErrorFechaVencimiento { get; set; }
     private bool mostrarErrorFechaVencimiento = false;
-
+   
     private void FormatearNumeroTarjeta(ChangeEventArgs e)
     {
         var valor = e.Value?.ToString() ?? "";

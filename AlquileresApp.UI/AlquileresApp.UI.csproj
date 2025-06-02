@@ -14,6 +14,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
     <EnableStaticWebAssetsCompression>false</EnableStaticWebAssetsCompression>
+    <EnableCompressionInStaticWebAssets>false</EnableCompressionInStaticWebAssets>
   </PropertyGroup>
 
   <ItemGroup>

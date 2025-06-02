@@ -1,4 +1,3 @@
-@page "/visualizar-tarjeta"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
@@ -12,105 +11,73 @@
 @inject NavigationManager NavigationManager
 @inject CasoDeUsoVisualizarTarjeta CUVisualizarTarjeta
 @inject CasoDeUsoEliminarTarjeta CUEliminarTarjeta
+@inject CasoDeUsoModificarTarjeta CUModificarTarjeta
 @inject IJSRuntime JS
 @attribute [Authorize]
 
-<PageTitle>Visualizar Tarjeta</PageTitle>
+<link href="css/VisualizarTarjeta.css" rel="stylesheet" />
 
 <div class="profile-container">
     @if (usuario != null)
     {
-        <div class="profile-header">
-            <h1>Visualizar Tarjeta</h1>
-        </div>
-
-        <div class="profile-content">
-            @if (!mostrarDetalleTarjeta)
-            {
                 <div class="profile-section">
-                    <div class="btn-container">
-                        <h2>Seleccionar Tarjeta</h2>
-                        <button class="btn-outline" @onclick="CancelarVisualizacion">
-                            <i class="fas fa-times"></i> 
-                        </button>
-                    </div>
-                    @if (tarjeta != null )
+                    @if (modoEdicion) 
                     {
-                        
-                                <div class="tarjeta-item" @onclick="() => SeleccionarTarjeta(tarjeta)">
-                                    <i class="fas fa-credit-card"></i>
-                                    <div class="tarjeta-info">
-                                        <span>**** **** **** @tarjeta.NumeroTarjeta.Substring(tarjeta.NumeroTarjeta.Length - 4)</span>
-                                        <small>Titular: @tarjeta.Titular</small>
-                                        <small>Vence: @tarjeta.FechaVencimiento</small>
-                                    </div>
+                        <DatosFormEdicionTarjeta Input="@datosForm" 
+                                        OnSubmit="GuardarCambios"
+                                        FormName="editarTarjeta"
+                                        SubmitButtonText="Guardar Cambios"
+                                        CancelarEdicion="CancelarEdicion"/>
+                    }
+                    else {
+                       @if (tarjeta != null )
+                    {
+                        <div class="tarjeta-container">
+                            <div class="info-container">
+                                <i class="fas fa-credit-card"></i>
+                                <div class="tarjeta-info">
+                                    <span>**** **** **** @tarjeta.NumeroTarjeta.Substring(tarjeta.NumeroTarjeta.Length - 4)</span>
+                                    <small>Titular: @tarjeta.Titular</small>
+                                    <small>Vence: @tarjeta.FechaVencimiento</small>  
                                 </div>
+                            </div>
+                            <div class="acciones-tarjeta">
+                                <button type="button" class="boton boton-modificar" @onclick="EditarTarjeta">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="boton boton-cancelar" @onclick="() => EliminarTarjeta(tarjeta.Id)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
                     }
                     else
                     {
                         <div class="alert alert-info">
                             No tienes tarjeta registrada.
                         </div>
+                    } 
                     }
+                    
                 </div>
-            }
-            else if (tarjetaSeleccionada != null)
-            {
-                <div class="profile-section">
-                    <div class="btn-container">
-                        <h2>Detalles de la Tarjeta</h2>
-                        <button class="btn-outline" @onclick="VolverALista">
-                            <i class="fas fa-arrow-left"></i> 
-                        </button>
-                    </div>
-                    <div class="tarjeta-detalle">
-                        <div class="tarjeta-info-detalle">
-                            <div class="info-item">
-                                <i class="fas fa-credit-card"></i>
-                                <div>
-                                    <label>Número de Tarjeta</label>
-                                    <p>**** **** **** @tarjetaSeleccionada.NumeroTarjeta.Substring(tarjetaSeleccionada.NumeroTarjeta.Length - 4)</p>
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-user"></i>
-                                <div>
-                                    <label>Titular</label>
-                                    <p>@tarjetaSeleccionada.Titular</p>
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-calendar"></i>
-                                <div>
-                                    <label>Fecha de Vencimiento</label>
-                                    <p>@tarjetaSeleccionada.FechaVencimiento</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tarjeta-acciones">
-                            <button class="btn btn-danger" @onclick="() => EliminarTarjeta(tarjetaSeleccionada.Id)">
-                                <i class="fas fa-trash"></i> Eliminar Tarjeta
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-info">
-            @if (_error != null)
-            {
-                <p>Error: @_error</p>
-            }
-            else
-            {
-                <p>Cargando información...</p>
-            }
-        </div>
     }
 </div>
+
+@if (erroresValidacion.Any())
+{
+    <div class="alert alert-danger mt-3">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <h4 class="alert-heading mb-0">Errores de validación:</h4>
+        </div>
+        <ul class="mt-2 mb-0">
+            @foreach (var error in erroresValidacion)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
 
 @if (!string.IsNullOrEmpty(mensajeExito))
 {
@@ -122,11 +89,6 @@
                 <p>@mensajeExito</p>
             </div>
         </div>
-        <div class="mt-3">
-            <button class="btn btn-primary" @onclick="VolverAPerfil">
-                <i class="fas fa-arrow-left"></i> Volver al Perfil
-            </button>
-        </div>
     </div>
 }
 
@@ -134,9 +96,10 @@
     private Usuario? usuario;
     private string? _error;
     private Tarjeta tarjeta;
-    private bool mostrarDetalleTarjeta = false;
-    private Tarjeta? tarjetaSeleccionada;
     private string? mensajeExito;
+    public bool modoEdicion = false; 
+    private DatosFormEdicionTarjeta.InputModel datosForm = new();
+    private List<string> erroresValidacion = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -171,23 +134,23 @@
         }
     }
 
-    private void SeleccionarTarjeta(Tarjeta tarjeta)
+    private void EditarTarjeta()
     {
-        tarjetaSeleccionada = tarjeta;
-        mostrarDetalleTarjeta = true;
+        datosForm = new DatosFormEdicionTarjeta.InputModel
+        {
+            NumeroTarjeta = tarjeta.NumeroTarjeta,
+            Titular = tarjeta.Titular,
+            FechaVencimiento = tarjeta.FechaVencimiento,
+            CVV = tarjeta.CVV
+        };
+        modoEdicion = true;
     }
 
-    private void VolverALista()
+    private void CancelarEdicion()
     {
-        mostrarDetalleTarjeta = false;
-        tarjetaSeleccionada = null;
+        modoEdicion = false;
+        datosForm = new();
     }
-
-    private void CancelarVisualizacion()
-    {
-        NavigationManager.NavigateTo("/Perfil");
-    }
-
     private async Task EliminarTarjeta(int tarjetaId)
     {
         try
@@ -196,9 +159,6 @@
             {
                 await CUEliminarTarjeta.Ejecutar(tarjetaId);
                 mensajeExito = "La tarjeta ha sido eliminada exitosamente";
-                tarjeta = CUVisualizarTarjeta.Ejecutar(usuario!.Id);
-                mostrarDetalleTarjeta = false;
-                tarjetaSeleccionada = null;
                 StateHasChanged();
             }
         }
@@ -210,199 +170,90 @@
         }
     }
 
-    private void VolverAPerfil()
+    private async Task GuardarCambios()
     {
-        NavigationManager.NavigateTo("/Perfil");
+        try
+        {
+            erroresValidacion.Clear();
+            // Validar número de tarjeta
+            if (string.IsNullOrWhiteSpace(datosForm.NumeroTarjeta) || 
+                datosForm.NumeroTarjeta.Replace(" ", "").Length != 16)
+            {
+                erroresValidacion.Add("El número de tarjeta debe tener 16 dígitos");
+            }
+
+            // Validar titular
+            if (string.IsNullOrWhiteSpace(datosForm.Titular))
+            {
+                erroresValidacion.Add("El nombre del titular es requerido");
+            }
+
+            // Validar fecha de vencimiento
+            if (string.IsNullOrWhiteSpace(datosForm.FechaVencimiento) || 
+                !datosForm.FechaVencimiento.Contains("/") || 
+                datosForm.FechaVencimiento.Length != 5)
+            {
+                erroresValidacion.Add("La fecha de vencimiento debe tener el formato MM/AA");
+            }
+            else
+            {
+                var partes = datosForm.FechaVencimiento.Split('/');
+                if (partes.Length != 2 || 
+                    !int.TryParse(partes[0], out int mes) || 
+                    !int.TryParse(partes[1], out int año) ||
+                    mes < 1 || mes > 12)
+                {
+                    erroresValidacion.Add("La fecha de vencimiento debe tener el formato MM/AA válido");
+                }
+                else
+                {
+                    var fechaActual = DateTime.Now;
+                    var añoActual = fechaActual.Year % 100;
+                    var mesActual = fechaActual.Month;
+
+                    // Convertir a año completo para comparación más precisa
+                    var añoCompleto = 2000 + año; // Asumimos que las tarjetas no son de antes del 2000
+                    var añoActualCompleto = fechaActual.Year;
+
+                    if (añoCompleto < añoActualCompleto || 
+                        (añoCompleto == añoActualCompleto && mes < mesActual))
+                    {
+                        erroresValidacion.Add("La tarjeta está vencida. Por favor, ingrese una fecha de vencimiento válida.");
+                        Logger.LogWarning($"Intento de guardar tarjeta vencida. Fecha ingresada: {mes}/{año}");
+                    }
+                }
+            }
+
+            // Validar CVV
+            if (string.IsNullOrWhiteSpace(datosForm.CVV) || 
+                datosForm.CVV.Length != 3 || 
+                !datosForm.CVV.All(char.IsDigit))
+            {
+                erroresValidacion.Add("El CVV debe tener 3 dígitos");
+            }
+
+            if (erroresValidacion.Any())
+            {
+                StateHasChanged();
+                return;
+            }
+
+            await CUModificarTarjeta.Ejecutar(
+                tarjeta.Id, 
+                datosForm.NumeroTarjeta.Replace(" ", ""),
+                datosForm.Titular,
+                datosForm.FechaVencimiento,
+                datosForm.CVV
+            );
+            
+            mensajeExito = "La tarjeta ha sido actualizada exitosamente";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error al actualizar la tarjeta: {ex.Message}";
+            Logger.LogError(_error);
+            await JS.InvokeVoidAsync("alert", _error);
+        }
     }
 }
-
-<style>
-    .profile-container {
-        max-width: 800px;
-        margin: 2rem auto;
-        padding: 2rem;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .profile-header {
-        margin-bottom: 2rem;
-        text-align: center;
-    }
-
-    .profile-header h1 {
-        color: #333;
-        font-size: 2rem;
-        margin: 0;
-    }
-
-    .profile-content {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .profile-section {
-        background: #f8f9fa;
-        padding: 2rem;
-        border-radius: 10px;
-    }
-
-    .btn-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .btn-container h2 {
-        margin: 0;
-        color: #333;
-        font-size: 1.5rem;
-    }
-
-    .btn-outline {
-        background: none;
-        border: 1px solid #dc3545;
-        color: #dc3545;
-        padding: 0.5rem 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .btn-outline:hover {
-        background: #dc3545;
-        color: white;
-    }
-
-    .btn {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-    }
-
-    .btn-danger:hover {
-        background-color: #c82333;
-    }
-
-    .tarjetas-lista {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .tarjeta-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem;
-        background: white;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: 1px solid #dee2e6;
-    }
-
-    .tarjeta-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .tarjeta-item i {
-        font-size: 1.5rem;
-        color: #0d6efd;
-    }
-
-    .tarjeta-info {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .tarjeta-info span {
-        font-weight: 500;
-    }
-
-    .tarjeta-info small {
-        color: #6c757d;
-    }
-
-    .tarjeta-detalle {
-        background: white;
-        border-radius: 8px;
-        padding: 1.5rem;
-        border: 1px solid #dee2e6;
-    }
-
-    .tarjeta-info-detalle {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .info-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-
-    .info-item i {
-        font-size: 1.5rem;
-        color: #0d6efd;
-        margin-top: 0.25rem;
-    }
-
-    .info-item label {
-        display: block;
-        color: #6c757d;
-        font-size: 0.875rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .info-item p {
-        margin: 0;
-        font-size: 1.125rem;
-        color: #333;
-    }
-
-    .tarjeta-acciones {
-        display: flex;
-        justify-content: flex-end;
-        gap: 1rem;
-    }
-
-    .alert-success {
-        background-color: #d4edda;
-        border-color: #c3e6cb;
-        color: #155724;
-        padding: 1rem;
-        border-radius: 0.375rem;
-        margin-top: 1rem;
-    }
-
-    .alert-success i {
-        font-size: 1.5rem;
-        color: #28a745;
-    }
-
-    .alert-heading {
-        margin-bottom: 0.5rem;
-        font-size: 1.25rem;
-    }
-</style> 

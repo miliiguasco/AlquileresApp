@@ -160,7 +160,8 @@
 
 .btn:hover {
     opacity: 0.9;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .mensaje-exito {
@@ -170,6 +171,206 @@
     font-size: 0.9rem;
     animation: fadeIn 0.3s ease-out;
     text-align: center;
+}
+
+/* ESTILOS DE TABLA */
+
+.table-container {
+    margin-top: 0.3rem;
+    overflow-x: auto;
+    background: white;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.property-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+    box-shadow: none;
+}
+
+.property-table th,
+.property-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.property-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #1F3F48;
+    white-space: nowrap;
+}
+
+.property-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* ESTILOS BOTONES DE ACCION */
+
+.actions-cell {
+    width: 100px;
+    white-space: nowrap;
+}
+
+.actions-cell button {
+    padding: 0.4rem;
+    margin: 0 0.25rem;
+    border: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.actions-cell .btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.actions-cell .btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.actions-cell button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.actions-cell button i {
+    font-size: 1rem;
+}
+
+/* ESTILOS TAJETA */
+
+.tarjeta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    background-color: #f8f9fa;
+}
+
+.tarjeta-item:hover {
+    background-color: #e9ecef;
+}
+
+.tarjeta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.tarjeta-info small {
+    color: #6c757d;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0;
+}
+
+.form-check-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.payment-methods-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.payment-methods-actions button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    color: white;
+    border: none;
+    min-width: 180px;
+}
+
+.payment-methods-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+/* ESTILOS DE ESTADO RESERVA */
+
+.badge {
+    padding: 0.5em 1em;
+    font-size: 0.9em;
+}
+
+/* OTROS BOTONES  */
+
+.btn-otro {
+    border-radius: 5px;
+    padding: 0.5rem 1.5rem;
+}
+
+.btn-otro i {
+    margin-right: 0.5rem;
 }
 
 @keyframes fadeIn {

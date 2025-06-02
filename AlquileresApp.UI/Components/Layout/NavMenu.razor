@@ -41,7 +41,7 @@
                         @if (isDropdownOpen)
                         {
                             <div class="dropdown-menu show" @onclick:stopPropagation>
-                                <a class="dropdown-item" href="/Perfil/@context.User.FindFirst(ClaimTypes.UserData)?.Value">
+                                <a class="dropdown-item" href="/Perfil/@context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value">
                                     <i class="bi bi-person"></i> Ver perfil
                                 </a>
                                 @if (context.User.IsInRole("Administrador"))
