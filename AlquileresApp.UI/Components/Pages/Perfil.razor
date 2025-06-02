@@ -650,313 +650,237 @@
         mostrarConfirmacion = false;
     }
 }
-
 <style>
-    .profile-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        margin-top: 2rem;
-        flex-wrap: wrap;
+.profile-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    margin-top: 4rem;
+    min-height: calc(100vh - 4rem);
+    overflow-y: auto;
+}
+
+.profile-header {
+    margin-bottom: 2rem;
+}
+
+.profile-header h1 {
+    color: #1F3F48;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.tabs-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    min-width: 1000px;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #e9ecef;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.tab-button {
+    padding: 1rem 2rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #495057;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab-button:hover {
+    color: #1F3F48;
+}
+
+.tab-button.active {
+    color: #ff6b00;
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #ff6b00;
+}
+
+.tab-button i {
+    margin-right: 0.5rem;
+}
+
+.tab-content {
+    padding: 2rem;
+}
+
+.tab-pane {
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tab-pane h3 {
+    color: #1F3F48;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+@@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-section {
+    background: white;
+    padding: 2rem;
+}
+
+.profile-section h2 {
+    color: #1F3F48;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.info-group {
+    margin-bottom: 1.2rem;
+    padding: 0.8rem;
+    border-radius: var(--bs-border-radius);
+    background-color: var(--bs-tertiary-bg);
+    transition: background-color 0.2s ease;
+}
+
+.info-group:hover {
+    background-color: var(--bs-secondary-bg);
+}
+
+.info-group label {
+    display: block;
+    font-weight: 600;
+    color: #1F3F48;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.info-group span {
+    display: block;
+    color: var(--bs-body-color);
+    font-size: 1rem;
+    padding: 0.2rem 0;
+}
+
+.profile-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    width: 160px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #f1771f;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.mensaje-exito {
+    width: 300px;
+    color: var(--bs-success);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    animation: fadeIn 0.3s ease-out;
+    text-align: center;
+}
+
+@@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+@@media (max-width: 1440px) {
+    .profile-container {
+        max-width: 95%;
+    }
+}
+
+@@media (max-width: 1024px) {
+    .tabs-container {
+        min-width: auto;
+        width: 100%;
+        overflow-x: auto;
+    }
+}
+
+@@media (max-width: 768px) {
+    .profile-container {
+        margin: 1rem;
+        padding: 1.5rem;
     }
 
-    .profile-actions button {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        color: white;
-        border: none;
+    .profile-section {
+        padding: 1.5rem;
     }
 
-    .profile-actions button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    .profile-actions .btn-primary {
-        background-color: #4a9cb5;
-        border-color: #4a9cb5;
-    }
-
-    .profile-actions .btn-primary:hover {
-        background-color: #3d8ba0;
-    }
-
-    .profile-actions .btn-info {
-        background-color: #17a2b8;
-        border-color: #17a2b8;
-        color: white;
-    }
-
-    .profile-actions .btn-info:hover {
-        background-color: #138496;
-    }
-
-    .profile-actions .btn-success {
-        background-color: #28a745;
-        border-color: #28a745;
-    }
-
-    .profile-actions .btn-success:hover {
-        background-color: #218838;
-    }
-
-    .profile-actions .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-    }
-
-    .profile-actions .btn-danger:hover {
-        background-color: #c82333;
-    }
-
-    .profile-actions .btn-warning {
-        background-color: #ffc107;
-        border-color: #ffc107;
-        color: white;
-    }
-
-    .profile-actions .btn-warning:hover {
-        background-color: #e0a800;
-    }
-
-    .profile-actions button i {
-        font-size: 1.1rem;
-    }
-
-    .tarjetas-list {
-        margin-top: 1rem;
-    }
-
-    .tarjeta-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
-        background-color: #f8f9fa;
-    }
-
-    .tarjeta-item:hover {
-        background-color: #e9ecef;
-    }
-
-    .tarjeta-info {
-        display: flex;
+    .info-group {
         flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .tarjeta-info small {
-        color: #6c757d;
-    }
-
-    .form-check {
-        display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 0.5rem;
     }
 
-    .form-check-input {
-        width: 1.25rem;
-        height: 1.25rem;
-        margin-top: 0;
+    .info-group label {
+        min-width: auto;
+        width: 100%;
     }
 
-    .form-check-label {
-        font-weight: 500;
-        color: #495057;
-    }
-
-    .reservas-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin-top: 1rem;
-    }
-
-    .reserva-card {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        overflow: hidden;
-        transition: transform 0.2s ease;
-    }
-
-    .reserva-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-
-    .reserva-header {
-        padding: 1rem;
-        background: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .reserva-header h4 {
-        margin: 0;
-        color: #495057;
-    }
-
-    .estado-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-
-    .estado-badge.pendiente {
-        background-color: #ffc107;
-        color: #000;
-    }
-
-    .estado-badge.confirmada {
-        background-color: #28a745;
-        color: white;
-    }
-
-    .estado-badge.cancelada {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .estado-badge.finalizada {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    .reserva-body {
-        padding: 1rem;
-    }
-
-    .reserva-footer {
-        padding: 1rem;
-        border-top: 1px solid #dee2e6;
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .reserva-footer .btn {
-        padding: 0.5rem 1rem;
-    }
-
-    .card {
-        border: none;
-        border-radius: 10px;
-        transition: transform 0.2s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-2px);
-    }
-
-    .card-header {
-        border-radius: 10px 10px 0 0 !important;
-    }
-
-    .badge {
-        padding: 0.5em 1em;
-        font-size: 0.9em;
+    .profile-actions {
+        flex-direction: column;
     }
 
     .btn {
-        border-radius: 5px;
-        padding: 0.5rem 1.5rem;
-    }
-
-    .btn i {
-        margin-right: 0.5rem;
-    }
-
-    .table {
-        margin-top: 1rem;
-    }
-
-    .table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-    }
-
-    .table td {
-        vertical-align: middle;
-    }
-
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-    }
-
-    .payment-methods-actions {
-        display: flex;
-        flex-direction: row;
-        gap: 1rem;
+        width: 100%;
         justify-content: center;
-        margin-top: 2rem;
-        flex-wrap: wrap;
+        text-align: center;
     }
+}
 
-    .payment-methods-actions button {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        color: white;
-        border: none;
-        min-width: 180px;
-    }
-
-    .payment-methods-actions button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    .payment-methods-actions .btn-info {
-        background-color: #17a2b8;
-        border-color: #17a2b8;
-    }
-
-    .payment-methods-actions .btn-info:hover {
-        background-color: #138496;
-    }
-
-    .payment-methods-actions .btn-success {
-        background-color: #28a745;
-        border-color: #28a745;
-    }
-
-    .payment-methods-actions .btn-success:hover {
-        background-color: #218838;
-    }
-
-    .payment-methods-actions .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-    }
-
-    .payment-methods-actions .btn-danger:hover {
-        background-color: #c82333;
-    }
-
-    .payment-methods-actions .btn-warning {
-        background-color: #ffc107;
-        border-color: #ffc107;
-        color: #000;
-    }
-
-    .payment-methods-actions .btn-warning:hover {
-        background-color: #e0a800;
-    }
 </style> 
