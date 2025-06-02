@@ -74,7 +74,11 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
 
     private void verificarPropiedadDuplicada(string nombre)
     {
-        bool existe = dbContext.Propiedades.Any(p => p.Titulo == nombre);
+        
+         string nombreTrimmed = nombre.Trim().ToLower();
+
+        bool existe = dbContext.Propiedades
+        .Any(p => p.Titulo.Trim().ToLower() == nombreTrimmed);
         if (existe)
         {
             throw new Exception("La propiedad ya existe");
