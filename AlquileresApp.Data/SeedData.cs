@@ -189,7 +189,7 @@ namespace AlquileresApp.Data
                     Saldo = 4000.00m,
                     ClienteId = usuarios[0].Id
                 },
-                new Tarjeta
+                /* new Tarjeta
                 {
                     NumeroTarjeta = "9876543210987654",
                     Titular = "María García",
@@ -197,7 +197,7 @@ namespace AlquileresApp.Data
                     CVV = "456",
                     Saldo = 5000.00m,
                     ClienteId = usuarios[1].Id
-                }
+                } */
             };
             context.Tarjetas.AddRange(tarjetas);
             context.SaveChanges();
