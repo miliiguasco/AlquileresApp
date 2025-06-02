@@ -35,11 +35,8 @@
                             <i class="fas fa-times"></i> 
                         </button>
                     </div>
-                    @if (tarjetas != null && tarjetas.Any())
+                    @if (tarjeta != null )
                     {
-                        <div class="tarjetas-lista">
-                            @foreach (var tarjeta in tarjetas)
-                            {
                                 <div class="tarjeta-item" @onclick="() => SeleccionarTarjeta(tarjeta)">
                                     <i class="fas fa-credit-card"></i>
                                     <div class="tarjeta-info">
@@ -48,13 +45,12 @@
                                         <small>Vence: @tarjeta.FechaVencimiento</small>
                                     </div>
                                 </div>
-                            }
-                        </div>
+            
                     }
                     else
                     {
                         <div class="alert alert-info">
-                            No tienes tarjetas registradas.
+                            No tienes tarjeta registrada.
                         </div>
                     }
                 </div>
@@ -131,7 +127,7 @@
     private string? _error;
     private DatosFormEdicionTarjeta.InputModel datosForm = new();
     private string? mensajeExito;
-    private List<Tarjeta>? tarjetas;
+    private Tarjeta tarjeta;
     private bool mostrarFormularioEdicion = false;
     private Tarjeta? tarjetaSeleccionada;
     private List<string> erroresValidacion = new();
@@ -153,7 +149,7 @@
                 }
                 else
                 {
-                    tarjetas = CUVisualizarTarjeta.Ejecutar(usuario.Id);
+                    tarjeta = CUVisualizarTarjeta.Ejecutar(usuario.Id);
                 }
             }
             else
@@ -206,7 +202,7 @@
             
             if (tarjetaSeleccionada == null)
             {
-                erroresValidacion.Add("No se ha seleccionado ninguna tarjeta para editar");
+                erroresValidacion.Add("No se ha seleccionado la tarjeta para editar");
                 StateHasChanged();
                 return;
             }
