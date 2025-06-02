@@ -84,10 +84,6 @@ public Tarjeta ObtenerPorClienteId(int clienteId)
         dbContext.SaveChanges();
     }
 
-    public List<Tarjeta> ObtenerTarjetasPorUsuario(int usuarioId){
-        return dbContext.Tarjetas.Where(t => t.ClienteId == usuarioId).ToList();
-    }
-
 
     public void PagarMontoRestante(Tarjeta tarjeta, decimal monto){
         tarjeta.Saldo -= monto;

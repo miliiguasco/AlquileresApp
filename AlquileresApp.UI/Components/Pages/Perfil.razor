@@ -263,10 +263,10 @@
                         <td>
                             @if (reserva.Estado == EstadoReserva.Pendiente)
                             {
-                                <button class=" boton boton-modificar " @onclick="@(() => ModificarReserva(reserva.Id))">
+                                <button class=" boton button_misreservas boton-modificar " @onclick="@(() => ModificarReserva(reserva.Id))">
                                     <i class="bi bi-pencil  "></i> Modificar
                                 </button>
-                                <button class="boton boton-cancelar" @onclick="@(() => CancelarReserva(reserva.Id))">
+                                <button class="boton button_misreservas boton-cancelar" @onclick="@(() => CancelarReserva(reserva.Id))">
                                     <i class="bi bi-x-circle "></i> Cancelar
                                 </button>
                             }
@@ -289,14 +289,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Confirmar Cancelación</h5>
-                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
+                    <button type="button" class="btn-close button_misreservas" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
                 </div>
                 <div class="modal-body">
                     <p>¿Estás seguro de que querés cancelar esta reserva?</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
-                    <button class="btn btn-danger" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
+                    <button class="btn btn-secondary button_misreservas" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-danger button_misreservas" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
                 </div>
             </div>
         </div>
@@ -651,7 +651,314 @@
     }
 }
 <style>
-.profile-container {
+.profile-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .profile-actions button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        color: white;
+        border: none;
+    }
+
+    .profile-actions button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .profile-actions .btn-primary {
+        background-color: #4a9cb5;
+        border-color: #4a9cb5;
+    }
+
+    .profile-actions .btn-primary:hover {
+        background-color: #3d8ba0;
+    }
+
+    .profile-actions .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+        color: white;
+    }
+
+    .profile-actions .btn-info:hover {
+        background-color: #138496;
+    }
+
+    .profile-actions .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .profile-actions .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .profile-actions .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .profile-actions .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .profile-actions .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: white;
+    }
+
+    .profile-actions .btn-warning:hover {
+        background-color: #e0a800;
+    }
+
+    .profile-actions button i {
+        font-size: 1.1rem;
+    }
+
+    .tarjetas-list {
+        margin-top: 1rem;
+    }
+
+    .tarjeta-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        background-color: #f8f9fa;
+    }
+
+    .tarjeta-item:hover {
+        background-color: #e9ecef;
+    }
+
+    .tarjeta-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .tarjeta-info small {
+        color: #6c757d;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0;
+    }
+
+    .form-check-label {
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .reservas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .reserva-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+
+    .reserva-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .reserva-header {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .reserva-header h4 {
+        margin: 0;
+        color: #495057;
+    }
+
+    .estado-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .estado-badge.pendiente {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .estado-badge.confirmada {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .estado-badge.cancelada {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .estado-badge.finalizada {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .reserva-body {
+        padding: 1rem;
+    }
+
+    .reserva-footer {
+        padding: 1rem;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .reserva-footer .btn {
+        padding: 0.5rem 1rem;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+    .badge {
+        padding: 0.5em 1em;
+        font-size: 0.9em;
+    }
+
+    .btn {
+        border-radius: 5px;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn i {
+        margin-right: 0.5rem;
+    }
+
+    .table {
+        margin-top: 1rem;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .payment-methods-actions {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .payment-methods-actions button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        color: white;
+        border: none;
+        min-width: 180px;
+    }
+
+    .payment-methods-actions button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .payment-methods-actions .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+
+    .payment-methods-actions .btn-info:hover {
+        background-color: #138496;
+    }
+
+    .payment-methods-actions .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .payment-methods-actions .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .payment-methods-actions .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .payment-methods-actions .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .payment-methods-actions .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+
+    .payment-methods-actions .btn-warning:hover {
+        background-color: #e0a800;
+    }
+    .profile-container {
     max-width: 1400px;
     margin: 0 auto;
     margin-top: 4rem;
@@ -882,5 +1189,92 @@
         text-align: center;
     }
 }
+.container_misreservas {
+        margin-top: 80px; /* margen grande arriba */
+        max-width: 900px; /* para no ocupar todo el ancho */
+        margin-left: auto;
+        margin-right: auto; /* centra horizontalmente */
+    }
 
-</style> 
+    .table_misreservas {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    background-color: #f9fafb;
+    border-radius: 12px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #3b3b3b;
+    overflow: hidden;
+}
+
+.table_misreservas thead tr {
+    background-color: #f3f9ff;
+    color: #565757;
+    font-weight: 700;
+    text-align: left;
+    border-bottom: 2px solid #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table_misreservas th, .table_misreservas td {
+    padding: 14px 20px;
+    border: none;
+    vertical-align: middle;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Tarjeta efecto */
+.table_misreservas tbody tr {
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 10px;
+}
+
+.table_misreservas tbody tr:hover {
+    background-color: #e8f1fd;
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Efecto sutil al pasar por celda */
+.table_misreservas td:hover {
+    background-color: #f0f8ff;
+    cursor: default;
+}
+.button_misreservas {
+  padding: 10px 20px!important;
+  font-weight: bold!important;
+  border: none!important;
+  border-radius: 8px!important;
+  color: white!important;
+  font-size: 1rem!important;
+  cursor: pointer!important;
+  transition: all 0.3s ease!important;
+  margin-bottom: 1rem!important;
+}
+
+.boton-cancelar {
+  background-color: #ab2e2e;
+}
+
+.boton-cancelar:hover {
+  background-color: #c0392b;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+}
+
+.boton-modificar {
+  background-color: #3498db;
+}
+
+.boton-modificar:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+</style>
