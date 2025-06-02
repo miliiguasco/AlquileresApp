@@ -103,10 +103,10 @@
                     <i class="fas fa-edit"></i> Editar Propiedad
                 </button>
 
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" @onclick="OnClickUpload">
                     <i class="fas fa-edit"></i> Cargar Imagen
-                    <InputFile OnChange="CargarImagen" accept=".jpg,.jpeg,.png" style="display:none" />
                 </button>
+                <InputFile OnChange="CargarImagen" accept=".jpg,.jpeg,.png" style="display:none" />
 
                 <button class="btn btn-secondary" @onclick="VolverAInicio">Volver al Inicio</button>
             </div>
@@ -224,7 +224,7 @@
     private Propiedad propiedadEditada = new();
     private List<Imagen>? imagenes;
     private string? errorMensaje;
-    //  private ElementReference fileInput;
+    private ElementReference fileInput;
 
 
     
@@ -467,9 +467,9 @@ private async Task GuardarCambios()
             await InvokeAsync(StateHasChanged);
         }
 
-        private void OnClickUpload()
+       private async Task OnClickUpload()
         {
-            // El InputFile se activará automáticamente cuando se haga clic en el botón
+            await Js.InvokeVoidAsync("eval", "document.querySelector('[type=file]').click()");
         }
 
         private async Task CargarImagen(InputFileChangeEventArgs e)
