@@ -2,6 +2,7 @@ using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
 
 namespace AlquileresApp.Core;
+
 public class TarjetaValidador : ITarjetaValidador
 {
     public void ValidarDatos(Tarjeta tarjeta)
@@ -76,4 +77,5 @@ public class TarjetaValidador : ITarjetaValidador
         if (saldo < 0)
             throw new ArgumentException("El saldo no puede ser negativo");
     }
+    
 }

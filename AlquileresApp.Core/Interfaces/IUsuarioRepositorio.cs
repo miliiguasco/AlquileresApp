@@ -12,5 +12,6 @@ public interface IUsuarioRepositorio
     List<Administrador> ListarAdministradores();
     List<Encargado> ListarEncargados();
     public Usuario? AutenticarUsuario(string correo, String hashedContraseña);
+    public bool tieneTarjeta(Usuario usuario);
 }
 

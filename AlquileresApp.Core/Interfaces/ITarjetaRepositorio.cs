@@ -12,7 +12,7 @@ public interface ITarjetaRepositorio
     Tarjeta ObtenerPorClienteId(int clienteId);
 
     void EliminarTarjeta(Tarjeta tarjeta);
-    List<Tarjeta> ObtenerTarjetasPorUsuario(int usuarioId);
+
     void PagarMontoRestante(Tarjeta tarjeta, decimal monto);
 
 }

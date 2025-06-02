@@ -27,7 +27,7 @@ public class TarjetaRepositorio(AppDbContext dbContext) : ITarjetaRepositorio
         
         // Validar fecha de vencimiento
         var fechaActual = DateTime.Now;
-        var fechaVencimiento = DateTime.ParseExact(tarjeta.FechaVencimiento, "MM/yyyy", null);
+        var fechaVencimiento = DateTime.ParseExact(tarjeta.FechaVencimiento, "MM/yy", null);
         if (fechaVencimiento < fechaActual)
         {
             Console.WriteLine("La tarjeta está vencida");

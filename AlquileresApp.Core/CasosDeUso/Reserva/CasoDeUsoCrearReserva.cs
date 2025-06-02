@@ -61,20 +61,15 @@ public class CasoDeUsoCrearReserva(
         try
         {
             // Obtener y validar tarjeta
-            var tarjetas = tarjetaRepositorio.ObtenerTarjetasPorUsuario(cliente.Id);
-            if (tarjetas == null || !tarjetas.Any())
+            var tarjeta = tarjetaRepositorio.ObtenerPorClienteId(cliente.Id);
+            if (tarjeta == null )
             {
-                throw new Exception("El cliente no tiene ninguna tarjeta registrada. Por favor, registre una tarjeta antes de realizar la reserva.");
+                throw new Exception("El cliente no tiene una tarjeta registrada. Por favor, registre una tarjeta antes de realizar la reserva.");
             }
 
-            var tarjeta = tarjetas.First();
-            if (tarjeta == null)
-            {
-                throw new Exception("No se pudo validar la tarjeta");
-            }
 
             // Validar fecha de vencimiento de la tarjeta
-            if (!DateTime.TryParseExact(tarjeta.FechaVencimiento, "MM/yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime fechaVencimiento))
+            if (!DateTime.TryParseExact(tarjeta.FechaVencimiento, "MM/yy", null, System.Globalization.DateTimeStyles.None, out DateTime fechaVencimiento))
             {
                 throw new Exception("Formato de fecha de vencimiento de tarjeta inválido");
             }
