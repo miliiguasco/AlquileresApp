@@ -4776,38 +4776,19 @@
     ]
   },
   "packageFolders": {
-<<<<<<< HEAD
     "C:\\Users\\Lenovo\\.nuget\\packages\\": {}
-=======
-    "C:\\Users\\milag\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
->>>>>>> 9094fe63214816d42274a6dc2f4e057390e7a6ab
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-<<<<<<< HEAD
       "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
       "projectName": "AlquileresApp.Data",
       "projectPath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
       "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Data\\obj\\",
-=======
-      "projectUniqueName": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
-      "projectName": "AlquileresApp.Data",
-      "projectPath": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
-      "packagesPath": "C:\\Users\\milag\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Data\\obj\\",
->>>>>>> 9094fe63214816d42274a6dc2f4e057390e7a6ab
       "projectStyle": "PackageReference",
       "configFilePaths": [
-<<<<<<< HEAD
         "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config"
-=======
-        "C:\\Users\\milag\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
->>>>>>> 9094fe63214816d42274a6dc2f4e057390e7a6ab
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -4819,13 +4800,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-<<<<<<< HEAD
             "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
               "projectPath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj"
-=======
-            "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
-              "projectPath": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj"
->>>>>>> 9094fe63214816d42274a6dc2f4e057390e7a6ab
             }
           }
         }
@@ -4892,11 +4868,7 @@
       "code": "Undefined",
       "level": "Warning",
       "warningLevel": 1,
-<<<<<<< HEAD
-      "message": "Problema al leer el archivo de caché C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Data\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0."
-=======
-      "message": "Problem reading the cache file C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Data\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0."
->>>>>>> 9094fe63214816d42274a6dc2f4e057390e7a6ab
+      "message": "Problem reading the cache file C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Data\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0."
     }
   ]
 }
