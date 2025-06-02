@@ -85,7 +85,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         }
     }
 
-    public List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros)
+   public List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros)
     {
         var query = dbContext.Propiedades
         .Include(p => p.Imagenes)
@@ -111,7 +111,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             );
 
         return query.ToList();
-        }
+    } 
 
     public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId)
     {

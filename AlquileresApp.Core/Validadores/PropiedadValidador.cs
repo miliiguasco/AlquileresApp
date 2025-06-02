@@ -13,6 +13,8 @@ public class PropiedadValidador : IPropiedadValidador
             throw new Exception("El título de la propiedad es requerido");
         }
 
+        
+
         if (String.IsNullOrWhiteSpace(propiedad.Direccion))
         {
             throw new Exception("La dirección de la propiedad es requerida");
