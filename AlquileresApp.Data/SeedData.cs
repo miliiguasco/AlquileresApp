@@ -181,7 +181,7 @@ namespace AlquileresApp.Data
                 {
                     NumeroTarjeta = "9876543210987654",
                     Titular = "María García",
-                    FechaVencimiento = "12/2025",
+                    FechaVencimiento = "12/25",
                     CVV = "456",
                     Saldo = 500.00m,
                     ClienteId = usuarios[1].Id

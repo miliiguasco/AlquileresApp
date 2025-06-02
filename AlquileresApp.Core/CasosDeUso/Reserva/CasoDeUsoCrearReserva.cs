@@ -74,7 +74,7 @@ public class CasoDeUsoCrearReserva(
             }
 
             // Validar fecha de vencimiento de la tarjeta
-            if (!DateTime.TryParseExact(tarjeta.FechaVencimiento, "MM/yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime fechaVencimiento))
+            if (!DateTime.TryParseExact(tarjeta.FechaVencimiento, "MM/yy", null, System.Globalization.DateTimeStyles.None, out DateTime fechaVencimiento))
             {
                 throw new Exception("Formato de fecha de vencimiento de tarjeta inválido");
             }
