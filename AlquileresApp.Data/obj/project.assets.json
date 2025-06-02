@@ -4776,16 +4776,11 @@
     ]
   },
   "packageFolders": {
-<<<<<<< HEAD
     "C:\\Users\\Lenovo\\.nuget\\packages\\": {}
-=======
-    "C:\\Users\\valen\\.nuget\\packages\\": {}
->>>>>>> a9706314642d1a037629b5dbc41a7bfc3d4f9be6
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-<<<<<<< HEAD
       "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
       "projectName": "AlquileresApp.Data",
       "projectPath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
@@ -4794,16 +4789,6 @@
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config"
-=======
-      "projectUniqueName": "D:\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
-      "projectName": "AlquileresApp.Data",
-      "projectPath": "D:\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
-      "packagesPath": "C:\\Users\\valen\\.nuget\\packages\\",
-      "outputPath": "D:\\AlquileresApp\\AlquileresApp.Data\\obj\\",
-      "projectStyle": "PackageReference",
-      "configFilePaths": [
-        "C:\\Users\\valen\\AppData\\Roaming\\NuGet\\NuGet.Config"
->>>>>>> a9706314642d1a037629b5dbc41a7bfc3d4f9be6
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -4815,13 +4800,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-<<<<<<< HEAD
             "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
               "projectPath": "C:\\Users\\Lenovo\\Desktop\\Francisco\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj"
-=======
-            "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
-              "projectPath": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj"
->>>>>>> a9706314642d1a037629b5dbc41a7bfc3d4f9be6
             }
           }
         }

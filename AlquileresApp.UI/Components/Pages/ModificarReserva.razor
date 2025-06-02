@@ -7,6 +7,11 @@
 @inject CasoDeUsoModificarReserva CasoDeUsoModificarReserva
 @inject CasoDeUsoObtenerReserva CasoDeUsoObtenerReserva
 @inject NavigationManager NavigationManager
+@using AlquileresApp.Core.Servicios
+@using Microsoft.AspNetCore.Authorization
+@inject AuthenticationStateProvider ServicioAutenticacion
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 
 <link href="css/ModificarReserva.css" rel="stylesheet" />
 
@@ -75,6 +80,9 @@
     private string mensajeResultado;
     private bool mostrarMensaje = false;
 
+    public int user { get; set; }
+
+
     // Variables para el modal
     private bool mostrarModal = false;
     private string mensajeVistaPrevia;
@@ -84,6 +92,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+        var user = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         try
         {
             reserva = CasoDeUsoObtenerReserva.Ejecutar(ReservaId);
@@ -94,13 +104,13 @@
             }
             else
             {
-                NavigationManager.NavigateTo("/misreservas");
+                NavigationManager.NavigateTo($"/Perfil/{user}");
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error al obtener la reserva: {ex.Message}");
-            NavigationManager.NavigateTo("/misreservas");
+            NavigationManager.NavigateTo($"/Perfil/{user}");
         }
     }
 
@@ -127,7 +137,7 @@
         if (reserva == null)
         {
             Console.WriteLine("Reserva no encontrada.");
-            NavigationManager.NavigateTo("/misreservas");
+            NavigationManager.NavigateTo($"/Perfil/{user}");
             return;
         }
 
@@ -138,7 +148,7 @@
         if (resultado.EsExitosa)
         {
             await Task.Delay(3000); // Esperar unos segundos antes de redirigir
-            NavigationManager.NavigateTo("/misreservas");
+            NavigationManager.NavigateTo($"/Perfil/{user}");
         }
     }
 
@@ -155,6 +165,6 @@
 
     private void Cancelar()
     {
-        NavigationManager.NavigateTo("/misreservas");
+        NavigationManager.NavigateTo($"/Perfil/{user}");
     }
 }

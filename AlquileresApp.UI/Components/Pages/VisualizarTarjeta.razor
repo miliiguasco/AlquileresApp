@@ -42,10 +42,10 @@
                                 </div>
                             </div>
                             <div class="acciones-tarjeta">
-                                <button type="button" class="boton boton-modificar" @onclick="EditarTarjeta">
+                                <button type="button" class="btn btn-primary" @onclick="EditarTarjeta">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button type="button" class="boton boton-cancelar" @onclick="() => EliminarTarjeta(tarjeta.Id)">
+                                <button type="button" class="btn btn-danger" @onclick="() => EliminarTarjeta(tarjeta.Id)">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -160,6 +160,7 @@
                 await CUEliminarTarjeta.Ejecutar(tarjetaId);
                 mensajeExito = "La tarjeta ha sido eliminada exitosamente";
                 StateHasChanged();
+
             }
         }
         catch (Exception ex)
