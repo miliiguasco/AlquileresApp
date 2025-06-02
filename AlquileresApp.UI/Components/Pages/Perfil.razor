@@ -156,10 +156,9 @@
                                 <h3>Métodos de Pago</h3>
                                 <VisualizarTarjeta/>
                                 <div class="">   
-                                    
                                     @if (!TieneTarjeta())
                                     {
-                                    <button type="button" class="btn-warning" @onclick="IrARegistrarTarjeta">
+                                    <button type="button" class="boton boton-modificar" @onclick="IrARegistrarTarjeta">
                                         <i class="fas fa-plus-circle"></i> Registrar Nueva Tarjeta
                                     </button>
                                     }
