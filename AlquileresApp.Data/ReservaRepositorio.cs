@@ -78,12 +78,16 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
 
     public List<Reserva> ListarReservas()
     {
+        Console.WriteLine("📊 Iniciando ListarReservas...");
         var reservas = dbContext.Reservas
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
             .ToList();
-        if (reservas.Count == 0)
-            throw new Exception("No se encontraron reservas.");
+        Console.WriteLine($"✅ Se encontraron {reservas.Count} reservas");
+        foreach (var reserva in reservas)
+        {
+            Console.WriteLine($"Reserva ID: {reserva.Id}, Cliente: {reserva.Cliente?.Nombre}, Propiedad: {reserva.Propiedad?.Titulo}");
+        }
         return reservas;
     }
 

@@ -15,9 +15,6 @@ using AlquileresApp.Core.CasosDeUso.Tarjeta;
 using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 
- 
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -106,6 +103,7 @@ builder.Services.AddScoped<CasoDeUsoEliminarTarjeta>();
 builder.Services.AddScoped<CasoDeUsoModificarTarjeta>();
 builder.Services.AddScoped<ICasoDeUsoVerReserva, CasoDeUsoVerReserva>();
 builder.Services.AddScoped<CasoDeUsoCerrarSesion>();
+builder.Services.AddScoped<CasoDeUsoListarReservasAdm>();
 
 builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
 builder.Services.AddTransient<INotificadorEmail>(provider =>
@@ -114,7 +112,6 @@ builder.Services.AddTransient<INotificadorEmail>(provider =>
         "fxsl hsck basy pamv"
     )
 );
-
 
 var app = builder.Build();
 

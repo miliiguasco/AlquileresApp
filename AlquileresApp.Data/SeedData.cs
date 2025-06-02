@@ -24,11 +24,9 @@ namespace AlquileresApp.Data
             {
                 new Administrador
                 {
-
-
                     Nombre = "Fran",
                     Apellido = "Admin",
-                    Email = "fran@gmail.com",
+                    Email = "admi@gmail.com",
                     Telefono = "123456789",
                     Contraseña = hashService.HashPassword("password123"),
                     FechaNacimiento = new DateTime(1990, 1, 1),
@@ -51,15 +49,6 @@ namespace AlquileresApp.Data
                     Telefono = "987654321",
                     Contraseña = hashService.HashPassword("password456"),
                     FechaNacimiento = new DateTime(1985, 5, 15),
-                },
-                new Administrador
-                {
-                    Nombre = "Juan",
-                    Apellido = "Perez",
-                    Email = "admin@gmail.com",
-                    Telefono = "12332478",
-                    Contraseña = hashService.HashPassword("Administrador"),
-                    FechaNacimiento = new DateTime(1975,6,12),
                 }
             };
             context.Usuarios.AddRange(usuarios);
@@ -162,44 +151,47 @@ namespace AlquileresApp.Data
              context.Propiedades.AddRange(propiedades);
             context.SaveChanges();
 
-
-
-            // Crear reservas
+            // Crear reservas de prueba
             var reservas = new List<Reserva>
             {
                 new Reserva
                 {
-                    ClienteId = context.Usuarios.First().Id,
-                    PropiedadId = context.Propiedades.First().Id,
+                    ClienteId = usuarios[1].Id, // Milagros Guasco
+                    PropiedadId = propiedades[0].Id, // Casa en la playa
                     FechaInicio = DateTime.Now.AddDays(10),
                     FechaFin = DateTime.Now.AddDays(15),
+                    Estado = EstadoReserva.Pendiente,
                     PrecioTotal = 3750,
-                    MontoAPagar = 3750, // 5 noches * 150
-                },
-                new Reserva
-                {
-                    ClienteId = usuarios[0].Id,
-                    PropiedadId = propiedades[0].Id,
-                    FechaInicio = DateTime.Now.AddDays(20),
-                    FechaFin = DateTime.Now.AddDays(25),
-                    PrecioTotal = 3750, 
                     MontoAPagar = 3750,
+                    MontoRestante = 0,
+                    TipoPago = TipoPago.Total,
+                    CantidadHuespedes = 4
                 },
                 new Reserva
                 {
-                    ClienteId = usuarios[0].Id,
-                    PropiedadId = propiedades[2].Id,
+                    ClienteId = usuarios[2].Id, // María García
+                    PropiedadId = propiedades[2].Id, // Cabaña en la montaña
                     FechaInicio = DateTime.Now.AddDays(5),
                     FechaFin = DateTime.Now.AddDays(7),
-                    PrecioTotal = 160,
+                    Estado = EstadoReserva.Confirmada,
+                    PrecioTotal = 240,
+                    MontoAPagar = 240,
+                    MontoRestante = 0,
+                    TipoPago = TipoPago.Total,
+                    CantidadHuespedes = 2
                 },
                 new Reserva
                 {
-                    ClienteId = usuarios[1].Id,
-                    PropiedadId = propiedades[2].Id,
-                    FechaInicio = DateTime.Now.AddDays(2),
-                    FechaFin = DateTime.Now.AddDays(35),
-                    PrecioTotal = 1000,
+                    ClienteId = usuarios[1].Id, // Milagros Guasco
+                    PropiedadId = propiedades[3].Id, // Departamento céntrico
+                    FechaInicio = DateTime.Now.AddDays(20),
+                    FechaFin = DateTime.Now.AddDays(25),
+                    Estado = EstadoReserva.Activa,
+                    PrecioTotal = 400,
+                    MontoAPagar = 400,
+                    MontoRestante = 0,
+                    TipoPago = TipoPago.Total,
+                    CantidadHuespedes = 2
                 }
             };
             context.Reservas.AddRange(reservas);
@@ -211,16 +203,17 @@ namespace AlquileresApp.Data
                 new Tarjeta
                 {
                     NumeroTarjeta = "1234567890123456",
-                    Titular = "Juan Pérez", 
+                    Titular = "Maria Garcia", 
                     FechaVencimiento = "12/25",
                     CVV = "123",
-                    Saldo = 4000.00m,
+                    Saldo = 0m,
                     ClienteId = usuarios[0].Id
-                },
-                /* new Tarjeta
+                }
+                /*,
+                 new Tarjeta
                 {
                     NumeroTarjeta = "9876543210987654",
-                    Titular = "María García",
+                    Titular = "Juan Perez",
                     FechaVencimiento = "12/25",
                     CVV = "456",
                     Saldo = 5000.00m,

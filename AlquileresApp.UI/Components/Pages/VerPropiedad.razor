@@ -18,6 +18,11 @@
     }
     else
     {
+        <div class="d-flex justify-content-start mb-3">
+            <button class="btn btn-secondary" @onclick="VolverAtras">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
         <h2 class="tituloo">@propiedad.Titulo</h2>
 
         @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
@@ -132,5 +137,9 @@
     private void IrAReservar()
     {
         NavigationManager.NavigateTo($"/reservar/{PropiedadId}");
+    }
+    private void VolverAtras()
+    {
+        NavigationManager.NavigateTo("/");
     }
 }

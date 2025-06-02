@@ -12,7 +12,8 @@ public class CasoDeUsoCrearReserva(
     IPropiedadRepositorio propiedadRepositorio, 
     IUsuarioRepositorio usuarioRepositorio,  
     ITarjetaRepositorio tarjetaRepositorio, 
-    IFechaReservaValidador fechaReservaValidador)
+    IFechaReservaValidador fechaReservaValidador,
+    INotificadorEmail notificadorEmail)
 {
     public async Task Ejecutar(int clienteId, int propiedadId, DateTime fechaInicio, DateTime fechaFin, int cantidadHuespedes)
     {
@@ -117,7 +118,7 @@ public class CasoDeUsoCrearReserva(
             // Crear reserva
             reservasRepositorio.CrearReserva(reserva);
             Console.WriteLine("Reserva creada exitosamente");
-
+            notificadorEmail.EnviarConfirmacionReserva(cliente.Email, cliente.Nombre, fechaInicio.ToString("dd/MM/yyyy"), fechaFin.ToString("dd/MM/yyyy"), propiedad.Titulo);
             // Programar tareas automáticas
 
         }

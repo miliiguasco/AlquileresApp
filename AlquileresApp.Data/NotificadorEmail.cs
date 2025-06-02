@@ -79,5 +79,53 @@ public class NotificadorEmail: INotificadorEmail
         </body>
         </html>";
         EnviarEmail(destinatario, asunto, cuerpo);
-    }       
+    }
+
+    public void EnviarConfirmacionReserva(string destinatario, string nombreUsuario, string fechaInicio, string fechaFin, string propiedad)
+    {
+        string asunto = "Confirmación de Reserva";
+        string cuerpo = @$"
+        <!DOCTYPE html>
+        <html lang='es'>
+        <head>
+            <meta charset='UTF-8'>
+        </head>
+        <body style='margin:0; padding:0; background-color:#fafafa;'>
+            <table width='100%' cellpadding='0' cellspacing='0' border='0' style='font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;'>
+                <tr>
+                    <td align='center'>
+                        <table width='100%' cellpadding='0' cellspacing='0' border='0' style='box-shadow: 0 4px 10px rgba(31, 63, 72, 0.2);'>
+                            <!-- Encabezado -->
+                            <tr>
+                                <td style='background-color:#1F3F48; padding:20px; text-align:center; color:#F0F0E1;'>
+                                    <h1 style='margin:0; font-size:24px;'>¡Hola, {nombreUsuario}!</h1>
+                                </td>
+                            </tr>
+
+                            <!-- Cuerpo -->
+                            <tr>
+                                <td style='padding:20px; text-align:center; color:#000000;'>
+                                    <h1>¡Reserva Confirmada!</h1>
+                                    <p>Tu reserva ha sido confirmada con éxito.</p>
+                                    <p><strong>Fecha de Inicio:</strong> {fechaInicio}</p>
+                                    <p><strong>Fecha de Fin:</strong> {fechaFin}</p>
+                                    <p><strong>Lugar:</strong> {propiedad}</p>
+                                    <p>Gracias por elegirnos. ¡Te esperamos!</p>
+                                </td>
+                            </tr>
+
+                            <!-- Footer / Ayuda -->
+                            <tr>
+                                <td style='background-color:#f1771f; color:#F0F0E1; text-align:center; padding:14px; font-size:14px;'>
+                                    <p style='margin:0;'>¿Necesitás ayuda? Contactanos en cualquier momento.</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>";
+        EnviarEmail(destinatario, asunto, cuerpo);
+    }
 }   
