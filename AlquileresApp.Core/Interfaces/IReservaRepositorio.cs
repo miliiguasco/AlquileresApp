@@ -7,6 +7,7 @@ public interface IReservaRepositorio{
     //cancelar reserva
     public Reserva? ObtenerReservaPorId(int id);
 
+
     public Task EliminarAsync(int id);
     public Task<bool> SeSuperponeAsync(int propiedadId, DateTime inicio, DateTime fin);
    // void CancelarReserva(Reserva reserva);
@@ -15,6 +16,8 @@ public interface IReservaRepositorio{
     public List<Reserva> ListarMisReservas(int usuario);
     void Actualizar(Reserva reserva);
     public void RegistrarCheckout(Reserva reserva);
+   
+    public void ModificarReserva2(Reserva reserva);
 
 
 }

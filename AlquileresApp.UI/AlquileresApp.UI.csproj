@@ -21,4 +21,9 @@
     <ProjectReference Include="..\AlquileresApp.Data\AlquileresApp.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Geocoding.net" Version="3.6.1" />
+    <PackageReference Include="GoogleMaps.LocationServices" Version="1.2.0.5" />
+  </ItemGroup>
+
 </Project>

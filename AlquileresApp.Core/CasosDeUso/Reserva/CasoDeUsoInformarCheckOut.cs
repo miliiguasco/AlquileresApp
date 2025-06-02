@@ -19,7 +19,7 @@ public class CasoDeUsoInformarCheckOut(IReservaRepositorio reservasRepositorio)
         if (DateTime.Now < reserva.FechaInicio)
             throw new Exception("No se puede hacer check-out antes del check-in.");
         
-        reservasRepositorio.RegistrarCheckout(reserva);
+       // reservasRepositorio.RegistrarCheckout(reserva);
         reservasRepositorio.ModificarReserva(reserva);
     }
 }

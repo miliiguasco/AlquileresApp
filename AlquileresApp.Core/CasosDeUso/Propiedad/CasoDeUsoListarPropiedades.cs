@@ -7,9 +7,7 @@ public class CasoDeUsoListarPropiedades(IPropiedadRepositorio propiedadesReposit
 {
     public List<Propiedad> Ejecutar()
     {
-        Console.WriteLine("📡 Ejecutando CasoDeUsoListarPropiedades");
         var propiedades = propiedadesRepositorio.ListarPropiedades();
-        Console.WriteLine($"✅ Se encontraron {propiedades.Count} propiedades");
         return propiedades;
     }
 }

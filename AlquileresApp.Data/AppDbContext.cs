@@ -76,6 +76,7 @@ namespace AlquileresApp.Data
                 .HasForeignKey(r => r.PropiedadId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+
             // Configuración de Tarjeta
             modelBuilder.Entity<Tarjeta>()
                 .HasOne<Cliente>()

@@ -7,6 +7,8 @@
 @inject CasoDeUsoListarPropiedades CUListarPropiedades
 @inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
 @inject CasoDeUsoModificarPropiedad CUModificarPropiedad
+@inject IJSRuntime JS
+
 @attribute [Authorize(Roles = "Administrador")] 
 
 <PageTitle>Administración</PageTitle>
@@ -51,6 +53,7 @@
             }
             else if (tabActiva == "propiedades")
             {
+
                 <Propiedades />
             }
         </div>
@@ -60,7 +63,6 @@
 @code {
     private string tabActiva = "propiedades";
     private List<Propiedad>? propiedades;
-
     protected override async Task OnInitializedAsync()
     {
         await CargarPropiedades();
@@ -104,6 +106,7 @@
         {
             CUEliminarPropiedad.Ejecutar(propiedad);
             await CargarPropiedades();
+            
         }
         catch
         {

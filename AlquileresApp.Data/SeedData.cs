@@ -25,11 +25,10 @@ namespace AlquileresApp.Data
                 new Cliente
                 {
 
+
                     Nombre = "Milagros",
                     Apellido = "Guasco",
                     Email = "milagrosguasco11@gmail.com",
-
- 
                     Telefono = "123456789",
                     Contraseña = hashService.HashPassword("password123"),
                     FechaNacimiento = new DateTime(1990, 1, 1),
@@ -53,6 +52,23 @@ namespace AlquileresApp.Data
                 new Propiedad
                 {
                     Titulo = "Casa en la playa",
+                    Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
+                    Direccion = "Av. Costanera 123",
+                    Localidad = "Mar del Plata",
+                    PrecioPorNoche = 750.00m,
+                    Capacidad = 6,
+                    ServiciosDisponibles = new List<ServiciosPropiedad> 
+                    { 
+                        ServiciosPropiedad.Wifi,
+                        ServiciosPropiedad.AireAcondicionado,
+                        ServiciosPropiedad.Piscina,
+                        ServiciosPropiedad.Estacionamiento
+                    },
+                    PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50
+                },
+                new Propiedad
+                {
+                    Titulo = "Casa en la playa 2",
                     Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
                     Direccion = "Av. Costanera 123",
                     Localidad = "Mar del Plata",
@@ -134,8 +150,8 @@ namespace AlquileresApp.Data
             {
                 new Reserva
                 {
-                    ClienteId = usuarios[0].Id,
-                    PropiedadId = propiedades[0].Id,
+                    ClienteId = context.Usuarios.First().Id,
+                    PropiedadId = context.Propiedades.First().Id,
                     FechaInicio = DateTime.Now.AddDays(10),
                     FechaFin = DateTime.Now.AddDays(15),
                     PrecioTotal = 3750,

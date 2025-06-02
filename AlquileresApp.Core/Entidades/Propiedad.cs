@@ -8,14 +8,20 @@ public class Propiedad
     public string Titulo { get; set; } = string.Empty;
     public string Descripcion { get; set; } = string.Empty;
     public string Direccion { get; set; } = string.Empty;
-    public string Localidad { get; set; } = string.Empty;
     public decimal PrecioPorNoche { get; set; }
     public int Capacidad { get; set; }
+    public TipoPago TipoPago { get; set; }
+    public double Latitud { get; set; }
+    public string Localidad { get; set; } = string.Empty;
+    public double Longitud { get; set; }
+
+    public bool NoHabitable { get; set; } = false;
     public int EncargadoId { get; set; }
     public List<ServiciosPropiedad> ServiciosDisponibles { get; set; } = new();
     public List<Imagen> Imagenes { get; set; } = new();
     public List<Reserva> Reservas { get; set; } = new();
     public PoliticasDeCancelacion PoliticaCancelacion { get; set; }
-    public TipoPago TipoPago { get; set; }
-} 
+    public decimal MontoAPagar { get; set; }
+    public decimal MontoPagoAnticipado { get; set; }
+}
 

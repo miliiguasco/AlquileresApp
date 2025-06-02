@@ -2,27 +2,31 @@ using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadRepositorio
 {
-    public void CargarPropiedad(Propiedad propiedad){
+    public void CargarPropiedad(Propiedad propiedad) {
         verificarPropiedadDuplicada(propiedad.Titulo);
         dbContext.Propiedades.Add(propiedad);
         dbContext.SaveChanges();
     }
 
-    public void EliminarPropiedad(Propiedad propiedad)
+    public bool EliminarPropiedad(Propiedad propiedad)
     {
-            var propiedadExistente = dbContext.Propiedades.FirstOrDefault(p => p.Id == propiedad.Id);
-            if (propiedadExistente == null)
-                throw new Exception("La propiedad no existe");
+        var propiedadExistente = dbContext.Propiedades.FirstOrDefault(p => p.Id == propiedad.Id);
+        if (propiedadExistente == null)
+            throw new Exception("La propiedad no existe");
 
-            var tieneReservaActiva = dbContext.Reservas.Any(r => r.Propiedad.Id == propiedad.Id);
-            if (tieneReservaActiva)
-                throw new Exception("No se puede eliminar una propiedad con reserva activa");
+        var tieneReserva = dbContext.Reservas.Any(r => r.PropiedadId == propiedad.Id);
+        if (tieneReserva)
+        {
+            return false;
+        }
 
-            dbContext.Propiedades.Remove(propiedadExistente);
-            dbContext.SaveChanges();
+        dbContext.Propiedades.Remove(propiedadExistente);
+        dbContext.SaveChanges();
+        return true;
     }
 
     public List<Propiedad> ListarPropiedades(){
@@ -33,27 +37,55 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             throw new Exception("No se encontraron propiedades.");
         return propiedades;
     }
-        
+
     public void ModificarPropiedad(Propiedad propiedad) {
         var propiedadExistente = dbContext.Propiedades.FirstOrDefault(p => p.Id == propiedad.Id);
         if (propiedadExistente == null)
             throw new Exception("La propiedad no existe");
 
-        // Si el título está cambiando, verificar que no exista otro con ese título
-        verificarPropiedadDuplicada(propiedad.Titulo);
+        // Solo verificar duplicado si el título realmente cambió
+        if (!string.Equals(propiedadExistente.Titulo, propiedad.Titulo, StringComparison.OrdinalIgnoreCase))
+        {
+            verificarPropiedadDuplicada(propiedad.Titulo);
+        }
 
         dbContext.Entry(propiedadExistente).CurrentValues.SetValues(propiedad);
         dbContext.SaveChanges();
     }
+     public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin) //
+    {
+        var reservasExistentes = dbContext.Reservas
+            .Where(r => r.Propiedad.Id == propiedad.Id &&
+                        r.FechaInicio <= fechaFin &&
+                        r.FechaFin >= fechaInicio)
+            .ToList();
 
-    private void verificarPropiedadDuplicada(string nombre){
-        bool existe = dbContext.Propiedades.Any(p => p.Titulo == nombre);
-        if (existe){
-            throw new Exception("La propiedad ya existe");
-        }   
+        if (reservasExistentes.Any())
+        {
+            throw new Exception("La propiedad no está disponible en las fechas seleccionadas.");
+        }
     }
 
-      public List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros)
+    public void MarcarPropiedadComoNoHabitable(Propiedad propiedad)
+    {
+        dbContext.Propiedades.Update(propiedad);
+        dbContext.SaveChanges();
+    }
+
+    private void verificarPropiedadDuplicada(string nombre)
+    {
+        
+         string nombreTrimmed = nombre.Trim().ToLower();
+
+        bool existe = dbContext.Propiedades
+        .Any(p => p.Titulo.Trim().ToLower() == nombreTrimmed);
+        if (existe)
+        {
+            throw new Exception("La propiedad ya existe");
+        }
+    }
+
+    public List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros)
     {
         var query = dbContext.Propiedades
         .Include(p => p.Imagenes)
@@ -78,38 +110,27 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
                 ))
             );
 
+        
         return query.ToList();
     }
 
-    public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin) //
-    {
-        var reservasExistentes = dbContext.Reservas
-            .Where(r => r.Propiedad.Id == propiedad.Id &&
-                        r.FechaInicio <= fechaFin &&
-                        r.FechaFin >= fechaInicio)
-            .ToList();
-
-        if (reservasExistentes.Any())
-        {
-            throw new Exception("La propiedad no está disponible en las fechas seleccionadas.");
-        }
-    }
     public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId)
-{
-    return !dbContext.Reservas.Any(r =>
-        r.Propiedad.Id == propiedadId &&
-        r.Id != reservaId &&
-        r.FechaInicio <= fechaFin &&
-        r.FechaFin >= fechaInicio);
-
-    
-}
+    {
+        return !dbContext.Reservas.Any(r =>
+            r.Propiedad.Id == propiedadId &&
+            r.Id != reservaId &&
+            r.FechaInicio <= fechaFin &&
+            r.FechaFin >= fechaInicio);
 
 
-    public void ValidarDisponibilidad(DateTime fechaInicio, DateTime fechaFin){ //verificar este metodo
+    }
+
+
+   // public void ValidarDisponibilidad(DateTime fechaInicio, DateTime fechaFin){ //verificar este metodo
+    public void ValidarDisponibilidad(DateTime fechaInicio, DateTime fechaFin) { //verificar este metodo
         var reservasExistentes = dbContext.Reservas
             .Where(r => r.FechaInicio <= fechaFin && r.FechaFin >= fechaInicio)
-            .ToList();       
+            .ToList();
     }
 
     public Propiedad? ObtenerPropiedadPorId(int id)
@@ -119,11 +140,16 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             .FirstOrDefault(p => p.Id == id);
     }
     public Propiedad? ObtenerPorId(int id)
-{
-    return dbContext.Propiedades
-        .Include(p => p.Imagenes)
-        .FirstOrDefault(p => p.Id == id);
-}
+    {
+        return dbContext.Propiedades
+            .Include(p => p.Imagenes)
+            .FirstOrDefault(p => p.Id == id);
+    }
+
+    private Boolean existePropiedad(string titulo)
+    {
+        return dbContext.Propiedades.Any(p => p.Titulo == titulo);
+    }
 }
 /*
     public List<Propiedad> ListarPropiedadesConReservas()

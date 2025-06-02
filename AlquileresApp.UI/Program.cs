@@ -16,6 +16,8 @@ using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -79,6 +81,7 @@ builder.Services.AddScoped<CasoDeUsoModificarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoEliminarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoMostrarImagenes>();
 builder.Services.AddScoped<CasoDeUsoEliminarImagen>();
+builder.Services.AddScoped<CasoDeUsoEliminarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoCrearReserva>();
 builder.Services.AddScoped<CasoDeUsoListarPropiedadesFiltrado>();
 builder.Services.AddScoped<ITarjetaRepositorio, TarjetaRepositorio>();
@@ -96,7 +99,6 @@ builder.Services.AddTransient<INotificadorEmail>(provider =>
         "fxsl hsck basy pamv"
     )
 );
-
 
 builder.Services.AddScoped<CasoDeUsoVisualizarReserva>();
 builder.Services.AddScoped<CasoDeUsoVisualizarTarjeta>();
