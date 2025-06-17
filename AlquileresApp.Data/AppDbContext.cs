@@ -57,11 +57,32 @@ namespace AlquileresApp.Data
             modelBuilder.Entity<Propiedad>()
                 .Property(p => p.Localidad)
                 .IsRequired();
+
             // Configuración de Propiedad
             modelBuilder.Entity<Propiedad>()
-                .Property(p => p.PagoAnticipado)
+                .Property(p => p.TipoPago)
                 .IsRequired();
 
+            // Configuración de Reserva
+            modelBuilder.Entity<Reserva>()
+                .HasOne(r => r.Cliente)
+                .WithMany(c => c.Reservas)
+                .HasForeignKey(r => r.ClienteId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reserva>()
+                .HasOne(r => r.Propiedad)
+                .WithMany(p => p.Reservas)
+                .HasForeignKey(r => r.PropiedadId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            // Configuración de Tarjeta
+            modelBuilder.Entity<Tarjeta>()
+                .HasOne<Cliente>()
+                .WithMany()
+                .HasForeignKey(t => t.ClienteId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         public void EnsureDatabaseCreated()

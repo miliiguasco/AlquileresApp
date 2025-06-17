@@ -4,8 +4,8 @@ using AlquileresApp.Core.Interfaces;
 
 public class CasoDeUsoEliminarImagen(IImagenesRepositorio imagenesRepositorio)
 {
-    public void Ejecutar(int imagenId)
+    public async Task Ejecutar(int imagenId)
     {
-        imagenesRepositorio.EliminarImagen(imagenId);
+        await imagenesRepositorio.EliminarImagenAsync(imagenId);
     }
 }

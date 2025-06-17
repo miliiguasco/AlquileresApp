@@ -1,19 +1,11 @@
-using AlquileresApp.Core.Interfaces;
-using AlquileresApp.Core.Entidades;
-
 namespace AlquileresApp.Core.CasosDeUso.Imagen;
+using AlquileresApp.Core.Entidades;
+using AlquileresApp.Core.Interfaces;
 
-public class CasoDeUsoCargarImagen
+public class CasoDeUsoCargarImagen(IImagenesRepositorio imagenesRepositorio)
 {
-    private readonly IImagenesRepositorio _imagenesRepositorio;
-
-    public CasoDeUsoCargarImagen(IImagenesRepositorio imagenesRepositorio)
+    public Imagen Ejecutar(Imagen imagen, int propiedadId)
     {
-        _imagenesRepositorio = imagenesRepositorio;
-    }
-
-    public AlquileresApp.Core.Entidades.Imagen Ejecutar(AlquileresApp.Core.Entidades.Imagen imagen, int propiedadId)
-    {
-        return _imagenesRepositorio.CargarImagen(imagen, propiedadId);
+       return imagenesRepositorio.CargarImagen(imagen, propiedadId);
     }
 }

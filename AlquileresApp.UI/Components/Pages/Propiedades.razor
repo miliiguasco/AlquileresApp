@@ -1,0 +1,168 @@
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@inject CasoDeUsoListarPropiedades CUListarPropiedades
+@inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
+@inject CasoDeUsoModificarPropiedad CUModificarPropiedad
+@inject ILogger<Propiedades> Logger
+@inject NavigationManager NavigationManager
+
+<div class="admin-section">
+
+    @if (propiedades != null && propiedades.Any())
+    {
+    @if (!string.IsNullOrEmpty(mensajeExito))
+    {
+        <div class="alert alert-success">@mensajeExito</div>
+    }
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">@mensajeError</div>
+    }
+        <div class="table-container">
+            <table class="property-table">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Título</th>
+                        <th>Ubicación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var prop in propiedades)
+                    {
+                        <tr>
+                            <td class="image-cell">
+                                @{
+                                    var imagenUrl = "/Imagenes/Propiedades/iconoimagen.jpg";
+                                    if (prop.Imagenes != null && prop.Imagenes.Any())
+                                    {
+                                        var primeraImagen = prop.Imagenes.FirstOrDefault();
+                                        if (primeraImagen != null && !string.IsNullOrEmpty(primeraImagen.Url))
+                                        {
+                                            imagenUrl = primeraImagen.Url.StartsWith("/") ? 
+                                                primeraImagen.Url : 
+                                                $"/Imagenes/Propiedades/{primeraImagen.Url}";
+                                        }
+                                    }
+                                }
+                                <img src="@imagenUrl" alt="@prop.Titulo" />
+                            </td>
+                            <td>@prop.Titulo</td>
+                            <td>@prop.Localidad</td>
+                            <td class="actions-cell">
+                                <button class="btn btn-primary" @onclick="() => EditarPropiedad(prop)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" @onclick="() => EliminarPropiedad(prop)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="btn" @onclick="() => NuevaPropiedad()">
+                Nueva propiedad
+            </button>
+        </div>
+    }
+    else
+    {
+        <p>No hay propiedades disponibles.</p>
+    }
+</div>
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Cancelación</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que querés eliminar esta propiedad?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-secondary" @onclick="@(async () => await ConfirmarCancelacion())">Sí, eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Propiedad>? propiedades;
+    private bool cargando = true;
+
+
+
+    private Propiedad propiedadAEliminar;
+    private string mensajeError;
+    private string mensajeExito;
+    private bool mostrarConfirmacion = false;
+
+    protected override async Task OnInitializedAsync()
+
+    {
+        try
+        {
+            propiedades = CUListarPropiedades.Ejecutar();
+        }
+        finally
+        {
+            cargando = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task EditarPropiedad(Propiedad propiedad)
+    {
+        NavigationManager.NavigateTo($"/EditarPropiedad/{propiedad.Id}");
+    }
+
+    private void EliminarPropiedad(Propiedad propiedad)
+    {
+        propiedadAEliminar = propiedad;
+        mostrarConfirmacion = true;
+        mensajeError = null;
+        mensajeExito = null;
+    }
+    private async Task ConfirmarCancelacion()
+    {
+        try
+        {   
+            if (CUEliminarPropiedad.Ejecutar(propiedadAEliminar)){
+                mensajeExito = $" Propiedad eliminada: ${propiedadAEliminar.Titulo}.";
+            }
+            else
+            {
+                mensajeError = $"Error al eliminar la propiedad: {propiedadAEliminar.Titulo}. Tiene reservas hechas";
+            }
+            propiedades = CUListarPropiedades.Ejecutar();
+            }
+            catch (Exception ex)
+            {
+            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
+        }
+        finally
+        {
+            mostrarConfirmacion = false;
+        }
+    }
+
+    private void CancelarConfirmacion()
+    {
+        mostrarConfirmacion = false;
+    }
+
+    private void NuevaPropiedad() {
+
+        NavigationManager.NavigateTo("/PublicarPropiedad");
+    }
+} 

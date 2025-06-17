@@ -1,0 +1,145 @@
+@page "/propiedad/{PropiedadId:int}"
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Enumerativos
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject IWebHostEnvironment Environment
+@inject CasoDeUsoObtenerPropiedad CUObtenerPropiedad
+
+<link href="css/VerPropiedad.css" rel="stylesheet" />
+
+<div class="propiedad-container bg-light p-4 rounded shadow-sm my-5">
+    @if (propiedad is null)
+    {
+        <p class="text-center">Cargando...</p>
+    }
+    else
+    {
+        <div class="d-flex justify-content-start mb-3">
+            <button class="btn btn-secondary" @onclick="VolverAtras">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
+        <h2 class="tituloo">@propiedad.Titulo</h2>
+
+        @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
+        {
+            <div id="carouselPropiedad" class="carousel slide mb-4" data-bs-ride="carousel" style="max-width: 700px; margin:auto;">
+    <div class="carousel-inner rounded shadow-sm">
+        @for (int i = 0; i < propiedad.Imagenes.Count; i++)
+        {
+            var img = propiedad.Imagenes[i];
+            <div class="carousel-item @(i == 0 ? "active" : "")">
+                <img src="@img.Url" alt="Imagen @i" class="d-block w-100" />
+            </div>
+        }
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselPropiedad" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselPropiedad" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Siguiente</span>
+    </button>
+</div>
+
+        }
+        else
+        {
+                 <div id="carouselPropiedad" class="carousel slide mb-4" data-bs-ride="carousel" style="max-width: 700px; margin:auto;">
+        <div class="carousel-inner rounded shadow-sm">
+            <div class="carousel-item active">
+                <img src="Imagenes/Propiedades/iconoimagen.jpg" class="d-block w-100 propiedad-img" alt="Sin imagen disponible" />
+            </div>
+        </div>
+            </div>  
+        }
+
+        <div class="detalle-propiedad px-3">
+            <p><strong>Dirección:</strong> @propiedad.Direccion</p>
+            <p><strong>Localidad:</strong> @propiedad.Localidad</p>
+            <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
+            <p><strong>Precio por noche:</strong> <span class="text-success fw-semibold">$@propiedad.PrecioPorNoche</span></p>
+            <p id="map" style="width: 100%; height: 300px; margin: 10px 0;"></p>
+
+            <h4 class="mt-4 mb-3">Servicios</h4>
+            @if (propiedad.ServiciosDisponibles is not null && propiedad.ServiciosDisponibles.Any())
+            {
+                <ul class="servicios-list list-unstyled d-flex flex-wrap gap-2">
+                    @foreach (var servicio in propiedad.ServiciosDisponibles)
+                    {
+                        <li class="badge bg-primary text-white py-2 px-3">@servicio.ToString()</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="fst-italic text-muted">No se especificaron servicios.</p>
+            }
+
+            <h4 class="mt-4 mb-3">Descripción</h4>
+            <p class="text-secondary fs-5 lh-lg">@propiedad.Descripcion</p>
+
+            <h4 class="mt-5 mb-3">Política de cancelación</h4>
+            <p class="fst-italic">@ObtenerDescripcionPolitica(propiedad.PoliticaCancelacion)</p>
+        </div>
+       <div class="info-grupo">
+                            <button class="btn btn-primary" @onclick="IrAReservar">
+                                <i class="fas fa-calendar-check"></i> Reservar esta propiedad
+                            </button>
+                        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int PropiedadId { get; set; }
+   
+     private Usuario UsuarioActual = new Cliente
+    {
+        Nombre = "María",
+        Apellido = "Gómez",
+        Email = "maria@demo.com",
+        Telefono = "1234567890",
+        Contraseña = "123456",
+        FechaNacimiento = new DateTime(1990, 1, 1)
+    };
+    private Propiedad? propiedad;
+    private string carouselId => $"carousel-{PropiedadId}";
+
+    protected override void OnInitialized()
+    {
+        propiedad = CUObtenerPropiedad.Ejecutar(PropiedadId);
+    }
+
+    [JSInvokable]
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (propiedad != null)
+        {
+            await JS.InvokeVoidAsync("mostrarMapa", "map", propiedad.Latitud, propiedad.Longitud);
+        }
+    }
+
+    private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
+    {
+        return politica switch
+        {
+            PoliticasDeCancelacion.Anticipo20_72hs => "Requiere 20% de anticipo y permite cancelación hasta 72hs antes.",
+            PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No requiere anticipo, pero no permite cancelaciones.",
+            PoliticasDeCancelacion.PagoTotal_48hs_50 => "Pago total por adelantado, permite cancelación hasta 48hs antes con 50% de reintegro.",
+            _ => "No especificada."
+        };
+    }
+    private void IrAReservar()
+    {
+        NavigationManager.NavigateTo($"/reservar/{PropiedadId}");
+    }
+    private void VolverAtras()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

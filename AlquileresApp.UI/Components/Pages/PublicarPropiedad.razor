@@ -1,0 +1,157 @@
+@page "/otra"
+@using Microsoft.AspNetCore.Components.Web
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@inject NavigationManager NavigationManager
+@inject CasoDeUsoListarPropiedades CUListarPropiedades
+@inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
+
+<link href="css/AltaUsuario.css" rel="stylesheet" />
+<link href="css/Index.css" rel="stylesheet" />
+
+<PageTitle>Inicio - Alquilando</PageTitle>
+
+<div class="registro-container">
+    <h1 class="registro-title">Bienvenido a Alquilando</h1>
+    <p class="lead">Tu plataforma para encontrar y publicar propiedades</p>
+
+    <div class="registro-form">
+        <button class="registro-button" @onclick="IrAPublicarPropiedad">
+            <i class="fas fa-plus"></i> Publicar Nueva Propiedad
+        </button>
+
+        <h2 class="registro-title">Propiedades Disponibles</h2>
+        
+        @if (propiedades == null)
+        {
+            <p>Cargando propiedades...</p>
+        }
+        else if (!propiedades.Any())
+        {
+            <p>No hay propiedades disponibles en este momento.</p>
+        }
+        else
+        {
+            <div class="propiedades-grid">
+                @foreach (var propiedad in propiedades)
+                {
+                    <div class="propiedad-card">
+                        <button class="btn-eliminar" @onclick:stopPropagation="true" @onclick="() => MostrarDialogoConfirmacion(propiedad.Id)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <div class="propiedad-contenido" @onclick="() => VerDetallesPropiedad(propiedad.Id)">
+                            <h3>@propiedad.Titulo</h3>
+                            <p class="descripcion">@propiedad.Descripcion</p>
+                            <div class="propiedad-detalles">
+                                <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
+                                <p><strong>Dirección:</strong> @propiedad.Direccion</p>
+                                <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@if (mostrarDialogo)
+{
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h3>Eliminar Propiedad</h3>
+            <p>¿Estás seguro de que deseas eliminar esta propiedad?</p>
+            <div class="modal-buttons">
+                <button class="btn-cancelar" @onclick="CancelarEliminacion">Cancelar</button>
+                <button class="btn-confirmar" @onclick="ConfirmarEliminacion">Eliminar</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarError)
+{
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h3>No se puede eliminar la propiedad</h3>
+            <p>Esta propiedad tiene reservas activas y no puede ser eliminada.</p>
+            <div class="modal-buttons">
+                <button class="btn-aceptar" @onclick="CerrarError">Aceptar</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Propiedad>? propiedades;
+    private string? errorMensaje;
+    private bool mostrarDialogo;
+    private bool mostrarError;
+    private int propiedadIdAEliminar;
+
+    protected override void OnInitialized()
+    {
+        CargarPropiedades();
+    }
+
+    private void CargarPropiedades()
+    {
+        try
+        {
+            propiedades = CUListarPropiedades.Ejecutar();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar propiedades: {ex.Message}");
+            propiedades = new List<Propiedad>();
+        }
+    }
+
+    private void IrAPublicarPropiedad()
+    {
+        NavigationManager.NavigateTo("/Publish");
+    }
+
+    private void VerDetallesPropiedad(int id)
+    {
+        NavigationManager.NavigateTo($"/propiedad/{id}");
+    }
+
+    private void MostrarDialogoConfirmacion(int id)
+    {
+        propiedadIdAEliminar = id;
+        mostrarDialogo = true;
+    }
+
+    private void CancelarEliminacion()
+    {
+        mostrarDialogo = false;
+    }
+
+    private void CerrarError()
+    {
+        mostrarError = false;
+    }
+
+    private async Task ConfirmarEliminacion()
+    {
+        try
+        {
+            var propiedadAEliminar = propiedades?.FirstOrDefault(p => p.Id == propiedadIdAEliminar);
+            if (propiedadAEliminar != null)
+            {
+                await Task.Run(() => CUEliminarPropiedad.Ejecutar(propiedadAEliminar));
+                CargarPropiedades();
+                mostrarDialogo = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al eliminar la propiedad: {ex.Message}";
+            Console.WriteLine($"Error al eliminar propiedad: {ex.Message}");
+            mostrarDialogo = false;
+            mostrarError = true;
+        }
+    }
+}

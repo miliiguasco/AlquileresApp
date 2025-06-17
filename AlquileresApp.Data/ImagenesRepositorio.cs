@@ -43,12 +43,13 @@ public class ImagenesRepositorio(AppDbContext dbContext) : IImagenesRepositorio
         return dbContext.Imagenes.Where(i => i.PropiedadId == propiedadId).ToList();
     }
 
-    public void EliminarImagen(int imagenId){
-        var imagen = dbContext.Imagenes.Find(imagenId);
-        if (imagen != null)
-        {
-            dbContext.Imagenes.Remove(imagen);
-            dbContext.SaveChanges();
-        }
+    public async Task EliminarImagenAsync(int imagenId)
+{
+    var imagen = await dbContext.Imagenes.FindAsync(imagenId);
+    if (imagen != null)
+    {
+        dbContext.Imagenes.Remove(imagen);
+        await dbContext.SaveChangesAsync();
     }
+}
 }

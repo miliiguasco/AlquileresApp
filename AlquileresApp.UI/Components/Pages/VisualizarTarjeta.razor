@@ -1,0 +1,260 @@
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.Tarjeta
+@inject AuthenticationStateProvider ServicioAutenticacion
+@inject IUsuarioRepositorio UsuarioRepositorio
+@inject ILogger<VisualizarTarjeta> Logger
+@inject NavigationManager NavigationManager
+@inject CasoDeUsoVisualizarTarjeta CUVisualizarTarjeta
+@inject CasoDeUsoEliminarTarjeta CUEliminarTarjeta
+@inject CasoDeUsoModificarTarjeta CUModificarTarjeta
+@inject IJSRuntime JS
+@attribute [Authorize]
+
+<link href="css/VisualizarTarjeta.css" rel="stylesheet" />
+
+<div class="profile-container">
+    @if (usuario != null)
+    {
+                <div class="profile-section">
+                    @if (modoEdicion) 
+                    {
+                        <DatosFormEdicionTarjeta Input="@datosForm" 
+                                        OnSubmit="GuardarCambios"
+                                        FormName="editarTarjeta"
+                                        SubmitButtonText="Guardar Cambios"
+                                        CancelarEdicion="CancelarEdicion"/>
+                    }
+                    else {
+                       @if (tarjeta != null )
+                    {
+                        <div class="tarjeta-container">
+                            <div class="info-container">
+                                <i class="fas fa-credit-card"></i>
+                                <div class="tarjeta-info">
+                                    <span>**** **** **** @tarjeta.NumeroTarjeta.Substring(tarjeta.NumeroTarjeta.Length - 4)</span>
+                                    <small>Titular: @tarjeta.Titular</small>
+                                    <small>Vence: @tarjeta.FechaVencimiento</small>  
+                                </div>
+                            </div>
+                            <div class="acciones-tarjeta">
+                                <button type="button" class="btn btn-primary" @onclick="EditarTarjeta">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger" @onclick="() => EliminarTarjeta(tarjeta.Id)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            No tienes tarjeta registrada.
+                        </div>
+                    } 
+                    }
+                    
+                </div>
+    }
+</div>
+
+@if (erroresValidacion.Any())
+{
+    <div class="alert alert-danger mt-3">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <h4 class="alert-heading mb-0">Errores de validación:</h4>
+        </div>
+        <ul class="mt-2 mb-0">
+            @foreach (var error in erroresValidacion)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(mensajeExito))
+{
+    <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle me-2"></i>
+            <div>
+                <h4 class="alert-heading">¡Operación Exitosa!</h4>
+                <p>@mensajeExito</p>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private Usuario? usuario;
+    private string? _error;
+    private Tarjeta tarjeta;
+    private string? mensajeExito;
+    public bool modoEdicion = false; 
+    private DatosFormEdicionTarjeta.InputModel datosForm = new();
+    private List<string> erroresValidacion = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+            var email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
+            
+            if (email != null)
+            {
+                usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(email);
+                if (usuario == null)
+                {
+                    _error = $"No se encontró usuario con email: {email}";
+                    Logger.LogWarning(_error);
+                }
+                else
+                {
+                    tarjeta = CUVisualizarTarjeta.Ejecutar(usuario.Id);
+                }
+            }
+            else
+            {
+                _error = "No se pudo obtener el email del usuario autenticado";
+                Logger.LogWarning(_error);
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error al cargar la información: {ex.Message}";
+            Logger.LogError(_error);
+        }
+    }
+
+    private void EditarTarjeta()
+    {
+        datosForm = new DatosFormEdicionTarjeta.InputModel
+        {
+            NumeroTarjeta = tarjeta.NumeroTarjeta,
+            Titular = tarjeta.Titular,
+            FechaVencimiento = tarjeta.FechaVencimiento,
+            CVV = tarjeta.CVV
+        };
+        modoEdicion = true;
+    }
+
+    private void CancelarEdicion()
+    {
+        modoEdicion = false;
+        datosForm = new();
+    }
+    private async Task EliminarTarjeta(int tarjetaId)
+    {
+        try
+        {
+            if (await JS.InvokeAsync<bool>("confirm", "¿Está seguro que desea eliminar esta tarjeta?"))
+            {
+                await CUEliminarTarjeta.Ejecutar(tarjetaId);
+                mensajeExito = "La tarjeta ha sido eliminada exitosamente";
+                StateHasChanged();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error al eliminar la tarjeta: {ex.Message}";
+            Logger.LogError(_error);
+            await JS.InvokeVoidAsync("alert", _error);
+        }
+    }
+
+    private async Task GuardarCambios()
+    {
+        try
+        {
+            erroresValidacion.Clear();
+            // Validar número de tarjeta
+            if (string.IsNullOrWhiteSpace(datosForm.NumeroTarjeta) || 
+                datosForm.NumeroTarjeta.Replace(" ", "").Length != 16)
+            {
+                erroresValidacion.Add("El número de tarjeta debe tener 16 dígitos");
+            }
+
+            // Validar titular
+            if (string.IsNullOrWhiteSpace(datosForm.Titular))
+            {
+                erroresValidacion.Add("El nombre del titular es requerido");
+            }
+
+            // Validar fecha de vencimiento
+            if (string.IsNullOrWhiteSpace(datosForm.FechaVencimiento) || 
+                !datosForm.FechaVencimiento.Contains("/") || 
+                datosForm.FechaVencimiento.Length != 5)
+            {
+                erroresValidacion.Add("La fecha de vencimiento debe tener el formato MM/AA");
+            }
+            else
+            {
+                var partes = datosForm.FechaVencimiento.Split('/');
+                if (partes.Length != 2 || 
+                    !int.TryParse(partes[0], out int mes) || 
+                    !int.TryParse(partes[1], out int año) ||
+                    mes < 1 || mes > 12)
+                {
+                    erroresValidacion.Add("La fecha de vencimiento debe tener el formato MM/AA válido");
+                }
+                else
+                {
+                    var fechaActual = DateTime.Now;
+                    var añoActual = fechaActual.Year % 100;
+                    var mesActual = fechaActual.Month;
+
+                    // Convertir a año completo para comparación más precisa
+                    var añoCompleto = 2000 + año; // Asumimos que las tarjetas no son de antes del 2000
+                    var añoActualCompleto = fechaActual.Year;
+
+                    if (añoCompleto < añoActualCompleto || 
+                        (añoCompleto == añoActualCompleto && mes < mesActual))
+                    {
+                        erroresValidacion.Add("La tarjeta está vencida. Por favor, ingrese una fecha de vencimiento válida.");
+                        Logger.LogWarning($"Intento de guardar tarjeta vencida. Fecha ingresada: {mes}/{año}");
+                    }
+                }
+            }
+
+            // Validar CVV
+            if (string.IsNullOrWhiteSpace(datosForm.CVV) || 
+                datosForm.CVV.Length != 3 || 
+                !datosForm.CVV.All(char.IsDigit))
+            {
+                erroresValidacion.Add("El CVV debe tener 3 dígitos");
+            }
+
+            if (erroresValidacion.Any())
+            {
+                StateHasChanged();
+                return;
+            }
+
+            await CUModificarTarjeta.Ejecutar(
+                tarjeta.Id, 
+                datosForm.NumeroTarjeta.Replace(" ", ""),
+                datosForm.Titular,
+                datosForm.FechaVencimiento,
+                datosForm.CVV
+            );
+            
+            mensajeExito = "La tarjeta ha sido actualizada exitosamente";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error al actualizar la tarjeta: {ex.Message}";
+            Logger.LogError(_error);
+            await JS.InvokeVoidAsync("alert", _error);
+        }
+    }
+}
