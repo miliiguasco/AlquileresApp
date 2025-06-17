@@ -2,6 +2,7 @@ using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Data;
 using Microsoft.EntityFrameworkCore;
+using AlquileresApp.Core.Enumerativos;
 using System;
 
 public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadRepositorio
@@ -52,19 +53,21 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         dbContext.Entry(propiedadExistente).CurrentValues.SetValues(propiedad);
         dbContext.SaveChanges();
     }
-     public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin) //
-    {
-        var reservasExistentes = dbContext.Reservas
-            .Where(r => r.Propiedad.Id == propiedad.Id &&
-                        r.FechaInicio <= fechaFin &&
-                        r.FechaFin >= fechaInicio)
-            .ToList();
+    public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin)
+{
+    var reservasExistentes = dbContext.Reservas
+        .Where(r => r.Propiedad.Id == propiedad.Id &&
+                    r.FechaInicio <= fechaFin &&
+                    r.FechaFin >= fechaInicio &&
+                    r.Estado != EstadoReserva.Cancelada &&
+                    r.Estado != EstadoReserva.Finalizada)
+        .ToList();
 
-        if (reservasExistentes.Any())
-        {
-            throw new Exception("La propiedad no está disponible en las fechas seleccionadas.");
-        }
+    if (reservasExistentes.Any())
+    {
+        throw new Exception("La propiedad no está disponible en las fechas seleccionadas.");
     }
+}
 
     public void MarcarPropiedadComoNoHabitable(Propiedad propiedad)
     {

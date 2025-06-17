@@ -79,13 +79,13 @@
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
         <div class="modal-dialog">
-    using System.Configuration;
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Confirmar Cancelación</h5>
                     <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
                 </div>
                 <div class="modal-body">
+                    <p>@mensajeCancelacion</p>
                     <p>¿Estás seguro de que querés cancelar esta reserva?</p>
                 </div>
                 <div class="modal-footer">
@@ -103,6 +103,7 @@
     private int reservaAEliminarId;
     private string mensajeError ;
     private string mensajeExito;
+    private string mensajeCancelacion;
 
     protected override async Task OnInitializedAsync()
     {
@@ -155,9 +156,17 @@
     private void CancelarReserva(int id)
     {
         reservaAEliminarId = id;
-        mostrarConfirmacion = true;
-        mensajeError = null;
-        mensajeExito = null;
+     var resultadoPreliminar = casoDeUsoCancelarReserva.calcularCancelacion(
+        reservas.First(r => r.Id == id) 
+    );
+mensajeCancelacion = resultadoPreliminar.Mensaje;
+    Console.WriteLine($"[CancelarReserva] ReservaId: {id}");
+    Console.WriteLine($"[CancelarReserva] Mensaje de cancelación: {mensajeCancelacion}");
+    Console.WriteLine($"[CancelarReserva] Resultado preliminar: {System.Text.Json.JsonSerializer.Serialize(resultadoPreliminar)}");
+
+    mostrarConfirmacion = true;
+    mensajeError = null;
+    mensajeExito = null;
     }
 
     private void ConfirmarCancelacion()
@@ -169,13 +178,7 @@
         if (resultado.EsExitosa)
         {
             mensajeExito = resultado.Mensaje;
-
-            if (resultado.MontoReembolsado.HasValue)
-            {
-                mensajeExito += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
-            }
-
-            CargarReservas( );
+            CargarReservas();
         }
         else
         {
