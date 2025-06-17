@@ -65,14 +65,15 @@ namespace AlquileresApp.Data
                     Localidad = "Mar del Plata",
                     PrecioPorNoche = 750.00m,
                     Capacidad = 6,
-                    ServiciosDisponibles = new List<ServiciosPropiedad> 
-                    { 
+                    ServiciosDisponibles = new List<ServiciosPropiedad>
+                    {
                         ServiciosPropiedad.Wifi,
                         ServiciosPropiedad.AireAcondicionado,
                         ServiciosPropiedad.Piscina,
                         ServiciosPropiedad.Estacionamiento
                     },
-                    PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50
+                    PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50,
+                    TipoPago = TipoPago.Total
                 },
                 new Propiedad
                 {
@@ -82,14 +83,15 @@ namespace AlquileresApp.Data
                     Localidad = "Mar del Plata",
                     PrecioPorNoche = 750.00m,
                     Capacidad = 6,
-                    ServiciosDisponibles = new List<ServiciosPropiedad> 
-                    { 
+                    ServiciosDisponibles = new List<ServiciosPropiedad>
+                    {
                         ServiciosPropiedad.Wifi,
                         ServiciosPropiedad.AireAcondicionado,
                         ServiciosPropiedad.Piscina,
                         ServiciosPropiedad.Estacionamiento
                     },
-                    PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50
+                    PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50,
+                    TipoPago = TipoPago.Total
                 },
                 new Propiedad
                 {
@@ -105,7 +107,8 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.Estacionamiento,
                         ServiciosPropiedad.Wifi
                     },
-                    PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs
+                    PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs,
+                    TipoPago = TipoPago.Parcial
                 },
                 new Propiedad
                 {
@@ -122,6 +125,7 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.Estacionamiento
                     },
                     PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable
+                    , TipoPago = TipoPago.SinAnticipo
                 },
                 new Propiedad
                 {
@@ -139,6 +143,7 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.AireAcondicionado
                     },
                     PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs,
+                    TipoPago = TipoPago.Parcial
                 }
 
             };
@@ -186,7 +191,7 @@ namespace AlquileresApp.Data
                     PropiedadId = propiedades[3].Id, // Departamento céntrico
                     FechaInicio = DateTime.Now.AddDays(20),
                     FechaFin = DateTime.Now.AddDays(25),
-                    Estado = EstadoReserva.Activa,
+                    Estado = EstadoReserva.Pendiente,
                     PrecioTotal = 400,
                     MontoAPagar = 400,
                     MontoRestante = 0,
@@ -209,16 +214,16 @@ namespace AlquileresApp.Data
                     Saldo = 0m,
                     ClienteId = usuarios[0].Id
                 }
-                /*,
+                ,
                  new Tarjeta
                 {
                     NumeroTarjeta = "9876543210987654",
-                    Titular = "Juan Perez",
+                    Titular = "Milagros Guasco",
                     FechaVencimiento = "12/25",
                     CVV = "456",
                     Saldo = 5000.00m,
                     ClienteId = usuarios[1].Id
-                } */
+                } 
             };
             context.Tarjetas.AddRange(tarjetas);
             context.SaveChanges();

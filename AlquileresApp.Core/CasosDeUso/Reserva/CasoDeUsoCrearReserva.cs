@@ -92,8 +92,6 @@ public class CasoDeUsoCrearReserva(
             };
             Console.WriteLine($"Monto total a pagar: {montoTotal} (Precio por noche: {propiedad.PrecioPorNoche}, Días: {dias})");
 
-            // Calcular y guardar el monto restante
-            
 
             // Realizar pago (que incluye la validación de saldo)
             if (!tarjetaRepositorio.Pagar(tarjeta, montoTotal))
@@ -102,7 +100,7 @@ public class CasoDeUsoCrearReserva(
             }
 
             Console.WriteLine("Pago procesado correctamente");
-            Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes);
+            Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes, montoTotal);
             if (reserva.FechaInicio == DateTime.Today) 
                 reserva.Estado = EstadoReserva.Activa;
             else    

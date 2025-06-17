@@ -52,9 +52,6 @@ using System;
         return new ResultadoModificacionReserva { EsExitosa = false, Mensaje = preview.Mensaje };
 
     var reserva = _reservaRepository.ObtenerReservaPorId(reservaId);
-    var cliente = _usuarioRepository.ObtenerUsuarioPorId(reserva.ClienteId) as Cliente;
-    if (cliente == null)
-        return new ResultadoModificacionReserva { EsExitosa = false, Mensaje = "Cliente no encontrado." };
 
     var tarjeta = _tarjetaRepository.ObtenerPorClienteId(reserva.ClienteId);
             if (tarjeta == null)
@@ -83,6 +80,7 @@ using System;
     {
         var reembolso = Math.Abs(diferencia);
         _tarjetaRepository.Reembolsar(tarjeta, reembolso);
+            
     }
 
     reserva.FechaInicio = nuevaFechaInicio;
@@ -91,13 +89,14 @@ using System;
     reserva.PrecioTotal = preview.MontoBase;
 
     _reservaRepository.Actualizar(reserva);
-
-    string mensajeFinal = diferencia switch
-    {
-        > 0 => $"Modificación exitosa. Se abonó un adicional de {diferencia:C}.",
-        < 0 => $"Modificación exitosa. Se reembolsó {Math.Abs(diferencia):C}.",
-        _ => "Modificación exitosa. El monto total no se modificó."
-    };
+        string mensajeFinal;
+        mensajeFinal = diferencia switch
+        {
+                > 0 => $"Modificación exitosa. Se abonó un adicional de {diferencia:C}.",
+                < 0 => $"Modificación exitosa. Se reembolsó {Math.Abs(diferencia):C}.",
+                _ => "Modificación exitosa. El monto total no se modificó."
+        };
+        var cliente = _usuarioRepository.ObtenerUsuarioPorId(reserva.ClienteId) as Cliente;
     // ✅ Enviar email al cliente
     string asunto = "Confirmación de modificación de reserva";
     string cuerpo = $"""
@@ -115,7 +114,6 @@ using System;
     Saludos,
     Equipo de Reservas
     """;
-
     _notificadorEmail.EnviarEmail(cliente.Email, asunto, cuerpo);
     return new ResultadoModificacionReserva
     {
@@ -129,9 +127,12 @@ using System;
     var reserva = _reservaRepository.ObtenerReservaPorId(reservaId);
     if (reserva == null)
         return new ResultadoVistaPreviaModificacion { EsPosible = false, Mensaje = "Reserva no encontrada." };
+    var cliente = _usuarioRepository.ObtenerUsuarioPorId(reserva.ClienteId) as Cliente;
+    if (cliente == null)
+        return new ResultadoVistaPreviaModificacion { EsPosible = false, Mensaje = "Cliente no encontrado." };
 
     if (reserva.Estado == EstadoReserva.Cancelada)
-        return new ResultadoVistaPreviaModificacion { EsPosible = false, Mensaje = "La reserva ya está cancelada." };
+            return new ResultadoVistaPreviaModificacion { EsPosible = false, Mensaje = "La reserva ya está cancelada." };
 
     _fechaReservaValidador.FechaValidador(nuevaFechaInicio, nuevaFechaFin);
 
@@ -146,7 +147,8 @@ using System;
     var dias = (nuevaFechaFin.Date - nuevaFechaInicio.Date).Days;
     var nuevoMontoBase = propiedad.PrecioPorNoche * dias;
 
-    var nuevoMonto = propiedad.TipoPago switch
+
+     var nuevoMonto = propiedad.TipoPago switch
     {
         TipoPago.SinAnticipo => 0,
         TipoPago.Parcial => nuevoMontoBase * 0.20m,
@@ -155,13 +157,24 @@ using System;
     };
 
     var diferencia = nuevoMonto - reserva.MontoAPagar;
-
-    string mensaje = diferencia switch
-    {
-        > 0 => $"Se deberá abonar un adicional de {diferencia:C}.",
-        < 0 => $"Se reembolsará {Math.Abs(diferencia):C}.",
-        _ => "No hay diferencia en el monto a pagar."
-    };
+     var diasAnticipacion = (reserva.FechaInicio.Date - DateTime.Now.Date).Days;
+    string mensaje;
+        if (diasAnticipacion < 10)
+        {
+            mensaje = "No se reembolsará porque la reserva se encuentra a menos de 10 días de su inicio.";
+            diferencia = 0;
+            nuevoMonto = reserva.MontoAPagar;
+            nuevoMontoBase = reserva.PrecioTotal;
+        }
+        else
+        {
+            mensaje = diferencia switch
+            {
+                > 0 => $"Se deberá abonar un adicional de {diferencia:C}.",
+                < 0 => $"Se reembolsará {Math.Abs(diferencia):C}.",
+                _ => "No hay diferencia en el monto a pagar."
+            };
+        }
 
     return new ResultadoVistaPreviaModificacion
     {
