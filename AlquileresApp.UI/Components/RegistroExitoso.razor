@@ -1,25 +1,41 @@
 @if (Visible)
 {
-    <div class="alert-success" role="alert">
+    @if (esCliente) 
+    {
+        <div class="alert-success" role="alert">
         <div class="message-container">
             <span>Usuario registrado correctamente.</span>
         </div>
-    </div>
-    <div class="mt-2 mb-3 message-container">
-        <span>Redireccionando...</span>
-        <div class="spinner-border spinner-border-sm ms-2" role="status">
-            <span class="visually-hidden">Cargando...</span>
         </div>
-    </div>
+        <div class="mt-2 mb-3 message-container">
+            <span>Redireccionando...</span>
+            <div class="spinner-border spinner-border-sm ms-2" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    }
+    else 
+    {
+        <div class="alert-success" role="alert">
+        <div class="message-container">
+            <span>Encargado registrado correctamente.</span>
+        </div>
+        </div>
+    }
 }
 
 @code {
     [Parameter]
     public bool Visible { get; set; }
+    [Parameter]
+    public bool esCliente { get; set; }
 }
 
 <style>
     .alert-success {
+        width: 300px;
+        height: 60px;
+        margin: 0 auto; 
         color: #155724;
         transition: all 0.3s ease-in-out;
     }
@@ -28,6 +44,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        align-self: center;
         gap: 0.5rem;
     }
 

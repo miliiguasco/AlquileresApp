@@ -42,11 +42,6 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
         return dbContext.Usuarios.OfType<Cliente>().ToList();
     }
 
-    public List<Administrador> ListarAdministradores()
-    {
-        return dbContext.Usuarios.OfType<Administrador>().ToList();
-    }
-
     public List<Encargado> ListarEncargados()
     {
         return dbContext.Usuarios.OfType<Encargado>().ToList();
@@ -82,6 +77,14 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
     {
 
         return dbContext.Tarjetas.Any(t => t.ClienteId == cliente.Id);
-;
+    }
+
+    public void EliminarEncargado(int id) 
+    {
+        var usuarioExistente = dbContext.Usuarios.SingleOrDefault(u => u.Id == id);
+        if (usuarioExistente == null)
+            throw new Exception("Usuario no encontrado");
+        dbContext.Usuarios.Remove(usuarioExistente);
+        dbContext.SaveChanges();
     }
 }

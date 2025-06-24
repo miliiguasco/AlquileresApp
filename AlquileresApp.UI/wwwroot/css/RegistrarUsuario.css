@@ -4,8 +4,16 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    margin-top: 4.5rem;
     width: 100%;
+}
+  
+.mt-normal {
+    margin-top: 4.5rem;
+}
+
+.button-container {
+    display: flex;
+    gap: 1rem;
 }
 
 .registro-title {

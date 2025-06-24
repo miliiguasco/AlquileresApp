@@ -85,10 +85,14 @@
     font-size: 1rem;
 }
 
+.button-container {
+    display: flex;
+    justify-content: space-evenly;
+}
+
 .btn {
     padding: 0.5rem 1rem;
     border-radius: 4px;
-    width: 160px;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;

@@ -9,9 +9,9 @@ public interface IUsuarioRepositorio
     Usuario? ObtenerUsuarioPorEmail(string email);
     List<Usuario> ListarUsuarios();
     List<Cliente> ListarClientes();
-    List<Administrador> ListarAdministradores();
     List<Encargado> ListarEncargados();
-    public Usuario? AutenticarUsuario(string correo, String hashedContraseña);
-    public bool tieneTarjeta(Usuario usuario);
+    Usuario? AutenticarUsuario(string correo, String hashedContraseña);
+    bool tieneTarjeta(Usuario usuario);
+    void EliminarEncargado(int id);
 }
 

@@ -27,9 +27,7 @@ namespace AlquileresApp.Data
                     Nombre = "Fran",
                     Apellido = "Admin",
                     Email = "admi@gmail.com",
-                    Telefono = "123456789",
                     Contraseña = hashService.HashPassword("password123"),
-                    FechaNacimiento = new DateTime(1990, 1, 1),
                 },
                 new Cliente
                 {
@@ -49,6 +47,13 @@ namespace AlquileresApp.Data
                     Telefono = "987654321",
                     Contraseña = hashService.HashPassword("password456"),
                     FechaNacimiento = new DateTime(1985, 5, 15),
+                },
+                new Encargado
+                {
+                    Nombre = "Pablo",
+                    Apellido = "Gomez",
+                    Email = "pablogomez@test.com",
+                    Contraseña = hashService.HashPassword("Encargado1"),
                 }
             };
             context.Usuarios.AddRange(usuarios);

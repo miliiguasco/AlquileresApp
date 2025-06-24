@@ -8,12 +8,12 @@ public abstract class Usuario
     public string Nombre { get; set; } = string.Empty;
     public string Apellido { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
-    public string Telefono { get; set; } = string.Empty;
+    public string? Telefono { get; set; } = string.Empty;
     public string Contraseña { get; set; } = string.Empty;
     public DateTime? FechaNacimiento { get; set; }
     public RolUsuario Rol { get; protected set; }
 
-    protected Usuario(string nombre, string apellido, string email, string telefono, string password, DateTime fechaNacimiento, RolUsuario rol)
+    protected Usuario(string nombre, string apellido, string email, string? telefono, string password, DateTime? fechaNacimiento, RolUsuario rol)
     {
         Nombre = nombre;
         Apellido = apellido;

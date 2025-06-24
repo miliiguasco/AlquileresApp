@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using AlquileresApp.Data;
 using AlquileresApp.Core.CasosDeUso.Usuario;
+using AlquileresApp.Core.CasosDeUso.Administrador;
 using AlquileresApp.Core.CasosDeUso.Propiedad;
 using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Validadores;
@@ -90,6 +91,8 @@ builder.Services.AddScoped<CasoDeUsoListarMisReservas>();
 builder.Services.AddScoped<CasoDeUsoCancelarReserva>();
 builder.Services.AddScoped<CasoDeUsoModificarReserva>();
 builder.Services.AddScoped<CasoDeUsoObtenerReserva>();
+builder.Services.AddScoped<CasoDeUsoRegistrarEncargado>(); 
+builder.Services.AddScoped<CasoDeUsoListarEncargados>();
 builder.Services.AddTransient<INotificadorEmail>(provider =>
     new NotificadorEmail(
         "reservaenalquilando@gmail.com",
@@ -142,9 +145,7 @@ using (var scope = app.Services.CreateScope())
                 "Admin",
                 "User",
                 "admin@gmail.com",
-                "123456789",
-                hashedPassword,
-                DateTime.Now.AddYears(-20)
+                hashedPassword
             );
             
             dbContext.Usuarios.Add(testUser);

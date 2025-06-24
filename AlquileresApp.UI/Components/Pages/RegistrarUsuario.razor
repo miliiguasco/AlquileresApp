@@ -8,7 +8,7 @@
 
 <link href="css/RegistrarUsuario.css" rel="stylesheet" />
 
-<div class="registro-container">
+<div class="registro-container mt-normal">
     <h1 class="registro-title">Registrarse</h1>
     <div class="registro-form">
         <section>
@@ -19,7 +19,7 @@
                 SubmitButtonText="Registrar"
                 ButtonClass="registro-button"
                 OnEmailChange="@LimpiarError" />
-            <RegistroExitoso Visible="@registroExitoso" />
+            <RegistroExitoso Visible="@registroExitoso" esCliente=true/>
             <Error Mensaje="@errorMensaje"/>
         </section>
     </div>
