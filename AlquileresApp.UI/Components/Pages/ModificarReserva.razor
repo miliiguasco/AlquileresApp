@@ -96,7 +96,7 @@
         var user = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         try
         {
-            reserva = CasoDeUsoObtenerReserva.Ejecutar(ReservaId);
+            reserva = await CasoDeUsoObtenerReserva.Ejecutar(ReservaId);
             if (reserva != null)
             {
                 Filtros.FechaInicio = reserva.FechaInicio;
@@ -114,9 +114,9 @@
         }
     }
 
-    private void MostrarVistaPrevia()
+    private async Task MostrarVistaPrevia()
     {
-        var resultado = CasoDeUsoModificarReserva.CalcularModificacion(ReservaId, Filtros.FechaInicio, Filtros.FechaFin);
+        var resultado = await CasoDeUsoModificarReserva.CalcularModificacion(ReservaId, Filtros.FechaInicio, Filtros.FechaFin);
         if (!resultado.EsPosible)
         {
             mensajeResultado = resultado.Mensaje;
@@ -141,7 +141,7 @@
             return;
         }
 
-        var resultado = CasoDeUsoModificarReserva.Ejecutar(ReservaId, Filtros.FechaInicio, Filtros.FechaFin);
+        var resultado = await CasoDeUsoModificarReserva.Ejecutar(ReservaId, Filtros.FechaInicio, Filtros.FechaFin);
         mensajeResultado = resultado.Mensaje;
         mostrarMensaje = true;
 

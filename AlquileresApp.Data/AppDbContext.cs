@@ -29,18 +29,20 @@ namespace AlquileresApp.Data
         public DbSet<Reserva> Reservas { get; set; }
         public DbSet<Tarjeta> Tarjetas { get; set; }
         public DbSet<Imagen> Imagenes { get; set; }
+        public DbSet<Promocion> Promociones { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // Solo configurar si no está configurado desde afuera (evitar conflicto con AddDbContext)
-                var path = DbPath;
-                Console.WriteLine($"Configurando base de datos en: {path}");
-                optionsBuilder.UseSqlite($"Data Source={path}");
+            var path = DbPath;
+            Console.WriteLine($"Configurando base de datos en: {path}");
+            optionsBuilder.UseSqlite($"Data Source={path}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
 
             // Configuración TPH
             modelBuilder.Entity<Usuario>()
@@ -65,10 +67,10 @@ namespace AlquileresApp.Data
 
             // Configuración de Reserva
             modelBuilder.Entity<Reserva>()
-                .HasOne(r => r.Cliente)
-                .WithMany(c => c.Reservas)
-                .HasForeignKey(r => r.ClienteId)
-                .OnDelete(DeleteBehavior.Cascade);
+    .HasOne(r => r.Cliente)
+    .WithMany(c => c.Reservas)
+    .HasForeignKey(r => r.ClienteId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Reserva>()
                 .HasOne(r => r.Propiedad)

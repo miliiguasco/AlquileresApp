@@ -4,8 +4,9 @@ using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Enumerativos;
 using AlquileresApp.Core.Validadores;
 using System;
+using System.Threading.Tasks;
 
-    public class ResultadoModificacionReserva
+public class ResultadoModificacionReserva
     {
         public bool EsExitosa { get; set; }
         public string Mensaje { get; set; }
@@ -44,14 +45,14 @@ using System;
             _notificadorEmail = notificadorEmail;
         }
 
-        public ResultadoModificacionReserva Ejecutar(int reservaId, DateTime nuevaFechaInicio, DateTime nuevaFechaFin)
+        public async Task<ResultadoModificacionReserva> Ejecutar(int reservaId, DateTime nuevaFechaInicio, DateTime nuevaFechaFin)
 {
-    var preview = CalcularModificacion(reservaId, nuevaFechaInicio, nuevaFechaFin);
+    var preview = await CalcularModificacion(reservaId, nuevaFechaInicio, nuevaFechaFin);
 
     if (!preview.EsPosible)
         return new ResultadoModificacionReserva { EsExitosa = false, Mensaje = preview.Mensaje };
 
-    var reserva = _reservaRepository.ObtenerReservaPorId(reservaId);
+    var reserva = await _reservaRepository.ObtenerReservaPorId(reservaId);
 
     var tarjeta = _tarjetaRepository.ObtenerPorClienteId(reserva.ClienteId);
             if (tarjeta == null)
@@ -88,7 +89,7 @@ using System;
     reserva.MontoAPagar = preview.MontoNuevo;
     reserva.PrecioTotal = preview.MontoBase;
 
-    _reservaRepository.Actualizar(reserva);
+     _reservaRepository.Actualizar(reserva);
         string mensajeFinal;
         mensajeFinal = diferencia switch
         {
@@ -122,9 +123,9 @@ using System;
     };
 }
 
-    public ResultadoVistaPreviaModificacion CalcularModificacion(int reservaId, DateTime nuevaFechaInicio, DateTime nuevaFechaFin)
+    public async Task<ResultadoVistaPreviaModificacion> CalcularModificacion(int reservaId, DateTime nuevaFechaInicio, DateTime nuevaFechaFin)
 {
-    var reserva = _reservaRepository.ObtenerReservaPorId(reservaId);
+    var reserva = await _reservaRepository.ObtenerReservaPorId(reservaId);
     if (reserva == null)
         return new ResultadoVistaPreviaModificacion { EsPosible = false, Mensaje = "Reserva no encontrada." };
     var cliente = _usuarioRepository.ObtenerUsuarioPorId(reserva.ClienteId) as Cliente;

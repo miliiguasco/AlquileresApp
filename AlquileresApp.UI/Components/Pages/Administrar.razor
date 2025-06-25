@@ -4,12 +4,17 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.CasosDeUso.Promocion
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.Interfaces
 
 @inject CasoDeUsoListarPropiedades CUListarPropiedades
 @inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
 @inject CasoDeUsoModificarPropiedad CUModificarPropiedad
+@inject CasoDeUsoListarPromociones CUListarPromociones
+@inject CasoDeUsoCrearPromocion CUCrearPromocion
+@inject CasoDeUsoEliminarPromocion CUEliminarPromocion
+@inject CasoDeUsoModificarPromocion CUModificarPromocion
 @inject IJSRuntime JS
 
 @attribute [Authorize(Roles = "Administrador")] 
@@ -37,15 +42,16 @@
                     @onclick='@(() => CambiarTab("propiedades"))'>
                 Propiedades
             </button>
+            <button class="tab-button @(tabActiva == "promociones" ? "active" : "")" 
+                    @onclick='@(() => CambiarTab("promociones"))'>
+                Promociones
+            </button>
         </div>
 
         <div class="tab-content">
             @if (tabActiva == "reservas")
             {
                 <div class="tab-pane active">
-                    @{
-                        Console.WriteLine("🔄 Administrar - Renderizando ListaReservasadm");
-                    }
                     <ListaReservasadm />
                 </div>
             }
@@ -62,6 +68,16 @@
                     <Propiedades />
                 </div>
             }
+            else if (tabActiva == "promociones")
+            {
+                <div class="tab-pane active">
+                    <ListaPromociones
+                        Promociones="promociones"
+                        OnCrear="CrearPromocion"
+                        OnEditar="EditarPromocion"
+                        OnEliminar="EliminarPromocion" />
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -69,56 +85,61 @@
 @code {
     private string tabActiva = "reservas";
     private List<Propiedad>? propiedades;
-    
+    private List<Promocion>? promociones;
+
     protected override async Task OnInitializedAsync()
     {
         await CargarPropiedades();
+        await CargarPromociones();
     }
 
     private async Task CambiarTab(string tab)
     {
-        Console.WriteLine($"🔄 Cambiando a tab: {tab}");
         tabActiva = tab;
         await InvokeAsync(StateHasChanged);
     }
 
     private Task CargarPropiedades()
     {
-        try
-        {
-            propiedades = CUListarPropiedades.Ejecutar();
-            StateHasChanged();
-        }
-        catch
-        {
-            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
-        }
+        propiedades = CUListarPropiedades.Ejecutar();
+        StateHasChanged();
         return Task.CompletedTask;
+    }
+
+    private Task CargarPromociones()
+    {
+        promociones = CUListarPromociones.Ejecutar();
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private async Task CrearPromocion(Promocion promocion)
+    {
+        CUCrearPromocion.Ejecutar(promocion);
+        await CargarPromociones();
+    }
+
+    private async Task EditarPromocion(Promocion promocion)
+    {
+        CUModificarPromocion.Ejecutar(promocion);
+        await CargarPromociones();
+    }
+
+    private async Task EliminarPromocion(Promocion promocion)
+    {
+        CUEliminarPromocion.Ejecutar(promocion.Id);
+        await CargarPromociones();
     }
 
     private async Task EditarPropiedad(Propiedad propiedad)
     {
-        try
-        {
-            CUModificarPropiedad.Ejecutar(propiedad);
-            await CargarPropiedades();
-        }
-        catch
-        {
-            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
-        }
+        CUModificarPropiedad.Ejecutar(propiedad);
+        await CargarPropiedades();
     }
 
     private async Task EliminarPropiedad(Propiedad propiedad)
     {
-        try
-        {
-            CUEliminarPropiedad.Ejecutar(propiedad);
-            await CargarPropiedades();
-        }
-        catch
-        {
-            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
-        }
+        CUEliminarPropiedad.Ejecutar(propiedad);
+        await CargarPropiedades();
     }
-} 
+}
