@@ -2,6 +2,7 @@ using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Enumerativos;
+using System.Threading.Tasks;
 
 
 namespace AlquileresApp.Core.CasosDeUso.Reserva;
@@ -30,17 +31,17 @@ public class CasoDeUsoCancelarReserva
         public string Mensaje { get; set; }
         public decimal? MontoReembolsado { get; set; }
     }
-    public ResultadoCancelacionReserva Ejecutar(int reservaId)
+    public async Task<ResultadoCancelacionReserva> Ejecutar(int reservaId)
     {
         var resultado = new ResultadoCancelacionReserva();
-        var reserva = _reservaRepository.ObtenerReservaPorId(reservaId);
+        var reserva = await _reservaRepository.ObtenerReservaPorId(reservaId);
         if (reserva == null)
         {
             resultado.EsExitosa = false;
             resultado.Mensaje = "La reserva no existe.";
             return resultado;
         }
-        resultado = calcularCancelacion(reserva);
+        resultado = await calcularCancelacion(reservaId);
 
         if (!resultado.EsExitosa)
             return resultado;
@@ -92,7 +93,7 @@ public class CasoDeUsoCancelarReserva
         }
         if (resultado.MontoReembolsado.HasValue && resultado.MontoReembolsado.Value > 0)
         {
-            resultado.Mensaje = $"Reserva cancelada exitosamente. Se aplicó un reembolso de {resultado.MontoReembolsado.Value:C}.";
+            resultado.Mensaje = $"Reserva cancelada exitosamente. {resultado.Mensaje}";
         }
         else
         {
@@ -114,9 +115,12 @@ public class CasoDeUsoCancelarReserva
         return resultado;
     }
 
-    public ResultadoCancelacionReserva calcularCancelacion(AlquileresApp.Core.Entidades.Reserva reserva)
+     public async Task<ResultadoCancelacionReserva> calcularCancelacion(int reservaId)
     {
         var resultado = new ResultadoCancelacionReserva();
+        var reserva = await _reservaRepository.ObtenerReservaPorId(reservaId);
+
+
 
 
         if (reserva.Estado == EstadoReserva.Cancelada)

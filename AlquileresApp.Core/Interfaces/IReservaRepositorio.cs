@@ -5,7 +5,8 @@ public interface IReservaRepositorio{
     void CrearReserva(Reserva reserva);
     void ModificarReserva(Reserva reserva);
     //cancelar reserva
-    public Reserva? ObtenerReservaPorId(int id);
+    Task<Reserva?> ObtenerReservaPorId(int id);
+   
 
 
     public Task EliminarAsync(int id);

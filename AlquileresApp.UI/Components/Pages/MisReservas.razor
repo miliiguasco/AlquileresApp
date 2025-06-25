@@ -1,4 +1,5 @@
 @page "/misreservas"
+@rendermode InteractiveServer
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.CasosDeUso.Reserva
@@ -7,6 +8,7 @@
 @inject CasoDeUsoCancelarReserva casoDeUsoCancelarReserva
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
+
 
 <link href="css/MisReservas.css" rel="stylesheet" />
 <div class="container_misreservas py-5">
@@ -59,7 +61,7 @@
                                 <button class=" boton boton-modificar " @onclick="@(() => ModificarReserva(reserva.Id))">
                                     <i class="bi bi-pencil  "></i> Modificar
                                 </button>
-                                <button class="boton boton-cancelar" @onclick="@(() => CancelarReserva(reserva.Id))">
+                                <button class="boton boton-cancelar" @onclick="() => CancelarReserva(reserva.Id)">
                                     <i class="bi bi-x-circle "></i> Cancelar
                                 </button>
                             }
@@ -85,8 +87,9 @@
                     <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
                 </div>
                 <div class="modal-body">
-                    <p>@mensajeCancelacion</p>
-                    <p>¿Estás seguro de que querés cancelar esta reserva?</p>
+                    <p>@(mensajeCancelacion ?? "¿No se encontró mensaje de cancelación?")</p>
+                    <p>¿Estás seguro de que deseas cancelar esta reserva?</p>
+                    <p>Esta acción no se puede deshacer.</p>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
@@ -101,9 +104,9 @@
     private List<Reserva> reservas = new();
     private bool mostrarConfirmacion = false;
     private int reservaAEliminarId;
-    private string mensajeError ;
-    private string mensajeExito;
-    private string mensajeCancelacion;
+    private string? mensajeError ;
+    private string? mensajeExito;
+    private string? mensajeCancelacion;
 
     protected override async Task OnInitializedAsync()
     {
@@ -153,32 +156,26 @@
         NavigationManager.NavigateTo($"/modificarreserva/{id}");
     }
 
-    private void CancelarReserva(int id)
-    {
-        reservaAEliminarId = id;
-     var resultadoPreliminar = casoDeUsoCancelarReserva.calcularCancelacion(
-        reservas.First(r => r.Id == id) 
-    );
-mensajeCancelacion = resultadoPreliminar.Mensaje;
-    Console.WriteLine($"[CancelarReserva] ReservaId: {id}");
-    Console.WriteLine($"[CancelarReserva] Mensaje de cancelación: {mensajeCancelacion}");
-    Console.WriteLine($"[CancelarReserva] Resultado preliminar: {System.Text.Json.JsonSerializer.Serialize(resultadoPreliminar)}");
-
+private async Task CancelarReserva(int id)
+{
+    reservaAEliminarId = id;
+    var resultadoPreliminar = await casoDeUsoCancelarReserva.calcularCancelacion(id);
+    mensajeCancelacion = resultadoPreliminar.Mensaje;
     mostrarConfirmacion = true;
-    mensajeError = null;
-    mensajeExito = null;
-    }
 
-    private void ConfirmarCancelacion()
+    await InvokeAsync(StateHasChanged); 
+}
+
+    private async Task ConfirmarCancelacion()
 {
     try
     {
-        var resultado = casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
+        var resultado = await casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
 
         if (resultado.EsExitosa)
         {
             mensajeExito = resultado.Mensaje;
-            CargarReservas();
+            await CargarReservas();
         }
         else
         {

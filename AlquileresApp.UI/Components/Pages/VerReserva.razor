@@ -136,7 +136,7 @@
                 return;
             }
 
-            reserva = await Task.FromResult(CUVerReserva.Ejecutar(ReservaId, usuario.Id));
+            reserva = await Task.FromResult(await CUVerReserva.Ejecutar(ReservaId, usuario.Id));
         }
         catch (Exception ex)
         {

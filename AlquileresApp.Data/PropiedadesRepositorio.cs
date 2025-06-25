@@ -89,33 +89,37 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
     }
 
    public List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros)
-    {
-        var query = dbContext.Propiedades
+{
+    var query = dbContext.Propiedades
         .Include(p => p.Imagenes)
+        .Include(p => p.Reservas) // Asegurarse de incluirlas si se usan en la condición
         .AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(filtros.Localidad))
-        {
-            query = query.Where(p => p.Localidad.ToLower().Contains(filtros.Localidad.ToLower()));
-        }
+    if (!string.IsNullOrWhiteSpace(filtros.Localidad))
+    {
+        query = query.Where(p => p.Localidad.ToLower().Contains(filtros.Localidad.ToLower()));
+    }
 
+    if (filtros.CantidadHuespedes.HasValue)
+    {
+        query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
+    }
 
-        if (filtros.CantidadHuespedes.HasValue)
-        {
-            query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
-        }
+    // Verificar disponibilidad por fechas ignorando reservas canceladas o finalizadas
+    query = query.Where(p =>
+        !p.Reservas.Any(r =>
+            r.Estado != EstadoReserva.Cancelada &&
+            r.Estado != EstadoReserva.Finalizada &&
+            (
+                (filtros.FechaInicio >= r.FechaInicio && filtros.FechaInicio < r.FechaFin) ||
+                (filtros.FechaFin > r.FechaInicio && filtros.FechaFin <= r.FechaFin) ||
+                (filtros.FechaInicio <= r.FechaInicio && filtros.FechaFin >= r.FechaFin)
+            )
+        )
+    );
 
-            query = query.Where(p =>
-                !(p.Reservas.Any(r =>
-                    (filtros.FechaInicio >= r.FechaInicio && filtros.FechaInicio < r.FechaFin) ||
-                    (filtros.FechaFin > r.FechaInicio && filtros.FechaFin <= r.FechaFin) ||
-                    (filtros.FechaInicio <= r.FechaInicio && filtros.FechaFin >= r.FechaFin)
-                ))
-            );
-
-        
-        return query.ToList();
-    } 
+    return query.ToList();
+}
 
     public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId)
     {

@@ -15,6 +15,7 @@ using AlquileresApp.Core.CasosDeUso.Reserva;
 using AlquileresApp.Core.CasosDeUso.Tarjeta;
 using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
+using AlquileresApp.Core.CasosDeUso.Promocion;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -115,7 +116,11 @@ builder.Services.AddTransient<INotificadorEmail>(provider =>
         "fxsl hsck basy pamv"
     )
 );
-
+builder.Services.AddScoped<CasoDeUsoEliminarPromocion>();
+builder.Services.AddScoped<IPromocionRepositorio, PromocionRepositorio>();
+builder.Services.AddScoped<CasoDeUsoCrearPromocion>();
+builder.Services.AddScoped<CasoDeUsoListarPromociones>();
+builder.Services.AddScoped<CasoDeUsoModificarPromocion>();
 var app = builder.Build();
 
 // Initialize Database and Seed Data

@@ -46,13 +46,12 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         dbContext.Entry(reservaExistente).CurrentValues.SetValues(reserva);
         dbContext.SaveChanges();
     }
-
-    public Reserva? ObtenerReservaPorId(int id)
+    public async Task<Reserva?> ObtenerReservaPorId(int id)
     {
-        return dbContext.Reservas
+        return await dbContext.Reservas
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
-            .FirstOrDefault(r => r.Id == id);
+            .FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public void ModificarReserva2(Reserva reserva)

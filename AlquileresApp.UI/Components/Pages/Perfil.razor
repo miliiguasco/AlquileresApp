@@ -533,11 +533,11 @@
         mensajeExito = null;
     }
 
-    private void ConfirmarCancelacion()
+    private async Task ConfirmarCancelacion()
 {
     try
     {
-        var resultado = casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
+        var resultado = await casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
 
         if (resultado.EsExitosa)
         {
@@ -548,7 +548,7 @@
                 mensajeExito_misReservas += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
             }
 
-            CargarmisReservas();
+            await CargarmisReservas();
         }
         else
         {

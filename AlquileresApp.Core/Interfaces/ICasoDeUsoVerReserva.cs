@@ -3,5 +3,5 @@ using AlquileresApp.Core.Entidades;
 
 public interface ICasoDeUsoVerReserva
 {
-    Reserva? Ejecutar(int reservaId, int usuarioId);
+     Task<Reserva?> Ejecutar(int reservaId, int usuarioId);
 } 

@@ -1,0 +1,58 @@
+@using AlquileresApp.Core.Entidades
+@code {
+    [Parameter] public List<Promocion> Promociones { get; set; } = new();
+    [Parameter] public EventCallback<Promocion> OnEditar { get; set; }
+    [Parameter] public EventCallback<Guid> OnEliminar { get; set; }
+    [Parameter] public EventCallback<Promocion> OnCrear { get; set; }
+
+    private Promocion nuevaPromocion = new();
+
+    private void LimpiarFormulario()
+    {
+        nuevaPromocion = new Promocion();
+    }
+
+    private async Task Crear()
+    {
+        await OnCrear.InvokeAsync(nuevaPromocion);
+        LimpiarFormulario();
+    }
+}
+<h3>Lista de Promociones</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Descuento (%)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var promo in Promociones)
+        {
+            <tr>
+                <td>@promo.Titulo</td>
+                <td>@promo.Descripcion</td>
+                <td>@promo.FechaInicio.ToShortDateString()</td>
+                <td>@promo.FechaFin.ToShortDateString()</td>
+                <td>@promo.PorcentajeDescuento</td>
+                <td>
+                    <button @onclick="() => OnEditar.InvokeAsync(promo)">✏️</button>
+                    <button @onclick="() => OnEliminar.InvokeAsync(promo.Id)">🗑️</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Crear nueva promoción</h4>
+<input @bind="nuevaPromocion.Titulo" placeholder="Título" />
+<input @bind="nuevaPromocion.Descripcion" placeholder="Descripción" />
+<input type="date" @bind="nuevaPromocion.FechaInicio" />
+<input type="date" @bind="nuevaPromocion.FechaFin" />
+<input type="number" @bind="nuevaPromocion.PorcentajeDescuento" />
+<button @onclick="Crear">Crear</button>

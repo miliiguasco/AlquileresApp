@@ -6,11 +6,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AlquileresApp.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Promociones",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Titulo = table.Column<string>(type: "TEXT", nullable: false),
+                    Descripcion = table.Column<string>(type: "TEXT", nullable: false),
+                    FechaInicio = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    FechaFin = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    PorcentajeDescuento = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Activa = table.Column<bool>(type: "INTEGER", nullable: false),
+                    borrada = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Promociones", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Propiedades",
                 columns: table => new
@@ -19,12 +37,19 @@ namespace AlquileresApp.Data.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Titulo = table.Column<string>(type: "TEXT", nullable: false),
                     Descripcion = table.Column<string>(type: "TEXT", nullable: false),
-                    Localidad = table.Column<string>(type: "TEXT", nullable: false),
                     Direccion = table.Column<string>(type: "TEXT", nullable: false),
                     PrecioPorNoche = table.Column<decimal>(type: "TEXT", nullable: false),
                     Capacidad = table.Column<int>(type: "INTEGER", nullable: false),
+                    TipoPago = table.Column<int>(type: "INTEGER", nullable: false),
+                    Latitud = table.Column<double>(type: "REAL", nullable: false),
+                    Localidad = table.Column<string>(type: "TEXT", nullable: false),
+                    Longitud = table.Column<double>(type: "REAL", nullable: false),
+                    NoHabitable = table.Column<bool>(type: "INTEGER", nullable: false),
+                    EncargadoId = table.Column<int>(type: "INTEGER", nullable: false),
                     ServiciosDisponibles = table.Column<string>(type: "TEXT", nullable: false),
-                    PoliticaCancelacion = table.Column<int>(type: "INTEGER", nullable: false)
+                    PoliticaCancelacion = table.Column<int>(type: "INTEGER", nullable: false),
+                    MontoAPagar = table.Column<decimal>(type: "TEXT", nullable: false),
+                    MontoPagoAnticipado = table.Column<decimal>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -80,7 +105,14 @@ namespace AlquileresApp.Data.Migrations
                     PropiedadId = table.Column<int>(type: "INTEGER", nullable: false),
                     FechaInicio = table.Column<DateTime>(type: "TEXT", nullable: false),
                     FechaFin = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    PrecioTotal = table.Column<decimal>(type: "TEXT", nullable: false)
+                    Estado = table.Column<int>(type: "INTEGER", nullable: false),
+                    TipoPago = table.Column<int>(type: "INTEGER", nullable: false),
+                    PrecioTotal = table.Column<decimal>(type: "TEXT", nullable: false),
+                    MontoAPagar = table.Column<decimal>(type: "TEXT", nullable: false),
+                    MontoRestante = table.Column<decimal>(type: "TEXT", nullable: false),
+                    CantidadHuespedes = table.Column<int>(type: "INTEGER", nullable: false),
+                    FechaCheckOut = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    EmpleadoQueRealizoCheckOutId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -96,7 +128,7 @@ namespace AlquileresApp.Data.Migrations
                         column: x => x.ClienteId,
                         principalTable: "Usuarios",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -105,19 +137,20 @@ namespace AlquileresApp.Data.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    ClienteId = table.Column<int>(type: "INTEGER", nullable: false),
                     NumeroTarjeta = table.Column<string>(type: "TEXT", nullable: false),
                     Titular = table.Column<string>(type: "TEXT", nullable: false),
                     FechaVencimiento = table.Column<string>(type: "TEXT", nullable: false),
                     CVV = table.Column<string>(type: "TEXT", nullable: false),
-                    ReservaId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Saldo = table.Column<decimal>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tarjetas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tarjetas_Reservas_ReservaId",
-                        column: x => x.ReservaId,
-                        principalTable: "Reservas",
+                        name: "FK_Tarjetas_Usuarios_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Usuarios",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -138,10 +171,9 @@ namespace AlquileresApp.Data.Migrations
                 column: "PropiedadId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tarjetas_ReservaId",
+                name: "IX_Tarjetas_ClienteId",
                 table: "Tarjetas",
-                column: "ReservaId",
-                unique: true);
+                column: "ClienteId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_Email",
@@ -157,10 +189,13 @@ namespace AlquileresApp.Data.Migrations
                 name: "Imagenes");
 
             migrationBuilder.DropTable(
-                name: "Tarjetas");
+                name: "Promociones");
 
             migrationBuilder.DropTable(
                 name: "Reservas");
+
+            migrationBuilder.DropTable(
+                name: "Tarjetas");
 
             migrationBuilder.DropTable(
                 name: "Propiedades");
