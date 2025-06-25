@@ -23,7 +23,6 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
             throw new Exception("Ya existe una promoción activa con el mismo título.");
         }
 
-        promocion.Id = Guid.NewGuid(); // por si no lo estás generando en otro lado
         promocion.borrada = false;
 
         dbContext.Promociones.Add(promocion);
@@ -31,22 +30,25 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
     }
 
     public void Actualizar(Promocion promocion)
-{
-    var conflicto = dbContext.Promociones.Any(p =>
-        p.Id != promocion.Id &&
-        p.Titulo.ToLower() == promocion.Titulo.ToLower() &&
-        !p.borrada);
-
-    if (conflicto)
     {
-        throw new Exception("Ya existe otra promoción activa con el mismo título.");
+        var conflicto = dbContext.Promociones.Any(p =>
+            p.Id != promocion.Id &&
+            p.Titulo.ToLower() == promocion.Titulo.ToLower() &&
+            !p.borrada);
+
+        if (conflicto)
+        {
+            throw new Exception("Ya existe otra promoción activa con el mismo título.");
+        }
+        else
+        {
+
+            dbContext.Promociones.Update(promocion);
+            dbContext.SaveChanges();
+        }
     }
 
-    dbContext.Promociones.Update(promocion);
-    dbContext.SaveChanges();
-}
-
-    public void Eliminar(Guid id)
+    public void Eliminar(int id)
     {
         var promocion = dbContext.Promociones.Find(id);
         if (promocion != null)
@@ -56,7 +58,7 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
         }
     }
 
-    public Promocion? ObtenerPorId(Guid id)
+    public Promocion ObtenerPorId(int id)
     {
         return dbContext.Promociones
             .FirstOrDefault(p => p.Id == id && !p.borrada);

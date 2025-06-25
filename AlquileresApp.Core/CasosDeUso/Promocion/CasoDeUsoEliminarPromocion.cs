@@ -10,7 +10,7 @@ public class CasoDeUsoEliminarPromocion
         _repositorio = repositorio;
     }
 
-    public void Ejecutar(Guid id)
+    public void Ejecutar(int id)
     {
         _repositorio.Eliminar(id);
     }

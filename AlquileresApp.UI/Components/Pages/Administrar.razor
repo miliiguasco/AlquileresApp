@@ -70,11 +70,7 @@
             else if (tabActiva == "promociones")
             {
                 <div class="tab-pane active">
-                    <ListaPromociones
-                        Promociones="promociones"
-                        OnCrear="CrearPromocion"
-                        OnEditar="EditarPromocion"
-                        OnEliminar="EliminarPromocion" />
+                    <ListarPromociones />
                 </div>
             }
         </div>
@@ -89,7 +85,6 @@
     protected override async Task OnInitializedAsync()
     {
         await CargarPropiedades();
-        await CargarPromociones();
     }
 
     private async Task CambiarTab(string tab)
@@ -103,31 +98,6 @@
         propiedades = CUListarPropiedades.Ejecutar();
         StateHasChanged();
         return Task.CompletedTask;
-    }
-
-    private Task CargarPromociones()
-    {
-        promociones = CUListarPromociones.Ejecutar();
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-
-    private async Task CrearPromocion(Promocion promocion)
-    {
-        CUCrearPromocion.Ejecutar(promocion);
-        await CargarPromociones();
-    }
-
-    private async Task EditarPromocion(Promocion promocion)
-    {
-        CUModificarPromocion.Ejecutar(promocion);
-        await CargarPromociones();
-    }
-
-    private async Task EliminarPromocion(Promocion promocion)
-    {
-        CUEliminarPromocion.Ejecutar(promocion.Id);
-        await CargarPromociones();
     }
 
     private async Task EditarPropiedad(Propiedad propiedad)

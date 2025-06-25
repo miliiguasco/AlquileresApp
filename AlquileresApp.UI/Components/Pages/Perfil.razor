@@ -247,11 +247,13 @@
                     <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Estás seguro de que querés cancelar esta reserva?</p>
+                    <p>@(mensajeCancelacion ?? "¿No se encontró mensaje de cancelación?")</p>
+                    <p>¿Estás seguro de que deseas cancelar esta reserva?</p>
+                    <p>Esta acción no se puede deshacer.</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-otro btn-secondary" @onclick="CancelarConfirmacion">No</button>
-                    <button class="btn-otro btn-danger" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-danger" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
                 </div>
             </div>
         </div>
@@ -299,6 +301,7 @@
     private int reservaAEliminarId;
     private string mensajeError ;
     private string mensajeExito_misReservas;
+     private string? mensajeCancelacion;
 
 
 
@@ -525,13 +528,16 @@
         NavigationManager.NavigateTo($"/modificarreserva/{id}");
     }
 
-    private void CancelarReserva(int id)
-    {
-        reservaAEliminarId = id;
-        mostrarConfirmacion = true; 
-        mensajeError = null;
-        mensajeExito = null;
-    }
+    private async Task CancelarReserva(int id)
+{
+    reservaAEliminarId = id;
+    var resultadoPreliminar = await casoDeUsoCancelarReserva.calcularCancelacion(id);
+    mensajeCancelacion = resultadoPreliminar.Mensaje;
+    mostrarConfirmacion = true;
+    mensajeError = null;
+    mensajeExito = null;
+    await InvokeAsync(StateHasChanged); 
+}
 
     private async Task ConfirmarCancelacion()
 {
@@ -543,10 +549,6 @@
         {
             mensajeExito_misReservas = resultado.Mensaje;
 
-            if (resultado.MontoReembolsado.HasValue)
-            {
-                mensajeExito_misReservas += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
-            }
 
             await CargarmisReservas();
         }

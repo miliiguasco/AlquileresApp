@@ -121,6 +121,7 @@ builder.Services.AddScoped<IPromocionRepositorio, PromocionRepositorio>();
 builder.Services.AddScoped<CasoDeUsoCrearPromocion>();
 builder.Services.AddScoped<CasoDeUsoListarPromociones>();
 builder.Services.AddScoped<CasoDeUsoModificarPromocion>();
+builder.Services.AddScoped<CasoDeUsoObtenerPromocion>();
 var app = builder.Build();
 
 // Initialize Database and Seed Data

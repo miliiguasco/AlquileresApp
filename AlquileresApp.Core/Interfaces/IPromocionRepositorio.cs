@@ -7,7 +7,7 @@ namespace AlquileresApp.Core.Interfaces
         List<Promocion> ObtenerTodas();
         void Guardar(Promocion promocion);
         void Actualizar(Promocion promocion);
-        void Eliminar(Guid id);
-        Promocion? ObtenerPorId(Guid id);
+        void Eliminar(int id);
+        Promocion? ObtenerPorId(int id);
     }
 }

@@ -1,58 +1,226 @@
+
 @using AlquileresApp.Core.Entidades
-@code {
-    [Parameter] public List<Promocion> Promociones { get; set; } = new();
-    [Parameter] public EventCallback<Promocion> OnEditar { get; set; }
-    [Parameter] public EventCallback<Guid> OnEliminar { get; set; }
-    [Parameter] public EventCallback<Promocion> OnCrear { get; set; }
+@using AlquileresApp.Core.CasosDeUso.Promocion
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@inject CasoDeUsoListarPromociones CUListarPromociones
+@inject CasoDeUsoCrearPromocion CUCrearPromocion
+@inject CasoDeUsoEliminarPromocion CUEliminarPromocion
+@inject CasoDeUsoModificarPromocion CUModificarPromocion
+@inject ILogger<ListarPromociones> Logger
+@inject NavigationManager NavigationManager
 
-    private Promocion nuevaPromocion = new();
+@attribute [Authorize(Roles = "Administrador")]
 
-    private void LimpiarFormulario()
+<link href="css/Tabla.css" rel="stylesheet" />
+
+<div class="admin-section">
+    @if (isLoading)
     {
-        nuevaPromocion = new Promocion();
+        <div class="alert alert-info">
+            <i class="fas fa-spinner fa-spin"></i> Cargando promociones...
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+    else if (promociones != null && promociones.Any())
+    {
+        @if (!string.IsNullOrEmpty(mensajeExito))
+        {
+            <div class="alert alert-success">@mensajeExito</div>
+        }
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <div class="alert alert-danger">@mensajeError</div>
+        }
+
+        <div class="table-container">
+            <table class="property-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Descuento (%)</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var promo in promociones)
+                    {
+                        <tr>
+                            <td>@promo.Titulo</td>
+                            <td>@promo.Descripcion</td>
+                            <td>@promo.FechaInicio.ToShortDateString()</td>
+                            <td>@promo.FechaFin.ToShortDateString()</td>
+                            <td>@promo.PorcentajeDescuento</td>
+                            <td class="actions-cell">
+                                <button class="btn btn-sm btn-outline-primary" @onclick="@(() => IrAEditar(promo.Id))">
+    Editar
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" @onclick="() => MostrarConfirmacion(promo.Id)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>No hay promociones disponibles.</p>
+    }
+    <button class="btn" @onclick="@(() => NavigationManager.NavigateTo("/PublicarPromocion"))">
+    Nueva promoción
+</button>
+</div>
+
+
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" @onclick="CancelarConfirmacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás segura de que querés eliminar esta promoción?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">Cancelar</button>
+                    <button class="btn btn-danger" @onclick="ConfirmarEliminacion">Sí, eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private List<Promocion> promociones = new();
+    private Promocion nuevaPromocion = new();
+    private Promocion promocionEnEdicion = null;
+
+    private bool mostrarModalEdicion = false;
+    private bool mostrarConfirmacion = false;
+
+    private int promocionAEliminar;
+    private string mensajeExito;
+    private string mensajeError;
+    private string error;
+    private bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPromociones();
+    }
+
+    private async Task CargarPromociones()
+    {
+        try
+        {
+            isLoading = true;
+            promociones = CUListarPromociones.Ejecutar();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error al cargar promociones");
+            error = $"Error al cargar promociones: {ex.Message}";
+            promociones = new List<Promocion>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private async Task Crear()
     {
-        await OnCrear.InvokeAsync(nuevaPromocion);
-        LimpiarFormulario();
-    }
-}
-<h3>Lista de Promociones</h3>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Título</th>
-            <th>Descripción</th>
-            <th>Inicio</th>
-            <th>Fin</th>
-            <th>Descuento (%)</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var promo in Promociones)
+        try
         {
-            <tr>
-                <td>@promo.Titulo</td>
-                <td>@promo.Descripcion</td>
-                <td>@promo.FechaInicio.ToShortDateString()</td>
-                <td>@promo.FechaFin.ToShortDateString()</td>
-                <td>@promo.PorcentajeDescuento</td>
-                <td>
-                    <button @onclick="() => OnEditar.InvokeAsync(promo)">✏️</button>
-                    <button @onclick="() => OnEliminar.InvokeAsync(promo.Id)">🗑️</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            mensajeError = null;
+            mensajeExito = null;
+            CUCrearPromocion.Ejecutar(nuevaPromocion);
+            mensajeExito = "Promoción creada exitosamente.";
 
-<h4>Crear nueva promoción</h4>
-<input @bind="nuevaPromocion.Titulo" placeholder="Título" />
-<input @bind="nuevaPromocion.Descripcion" placeholder="Descripción" />
-<input type="date" @bind="nuevaPromocion.FechaInicio" />
-<input type="date" @bind="nuevaPromocion.FechaFin" />
-<input type="number" @bind="nuevaPromocion.PorcentajeDescuento" />
-<button @onclick="Crear">Crear</button>
+            nuevaPromocion = new Promocion();
+            await CargarPromociones();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al crear promoción: {ex.Message}";
+        }
+    }
+
+    private void MostrarConfirmacion(int id)
+    {
+        promocionAEliminar = id;
+        mostrarConfirmacion = true;
+        mensajeError = null;
+        mensajeExito = null;
+    }
+
+    private async Task ConfirmarEliminacion()
+    {
+        try
+        {
+            CUEliminarPromocion.Ejecutar(promocionAEliminar);
+            mensajeExito = "Promoción eliminada correctamente.";
+            await CargarPromociones();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al eliminar promoción: {ex.Message}";
+        }
+        finally
+        {
+            mostrarConfirmacion = false;
+        }
+    }
+
+    private void CancelarConfirmacion() => mostrarConfirmacion = false;
+
+    private void EditarPromocion(Promocion promo)
+    {
+        promocionEnEdicion = new Promocion
+        {
+            Id = promo.Id,
+            Titulo = promo.Titulo,
+            Descripcion = promo.Descripcion,
+            FechaInicio = promo.FechaInicio,
+            FechaFin = promo.FechaFin,
+            PorcentajeDescuento = promo.PorcentajeDescuento
+        };
+        mostrarModalEdicion = true;
+    }
+
+    private async Task GuardarEdicion()
+    {
+        try
+        {
+            CUModificarPromocion.Ejecutar(promocionEnEdicion);
+            mensajeExito = "Promoción modificada correctamente.";
+            await CargarPromociones();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al modificar promoción: {ex.Message}";
+        }
+        finally
+        {
+            mostrarModalEdicion = false;
+        }
+    }
+    private void IrAEditar(int id)
+{
+    NavigationManager.NavigateTo($"/EditarPromocion/{id}");
+}
+}
