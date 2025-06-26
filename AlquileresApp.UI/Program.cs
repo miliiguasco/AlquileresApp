@@ -15,6 +15,7 @@ using AlquileresApp.Core.CasosDeUso.Reserva;
 using AlquileresApp.Core.CasosDeUso.Tarjeta;
 using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
+using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -115,6 +116,12 @@ builder.Services.AddTransient<INotificadorEmail>(provider =>
         "fxsl hsck basy pamv"
     )
 );
+
+builder.Services.AddScoped<IPreguntasFrecuentesRepositorio, PreguntaFrecuenteRepositorio>();
+builder.Services.AddScoped<CasoDeUsoMostrarPreguntasFrecuentes>();
+builder.Services.AddScoped<CasoDeUsoCrearPreguntaFrecuente>();
+builder.Services.AddScoped<CasoDeUsoModificarPreguntaFrecuente>();
+builder.Services.AddScoped<CasoDeUsoEliminarPreguntaFrecuente>();
 
 var app = builder.Build();
 
