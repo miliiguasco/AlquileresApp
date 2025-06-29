@@ -29,6 +29,8 @@ namespace AlquileresApp.Data
         public DbSet<Reserva> Reservas { get; set; }
         public DbSet<Tarjeta> Tarjetas { get; set; }
         public DbSet<Imagen> Imagenes { get; set; }
+        public DbSet<PreguntaFrecuente> PreguntasFrecuentes { get; set; }
+        public DbSet<Mensaje> Mensajes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -84,7 +86,30 @@ namespace AlquileresApp.Data
                 .HasForeignKey(t => t.ClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
+      /*      // Configuración de Mensaje
+            modelBuilder.Entity<Mensaje>()
+                .HasOne(m => m.Reserva)
+                .WithMany()
+                .HasForeignKey(m => m.ReservaId)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Mensaje>()
+                .HasOne(m => m.Cliente)
+                .WithMany()
+                .HasForeignKey(m => m.ClienteId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Mensaje>()
+                .HasOne(m => m.Administrador)
+                .WithMany()
+                .HasForeignKey(m => m.AdministradorId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Índice para mejorar el rendimiento de consultas de chat
+            modelBuilder.Entity<Mensaje>()
+                .HasIndex(m => new { m.ReservaId, m.Fecha });
+        }
+*/
         public void EnsureDatabaseCreated()
         {
             try

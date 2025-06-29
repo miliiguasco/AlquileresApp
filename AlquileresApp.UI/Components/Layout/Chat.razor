@@ -1,0 +1,21 @@
+@inject CasoDeUsoIniciarChat IniciarChat
+
+@if (!ChatHabilitado)
+{
+    <p>El chat estará disponible después de realizar una reserva aprobada.</p>
+}
+else
+{
+    <ChatComponent ClienteId="@ClienteId" />
+}
+
+@code {
+    [Parameter] public int ClienteId { get; set; }
+
+    private bool ChatHabilitado = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ChatHabilitado = await IniciarChat.Ejecutar(ReservaId, ClienteId, AdministradorId);
+    }
+}

@@ -62,6 +62,9 @@
                                 <button class="boton boton-cancelar" @onclick="@(() => CancelarReserva(reserva.Id))">
                                     <i class="bi bi-x-circle "></i> Cancelar
                                 </button>
+                                <button class="boton boton-chat" @onclick="@(() => IniciarChat(reserva.Id))">
+                                    <i class="bi bi-chat "></i> Chat
+                                </button>
                             }
                             else
                             {
@@ -167,6 +170,11 @@ mensajeCancelacion = resultadoPreliminar.Mensaje;
     mostrarConfirmacion = true;
     mensajeError = null;
     mensajeExito = null;
+    }
+
+    private void IniciarChat(int reservaId)
+    {
+        NavigationManager.NavigateTo($"/chat/{reservaId}");
     }
 
     private void ConfirmarCancelacion()

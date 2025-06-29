@@ -1951,19 +1951,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\valen\\.nuget\\packages\\": {}
+    "C:\\Users\\Admin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+      "projectUniqueName": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
       "projectName": "AlquileresApp.Core",
-      "projectPath": "D:\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
-      "packagesPath": "C:\\Users\\valen\\.nuget\\packages\\",
-      "outputPath": "D:\\AlquileresApp\\AlquileresApp.Core\\obj\\",
+      "projectPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\valen\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
