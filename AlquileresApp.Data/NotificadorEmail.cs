@@ -18,21 +18,32 @@ public class NotificadorEmail: INotificadorEmail
         _puerto = puerto;
     }
 
-    public void EnviarEmail(string para, string asunto, string cuerpo)
+    public void EnviarEmail(string para, string asunto, string cuerpo, string? replyTo = null)
+{
+    using var cliente = new SmtpClient(_servidor, _puerto)
     {
-        using var cliente = new SmtpClient(_servidor, _puerto)
-        {
-            Credentials = new NetworkCredential(_remitente, _clave),
-            EnableSsl = true
-        };
+        Credentials = new NetworkCredential(_remitente, _clave),
+        EnableSsl = true
+    };
 
-        var mensaje = new MailMessage(_remitente, para, asunto, cuerpo)
-        {
-            IsBodyHtml = true 
-        };
+    var mensaje = new MailMessage
+    {
+        From = new MailAddress(_remitente),
+        Subject = asunto,
+        Body = cuerpo,
+        IsBodyHtml = true
+    };
 
-        cliente.Send(mensaje);
+    mensaje.To.Add(para);
+
+    if (!string.IsNullOrEmpty(replyTo))
+    {
+        mensaje.ReplyToList.Add(new MailAddress(replyTo));
     }
+
+    cliente.Send(mensaje);
+}
+
 
     public void EnviarCorreoBienvenida(string destinatario, string nombreUsuario)
     {

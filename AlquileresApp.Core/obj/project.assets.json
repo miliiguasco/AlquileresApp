@@ -1956,11 +1956,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+      "projectUniqueName": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp-1\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
       "projectName": "AlquileresApp.Core",
-      "projectPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+      "projectPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp-1\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
       "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp\\AlquileresApp.Core\\obj\\",
+      "outputPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp-1\\AlquileresApp.Core\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config"

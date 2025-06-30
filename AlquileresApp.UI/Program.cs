@@ -16,8 +16,11 @@ using AlquileresApp.Core.CasosDeUso.Tarjeta;
 using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes;
+using AlquileresApp.Core.CasosDeUso.ContactarAdmin;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -122,9 +125,11 @@ builder.Services.AddScoped<CasoDeUsoMostrarPreguntasFrecuentes>();
 builder.Services.AddScoped<CasoDeUsoCrearPreguntaFrecuente>();
 builder.Services.AddScoped<CasoDeUsoModificarPreguntaFrecuente>();
 builder.Services.AddScoped<CasoDeUsoEliminarPreguntaFrecuente>();
+builder.Services.AddScoped<CasoDeUsoContactarAdmin>();
+builder.Services.AddResponseCompression();
 
 var app = builder.Build();
-
+app.UseResponseCompression();
 // Initialize Database and Seed Data
 using (var scope = app.Services.CreateScope())
 {
@@ -215,5 +220,4 @@ app.MapGet("/Logout", async (HttpContext context) =>
 
 // Importante: Este debe ser el último mapeo
 app.MapFallbackToPage("/_Host");
-
 app.Run();
