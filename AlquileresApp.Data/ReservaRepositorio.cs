@@ -54,6 +54,15 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
             .Include(r => r.Propiedad)
             .FirstOrDefault(r => r.Id == id);
     }
+    public IEnumerable<Reserva> ObtenerReservasPorUsuarioYPropiedad(int? usuarioId, int propiedadId)
+    {
+       
+        return dbContext.Reservas
+                       .Include(r => r.Cliente)
+                       .Include(r => r.Propiedad)
+                       .Where(r => r.ClienteId == usuarioId && r.PropiedadId == propiedadId)
+                       .ToList(); // Materializa la consulta para devolver una lista
+    }
 
     public void ModificarReserva2(Reserva reserva)
     {

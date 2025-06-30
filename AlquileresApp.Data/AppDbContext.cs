@@ -29,13 +29,14 @@ namespace AlquileresApp.Data
         public DbSet<Reserva> Reservas { get; set; }
         public DbSet<Tarjeta> Tarjetas { get; set; }
         public DbSet<Imagen> Imagenes { get; set; }
+        public DbSet<Comentario> Comentarios { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // Solo configurar si no está configurado desde afuera (evitar conflicto con AddDbContext)
-                var path = DbPath;
-                Console.WriteLine($"Configurando base de datos en: {path}");
-                optionsBuilder.UseSqlite($"Data Source={path}");
+            var path = DbPath;
+            Console.WriteLine($"Configurando base de datos en: {path}");
+            optionsBuilder.UseSqlite($"Data Source={path}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -83,6 +84,20 @@ namespace AlquileresApp.Data
                 .WithMany()
                 .HasForeignKey(t => t.ClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Relación Uno a Muchos: Propiedad con Comentarios
+            modelBuilder.Entity<Propiedad>()
+                .HasMany(p => p.Comentarios) // Una Propiedad tiene muchos Comentarios
+                .WithOne(c => c.Propiedad)    // Un Comentario pertenece a una Propiedad
+                .HasForeignKey(c => c.PropiedadId) // La clave foránea en Comentario es PropiedadId
+                .OnDelete(DeleteBehavior.Cascade); // Cuando se borra una propiedad, se borran sus comentarios
+
+            // Relación Uno a Muchos: Usuario con Comentarios
+                modelBuilder.Entity<Usuario>()
+            .HasMany(u => u.ComentariosRealizados)
+            .WithOne(c => c.Usuario)
+            .HasForeignKey(c => c.UsuarioId)
+            .OnDelete(DeleteBehavior.SetNull); // O Restrict, según tu preferencia. SetNull si UsuarioId es nullable.
         }
 
         public void EnsureDatabaseCreated()

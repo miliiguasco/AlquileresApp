@@ -23,5 +23,6 @@ public class Propiedad
     public PoliticasDeCancelacion PoliticaCancelacion { get; set; }
     public decimal MontoAPagar { get; set; }
     public decimal MontoPagoAnticipado { get; set; }
+    public ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
 }
 
