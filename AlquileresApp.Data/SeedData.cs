@@ -48,13 +48,13 @@ namespace AlquileresApp.Data
                     Contraseña = hashService.HashPassword("password456"),
                     FechaNacimiento = new DateTime(1985, 5, 15),
                 },
-                new Encargado
+                /* new Encargado
                 {
                     Nombre = "Pablo",
                     Apellido = "Gomez",
                     Email = "pablogomez@test.com",
                     Contraseña = hashService.HashPassword("Encargado1"),
-                }
+                } */
             };
             context.Usuarios.AddRange(usuarios);
             context.SaveChanges();

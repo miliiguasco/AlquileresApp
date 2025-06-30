@@ -93,6 +93,7 @@ builder.Services.AddScoped<CasoDeUsoModificarReserva>();
 builder.Services.AddScoped<CasoDeUsoObtenerReserva>();
 builder.Services.AddScoped<CasoDeUsoRegistrarEncargado>(); 
 builder.Services.AddScoped<CasoDeUsoListarEncargados>();
+builder.Services.AddScoped<CasoDeUsoEliminarEncargado>();
 builder.Services.AddTransient<INotificadorEmail>(provider =>
     new NotificadorEmail(
         "reservaenalquilando@gmail.com",

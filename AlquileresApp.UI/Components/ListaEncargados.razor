@@ -5,6 +5,8 @@
 @inject IJSRuntime JSRuntime
 @inject CasoDeUsoListarEncargados CUListarEncargados
 @inject CasoDeUsoRegistrarEncargado CURegistrarEncargado
+@inject CasoDeUsoEliminarEncargado CUEliminarEncargado
+@rendermode InteractiveServer
 
 <link href="css/Tabla.css" rel="stylesheet"/>
 
@@ -13,13 +15,17 @@
     {
         @if (registrar) 
         {
-            <RegistrarEncargado Input="@Input" 
-                                  OnSubmit="NuevoEncargado"
-                                  FormName="RegistrarEncargado"
-                                  SubmitButtonText="Registrar"
-                                  ButtonClass="btn"
-                                  CancelarEdicion="CancelarRegistro"/>
-            <RegistroExitoso Visible='@registroExitoso' esCliente=false/>
+            <div class="registro-container">
+                <RegistrarEncargado Input="@Input" 
+                                    OnSubmit="NuevoEncargado"
+                                    FormName="RegistrarEncargado"
+                                    SubmitButtonText="Registrar"
+                                    ButtonClass="btn"
+                                    CancelarEdicion="CancelarRegistro"
+                                    OnEmailChange="LimpiarError"/>
+                <RegistroExitoso Visible='@registroExitoso' esCliente=false/>
+                <Error Mensaje="@errorMensaje"/>
+            </div>
         }
         else 
         {
@@ -55,10 +61,27 @@
     }
     else
     {
-        <p>No hay encargados disponibles.</p> 
-        <button class="btn" @onclick="() => HabilitarRegistro()">
-            Agregar encargado
-        </button>
+        @if (registrar) 
+        {
+            <div class="registro-container">
+                <RegistrarEncargado Input="@Input" 
+                                    OnSubmit="NuevoEncargado"
+                                    FormName="RegistrarEncargado"
+                                    SubmitButtonText="Registrar"
+                                    ButtonClass="btn"
+                                    CancelarEdicion="CancelarRegistro"
+                                    OnEmailChange="LimpiarError"/>
+                <RegistroExitoso Visible='@registroExitoso' esCliente=false/>
+                <Error Mensaje="@errorMensaje"/>
+            </div>
+        }
+        else 
+        {
+            <p>No hay encargados disponibles.</p> 
+            <button class="btn" @onclick="() => HabilitarRegistro()">
+                Añadir encargado
+            </button> 
+        } 
     }
 </div>
 
@@ -67,6 +90,7 @@
     private RegistrarEncargado.InputModel Input = new();
     private bool cargando = true;
     private bool registrar = false; 
+    private string? errorMensaje = null; 
     public bool registroExitoso = false; 
 
     protected override async Task OnInitializedAsync()
@@ -87,12 +111,14 @@
     {
         try
         {
-            //CUEliminarEncargado.Ejecutar(id);
+            CUEliminarEncargado.Ejecutar(id);
             encargados = CUListarEncargados.Ejecutar();
+            StateHasChanged(); 
         }
         catch (Exception ex) 
         {
-            throw new Exception(ex.Message);
+            errorMensaje = ex.Message; 
+            StateHasChanged(); 
         }
     }
 
@@ -104,21 +130,29 @@
             registroExitoso = true;  
             StateHasChanged();   
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
-            throw new Exception(ex.Message); 
-        }        
+            errorMensaje = ex.Message; 
+            StateHasChanged(); 
+        }
     }
 
     public void CancelarRegistro() 
     {
         registrar = false;
-        registroExitoso = false; 
+        registroExitoso = false;
+        Input = new();  
         encargados = CUListarEncargados.Ejecutar();
     }
 
     public void HabilitarRegistro() 
     {
         registrar = true; 
+    }
+
+    private void LimpiarError()
+    {
+        errorMensaje = null;
+        StateHasChanged();
     }
 } 
