@@ -100,12 +100,6 @@
         return Task.CompletedTask;
     }
 
-    private async Task EditarPropiedad(Propiedad propiedad)
-    {
-        CUModificarPropiedad.Ejecutar(propiedad);
-        await CargarPropiedades();
-    }
-
     private async Task EliminarPropiedad(Propiedad propiedad)
     {
         CUEliminarPropiedad.Ejecutar(propiedad);

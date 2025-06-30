@@ -66,6 +66,12 @@
     private string? errorMensaje;
     private string? mensajeExito;
 
+protected override void OnInitialized()
+{
+    var hoy = DateTime.Today;
+    nuevaPromocion.FechaInicio = hoy;
+    nuevaPromocion.FechaFin = hoy.AddDays(1);
+}
     private async Task CrearPromocion()
     {
         try

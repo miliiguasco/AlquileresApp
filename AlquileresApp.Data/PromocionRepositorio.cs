@@ -9,7 +9,6 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
     public List<Promocion> ObtenerTodas()
     {
         return dbContext.Promociones
-            .Where(p => !p.borrada)
             .ToList();
     }
 
@@ -29,11 +28,16 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
         dbContext.SaveChanges();
     }
 
-    public void Actualizar(Promocion promocion)
+    public void Actualizar(int id, string titulo, string descripcion, DateTime fechaInicio, DateTime fechaFin, decimal porcentajeDescuento)
     {
+        var promocion = dbContext.Promociones.Find(id);
+        if (promocion == null)
+        {
+            throw new Exception("Promoción no encontrada.");
+        }
         var conflicto = dbContext.Promociones.Any(p =>
-            p.Id != promocion.Id &&
-            p.Titulo.ToLower() == promocion.Titulo.ToLower() &&
+            p.Id != id &&
+            p.Titulo.ToLower() == titulo.ToLower() &&
             !p.borrada);
 
         if (conflicto)
@@ -43,6 +47,11 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
         else
         {
 
+            promocion.Titulo = titulo;
+            promocion.Descripcion = descripcion;
+            promocion.FechaInicio = fechaInicio;
+            promocion.FechaFin = fechaFin;
+            promocion.PorcentajeDescuento = porcentajeDescuento;
             dbContext.Promociones.Update(promocion);
             dbContext.SaveChanges();
         }
@@ -62,5 +71,11 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
     {
         return dbContext.Promociones
             .FirstOrDefault(p => p.Id == id && !p.borrada);
+    }
+    public List<Promocion> ObtenerTodasActivas()
+    {
+        return dbContext.Promociones
+            .Where(p => !p.borrada && p.FechaFin >= DateTime.Today)
+            .ToList();
     }
 }

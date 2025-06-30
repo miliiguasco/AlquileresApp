@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp2\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {}
+    "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {}
   },
   "projects": {
-    "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp2\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
+    "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp2\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+        "projectUniqueName": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
         "projectName": "AlquileresApp.Core",
-        "projectPath": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp2\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
+        "projectPath": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj",
         "packagesPath": "C:\\Users\\milag\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp2\\AlquileresApp\\AlquileresApp.Core\\obj\\",
+        "outputPath": "C:\\Users\\milag\\proyectosDotnet\\AlquileresApp\\AlquileresApp.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

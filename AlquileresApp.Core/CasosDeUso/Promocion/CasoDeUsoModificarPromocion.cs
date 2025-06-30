@@ -10,8 +10,22 @@ public class CasoDeUsoModificarPromocion
         _repositorio = repositorio;
     }
 
-    public void Ejecutar(Promocion promocion)
+    public void Ejecutar(int id, string titulo, string descripcion, DateTime fechaInicio, DateTime fechaFin, decimal porcentajeDescuento)
     {
-        _repositorio.Actualizar(promocion);
+        if (string.IsNullOrWhiteSpace(titulo))
+        throw new ArgumentException("El título es obligatorio.");
+
+    if (string.IsNullOrWhiteSpace(descripcion))
+        throw new ArgumentException("La descripción es obligatoria.");
+
+    if (fechaInicio.Date < DateTime.Today)
+        throw new ArgumentException("La fecha de inicio no puede ser anterior a hoy.");
+
+    if (fechaFin.Date < fechaInicio.Date)
+        throw new ArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio.");
+
+    if (porcentajeDescuento <= 0 || porcentajeDescuento > 100)
+        throw new ArgumentException("El porcentaje de descuento debe ser mayor a 0 y menor o igual a 100.");
+        _repositorio.Actualizar(id, titulo, descripcion, fechaInicio, fechaFin, porcentajeDescuento);
     }
 }

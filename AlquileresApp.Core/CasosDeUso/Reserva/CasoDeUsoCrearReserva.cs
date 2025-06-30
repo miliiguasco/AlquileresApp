@@ -13,7 +13,7 @@ public class CasoDeUsoCrearReserva(
     IUsuarioRepositorio usuarioRepositorio,  
     ITarjetaRepositorio tarjetaRepositorio, 
     IFechaReservaValidador fechaReservaValidador,
-    INotificadorEmail notificadorEmail)
+    INotificadorEmail notificadorEmail, IPromocionRepositorio promocionRepositorio)
 {
     public async Task Ejecutar(int clienteId, int propiedadId, DateTime fechaInicio, DateTime fechaFin, int cantidadHuespedes)
     {
@@ -83,6 +83,16 @@ public class CasoDeUsoCrearReserva(
             // Calcular el monto total de la reserva
             var dias = (fechaFin - fechaInicio).Days;
             var montoBase = propiedad.PrecioPorNoche * dias;
+            
+            // Calcular el total del descuento en porcentaje
+            //var totalPorcentajeDescuento = promocionesAplicables.Sum(p => p.PorcentajeDescuento);
+
+// Asegurarse de que no supere el 100%
+//if (totalPorcentajeDescuento > 100)
+//    totalPorcentajeDescuento = 100;
+
+// Aplicar el descuento al monto base
+//montoBase = montoBase * (1 - totalPorcentajeDescuento / 100.0);
             var montoTotal = propiedad.TipoPago switch //actualizar tmb deuda 
             {
                 TipoPago.SinAnticipo => 0,
