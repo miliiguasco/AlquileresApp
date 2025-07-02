@@ -30,14 +30,12 @@ public class CasoDeUsoAgregarComentario(IComentarioRepositorio comentarioReposit
         if (usuario == null)
             throw new Exception("Usuario no encontrado.");
 
-        // Solo si es Cliente, exigir reserva previa
         if (usuario.Rol == RolUsuario.Cliente)
         {
-            bool tieneReservaCompletada = reservaRepositorio.ObtenerReservasPorUsuarioYPropiedad(comentario.UsuarioId, propiedadId)
-                .Any(r => r.Estado == EstadoReserva.Confirmada || r.Estado == EstadoReserva.Finalizada || r.Estado == EstadoReserva.Activa || r.Estado == EstadoReserva.Pendiente);
+         bool tieneReserva = reservaRepositorio.ObtenerReservasPorUsuarioYPropiedad(comentario.UsuarioId, propiedadId).Any();
 
-            if (!tieneReservaCompletada)
-                throw new Exception("No tiene reserva en la propieda");
+        if (!tieneReserva)
+            throw new Exception("No tiene reserva en la propiedad");
         }
 
         // Asignar la propiedad al comentario
