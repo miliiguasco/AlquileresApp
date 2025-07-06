@@ -29,6 +29,7 @@ namespace AlquileresApp.Data
         public DbSet<Reserva> Reservas { get; set; }
         public DbSet<Tarjeta> Tarjetas { get; set; }
         public DbSet<Imagen> Imagenes { get; set; }
+        public DbSet<PreguntaFrecuente> PreguntasFrecuentes { get; set; }
         public DbSet<Promocion> Promociones { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -43,17 +44,17 @@ namespace AlquileresApp.Data
         {
             base.OnModelCreating(modelBuilder);
 
-
             // Configuración TPH
             modelBuilder.Entity<Usuario>()
                 .HasDiscriminator(u => u.Rol)
                 .HasValue<Cliente>(RolUsuario.Cliente)
                 .HasValue<Administrador>(RolUsuario.Administrador)
                 .HasValue<Encargado>(RolUsuario.Encargado);
-modelBuilder.Entity<Promocion>()
-    .HasMany(p => p.Propiedades)
-    .WithMany(p => p.Promociones);
-            
+                
+            modelBuilder.Entity<Promocion>()
+               .HasMany(p => p.Propiedades)
+               .WithMany(p => p.Promociones);
+
             // Email único
             modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Email)
@@ -70,10 +71,10 @@ modelBuilder.Entity<Promocion>()
 
             // Configuración de Reserva
             modelBuilder.Entity<Reserva>()
-    .HasOne(r => r.Cliente)
-    .WithMany(c => c.Reservas)
-    .HasForeignKey(r => r.ClienteId)
-    .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(r => r.Cliente)
+                .WithMany(c => c.Reservas)
+                .HasForeignKey(r => r.ClienteId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Reserva>()
                 .HasOne(r => r.Propiedad)
@@ -89,6 +90,7 @@ modelBuilder.Entity<Promocion>()
                 .HasForeignKey(t => t.ClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
+
 
         public void EnsureDatabaseCreated()
         {

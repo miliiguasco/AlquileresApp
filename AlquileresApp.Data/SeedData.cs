@@ -207,6 +207,15 @@ namespace AlquileresApp.Data
             context.Reservas.AddRange(reservas);
             context.SaveChanges();
 
+            //Crear preguntas frecuentes de prueba
+            var preguntasFrecuentes = new List<PreguntaFrecuente>
+            {
+                new PreguntaFrecuente { Pregunta = "¿Cómo puedo reservar una propiedad?", Respuesta = "Para reservar una propiedad, debes iniciar sesión y seleccionar la propiedad que deseas alquilar. Luego, completa los datos de contacto y confirma la reserva." },
+                new PreguntaFrecuente { Pregunta = "¿Cuáles son los métodos de pago disponibles?", Respuesta = "Disponemos de varios métodos de pago, como tarjeta de crédito, transferencia bancaria y pago en efectivo. Puedes seleccionar el método que prefieras al momento de realizar la reserva." },
+            };
+            context.PreguntasFrecuentes.AddRange(preguntasFrecuentes);
+            context.SaveChanges();
+            
             //Tarjetas de prueba
             var tarjetas = new List<Tarjeta>
             {

@@ -5,6 +5,7 @@
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
 @using AlquileresApp.Core.CasosDeUso.Promocion
+@using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.Interfaces
 
@@ -16,6 +17,10 @@
 @inject CasoDeUsoEliminarPromocion CUEliminarPromocion
 @inject CasoDeUsoModificarPromocion CUModificarPromocion
 @inject IJSRuntime JS
+@inject CasoDeUsoCrearPreguntaFrecuente CUCrearPreguntaFrecuente
+@inject CasoDeUsoModificarPreguntaFrecuente CUModificarPreguntaFrecuente
+@inject CasoDeUsoEliminarPreguntaFrecuente CUEliminarPreguntaFrecuente
+@inject CasoDeUsoMostrarPreguntasFrecuentes CUListarPreguntasFrecuentes
 
 @attribute [Authorize(Roles = "Administrador")] 
 
@@ -46,6 +51,10 @@
                     @onclick='@(() => CambiarTab("promociones"))'>
                 Promociones
             </button>
+            <button class="tab-button @(tabActiva == "preguntas-frecuentes" ? "active" : "")" 
+                    @onclick='@(() => CambiarTab("preguntas-frecuentes"))'>
+                Preguntas Frecuentes
+            </button>
         </div>
 
         <div class="tab-content">
@@ -73,6 +82,124 @@
                     <ListarPromociones />
                 </div>
             }
+            else if (tabActiva == "preguntas-frecuentes")
+            {
+                <div class="tab-pane active">
+                        <button class="btn btn-primary" @onclick="NuevaPregunta">
+                            <i class="fas fa-plus"></i> Nueva pregunta frecuente
+                        </button>
+                    <div class="preg-frec-table-container">
+                        @if (!string.IsNullOrEmpty(mensajeExito))
+                        {
+                            <div class="preg-frec-success">@mensajeExito</div>
+                        }
+                        <table class="property-table">
+                            <thead>
+                                <tr>
+                                    <th>Pregunta</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var pregunta in preguntas)
+                                {
+                                    <tr>
+                                        <td>@pregunta.Pregunta</td>
+                                        <td class="actions-cell">
+                                            <button class="btn btn-primary" @onclick="() => EditarPregunta(pregunta)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-danger" @onclick="() => ConfirmarEliminarPregunta(pregunta)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (mostrarModalEdicion)
+                    {
+                        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Editar Pregunta Frecuente</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Pregunta</label>
+                                            <input class="form-control" @bind="preguntaEditada.Pregunta" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Respuesta</label>
+                                            <textarea class="form-control" @bind="preguntaEditada.Respuesta"></textarea>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(errorEdicion))
+                                        {
+                                            <div class="alert alert-danger">@errorEdicion</div>
+                                        }
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" @onclick="CancelarEdicion">Cancelar</button>
+                                        <button class="btn btn-primary" @onclick="GuardarCambiosEdicion">Guardar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (mostrarModalEliminar)
+                    {
+                        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirmar Eliminación</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>¿Estás seguro de que deseas eliminar la pregunta frecuente?</p>
+                                        <p><strong>@preguntaAEliminar?.Pregunta</strong></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" @onclick="CancelarEliminar">Cancelar</button>
+                                        <button class="btn btn-primary" @onclick="EliminarPreguntaConfirmada">Eliminar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (mostrarModalCreacion)
+                    {
+                        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Nueva Pregunta Frecuente</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Pregunta</label>
+                                            <input class="form-control" @bind="nuevaPregunta.Pregunta" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Respuesta</label>
+                                            <textarea class="form-control" @bind="nuevaPregunta.Respuesta"></textarea>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(errorCreacion))
+                                        {
+                                            <div class="alert alert-danger">@errorCreacion</div>
+                                        }
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" @onclick="CancelarCreacion">Cancelar</button>
+                                        <button class="btn btn-primary" @onclick="GuardarNuevaPregunta">Guardar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -82,9 +209,21 @@
     private List<Propiedad>? propiedades;
     private List<Promocion>? promociones;
 
+    private List<PreguntaFrecuente> preguntas = new();
+    private bool mostrarModalEdicion = false;
+    private PreguntaFrecuente preguntaEditada = new();
+    private string errorEdicion;
+    private bool mostrarModalEliminar = false;
+    private PreguntaFrecuente? preguntaAEliminar;
+    private bool mostrarModalCreacion = false;
+    private PreguntaFrecuente nuevaPregunta = new();
+    private string errorCreacion;
+    private string mensajeExito;
+    
     protected override async Task OnInitializedAsync()
     {
         await CargarPropiedades();
+        preguntas = CUListarPreguntasFrecuentes.Ejecutar();
     }
 
     private async Task CambiarTab(string tab)
@@ -105,4 +244,81 @@
         CUEliminarPropiedad.Ejecutar(propiedad);
         await CargarPropiedades();
     }
-}
+
+    private void EditarPregunta(PreguntaFrecuente pregunta)
+    {
+        preguntaEditada = pregunta;
+        errorEdicion = string.Empty;
+        mostrarModalEdicion = true;
+    }
+
+    private async Task GuardarCambiosEdicion()
+    {
+        if (string.IsNullOrWhiteSpace(preguntaEditada.Pregunta) || string.IsNullOrWhiteSpace(preguntaEditada.Respuesta))
+        {
+            errorEdicion = "La pregunta y la respuesta no pueden estar vacías.";
+            return;
+        }
+        await CUModificarPreguntaFrecuente.Ejecutar(preguntaEditada);
+        preguntas = CUListarPreguntasFrecuentes.Ejecutar();
+        mostrarModalEdicion = false;
+        mensajeExito = "Pregunta editada correctamente";
+        StateHasChanged();
+    }
+
+    private void CancelarEdicion()
+    {
+        mostrarModalEdicion = false;
+    }
+
+    private void ConfirmarEliminarPregunta(PreguntaFrecuente pregunta)
+    {
+        preguntaAEliminar = pregunta;
+        mostrarModalEliminar = true;
+    }
+
+    private void CancelarEliminar()
+    {
+        mostrarModalEliminar = false;
+        preguntaAEliminar = null;
+    }
+
+    private void EliminarPreguntaConfirmada()
+    {
+        if (preguntaAEliminar != null)
+        {
+            CUEliminarPreguntaFrecuente.Ejecutar(preguntaAEliminar.Id);
+            preguntas = CUListarPreguntasFrecuentes.Ejecutar();
+            mensajeExito = "Pregunta eliminada correctamente";
+        }
+        mostrarModalEliminar = false;
+        preguntaAEliminar = null;
+        StateHasChanged();
+    }
+
+    private void NuevaPregunta()
+    {
+        nuevaPregunta = new PreguntaFrecuente();
+        errorCreacion = string.Empty;
+        mostrarModalCreacion = true;
+    }
+
+    private void GuardarNuevaPregunta()
+    {
+        if (string.IsNullOrWhiteSpace(nuevaPregunta.Pregunta) || string.IsNullOrWhiteSpace(nuevaPregunta.Respuesta))
+        {
+            errorCreacion = "La pregunta y la respuesta no pueden estar vacías.";
+            return;
+        }
+        CUCrearPreguntaFrecuente.Ejecutar(nuevaPregunta.Pregunta, nuevaPregunta.Respuesta);
+        preguntas = CUListarPreguntasFrecuentes.Ejecutar();
+        mostrarModalCreacion = false;
+        mensajeExito = "Pregunta agregada con éxito";
+        StateHasChanged();
+    }
+
+    private void CancelarCreacion()
+    {
+        mostrarModalCreacion = false;
+    }
+} 

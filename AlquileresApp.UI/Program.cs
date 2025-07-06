@@ -18,8 +18,12 @@ using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 using AlquileresApp.Core.CasosDeUso.Promocion;
 
+using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes;
+using AlquileresApp.Core.CasosDeUso.ContactarAdmin;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -114,12 +118,6 @@ builder.Services.AddScoped<CasoDeUsoCerrarSesion>();
 builder.Services.AddScoped<CasoDeUsoListarReservasAdm>();
 
 builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
-builder.Services.AddTransient<INotificadorEmail>(provider =>
-    new NotificadorEmail(
-        "reservaenalquilando@gmail.com",
-        "fxsl hsck basy pamv"
-    )
-);
 builder.Services.AddScoped<CasoDeUsoEliminarPromocion>();
 builder.Services.AddScoped<IPromocionRepositorio, PromocionRepositorio>();
 builder.Services.AddScoped<CasoDeUsoCrearPromocion>();
@@ -127,8 +125,17 @@ builder.Services.AddScoped<CasoDeUsoListarPromociones>();
 builder.Services.AddScoped<CasoDeUsoModificarPromocion>();
 builder.Services.AddScoped<CasoDeUsoObtenerPromocion>();
 builder.Services.AddScoped<CasoDeUsoListarPromocionesActivas>(); 
-var app = builder.Build();
 
+builder.Services.AddScoped<IPreguntasFrecuentesRepositorio, PreguntaFrecuenteRepositorio>();
+builder.Services.AddScoped<CasoDeUsoMostrarPreguntasFrecuentes>();
+builder.Services.AddScoped<CasoDeUsoCrearPreguntaFrecuente>();
+builder.Services.AddScoped<CasoDeUsoModificarPreguntaFrecuente>();
+builder.Services.AddScoped<CasoDeUsoEliminarPreguntaFrecuente>();
+builder.Services.AddScoped<CasoDeUsoContactarAdmin>();
+builder.Services.AddResponseCompression();
+
+var app = builder.Build();
+app.UseResponseCompression();
 // Initialize Database and Seed Data
 using (var scope = app.Services.CreateScope())
 {
@@ -219,5 +226,4 @@ app.MapGet("/Logout", async (HttpContext context) =>
 
 // Importante: Este debe ser el último mapeo
 app.MapFallbackToPage("/_Host");
-
 app.Run();
