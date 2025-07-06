@@ -24,8 +24,7 @@ public class Propiedad
     public decimal MontoAPagar { get; set; }
     public decimal MontoPagoAnticipado { get; set; }
     public ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
-
     public double CalificacionPromedio { get; set; } = 0; 
-    public int CantidadCalificaciones { get; set; } = 0;
+    public ICollection<Calificacion> Calificaciones { get; set; } = new List<Calificacion>();
 }
 

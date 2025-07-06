@@ -109,8 +109,8 @@ public class CasoDeUsoCancelarReserva
                 resultado.Mensaje = "Reserva cancelada exitosamente. No se aplicó reembolso ya que la reserva no tiene anticipo.";
             }
         }
-        
-        
+
+
         return resultado;
     }
 
@@ -152,7 +152,7 @@ public class CasoDeUsoCancelarReserva
                 }
                 else
                     resultado.Mensaje = "Se aplicara un reembolso del 20% del total de la reserva.";
-                    resultado.MontoReembolsado = reserva.PrecioTotal * 0.20m;
+                resultado.MontoReembolsado = reserva.PrecioTotal * 0.20m;
                 break;
 
             case PoliticasDeCancelacion.PagoTotal_48hs_50:
@@ -164,7 +164,7 @@ public class CasoDeUsoCancelarReserva
                 else
                     // Reembolso del 50% del total si se cancela con más de 48 horas de anticipación
                     resultado.Mensaje = "Se aplicara un reembolso del 50% del total de la reserva.";
-                    resultado.MontoReembolsado = reserva.PrecioTotal * 0.50m;
+                resultado.MontoReembolsado = reserva.PrecioTotal * 0.50m;
                 break;
 
             default:
@@ -174,5 +174,38 @@ public class CasoDeUsoCancelarReserva
         Console.WriteLine($"[Cancelación] ReservaId: {reserva.Id}, Estado: {reserva.Estado}, Política: {politica}, Horas antes del inicio: {horasAntesInicio}, Monto reembolsado: {resultado.MontoReembolsado}, Mensaje: {resultado.Mensaje}");
         return resultado;
 
+    }
+    
+    public ResultadoCancelacionReserva EjecutarParaInhabitabilidad(int reservaId)
+    {
+        var resultado = new ResultadoCancelacionReserva();
+        var reserva = _reservaRepository.ObtenerReservaPorId(reservaId);
+
+        if (reserva == null)
+        {
+            resultado.EsExitosa = false;
+            resultado.Mensaje = "La reserva no existe.";
+            return resultado;
+        }
+
+        // Si la reserva ya está cancelada, no hacemos nada más
+        if (reserva.Estado == EstadoReserva.Cancelada)
+        {
+            resultado.EsExitosa = false;
+            resultado.Mensaje = "La reserva ya está cancelada.";
+            return resultado;
+        }
+
+        // Aplicamos la regla específica: NO hay reembolso para este tipo de cancelación
+        resultado.EsExitosa = true; 
+        resultado.Mensaje = "Reserva cancelada debido a que la propiedad fue marcada como no habitable.";
+
+        // Actualizar estado de la reserva
+        reserva.Estado = EstadoReserva.Cancelada;
+        _reservaRepository.Actualizar(reserva);
+
+
+        Console.WriteLine($"{resultado.Mensaje}");
+        return resultado;
     }
 }

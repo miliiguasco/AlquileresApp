@@ -15,6 +15,8 @@ public abstract class Usuario
     
     public ICollection<Comentario> ComentariosRealizados { get; set; } = new List<Comentario>();
 
+    public ICollection<Calificacion> CalificacionesRealizadas { get; set; } = new List<Calificacion>();
+
     protected Usuario(string nombre, string apellido, string email, string telefono, string password, DateTime fechaNacimiento, RolUsuario rol)
     {
         Nombre = nombre;

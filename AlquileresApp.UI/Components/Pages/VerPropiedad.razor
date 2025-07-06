@@ -1,8 +1,10 @@
 @page "/propiedad/{PropiedadId:int}"
+@using AlquileresApp.Core.CasosDeUso.Calificacion
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.CasosDeUso.Comentario
 @using AlquileresApp.Core.CasosDeUso.Propiedad
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using System.IO
@@ -13,9 +15,11 @@
 @inject CasoDeUsoObtenerPropiedad CUObtenerPropiedad
 @inject CasoDeUsoAgregarComentario CUAgregarComentario
 
+@inject CasoDeUsoAgregarCalificacion CUAgregarCalificacion
+
 @inject CasoDeUsoOcultarComentario CUOcularComentario
 
-
+@inject CasoDeUsoMostrarCalificacion CUMostrarCalificacion
 @inject CasoDeUsoListarComentarios CUListarComentarios
 
 <link href="css/VerPropiedad.css" rel="stylesheet" />
@@ -27,11 +31,17 @@
     }
     else
     {
-        <div class="d-flex justify-content-start mb-3">
-            <button class="btn btn-secondary" @onclick="VolverAtras">
-                <i class="fas fa-arrow-left"></i> Volver
-            </button>
-        </div>
+
+           <div class="d-flex justify-content-between align-items-center mb-3">
+                <button class="btn btn-secondary" @onclick="VolverAtras">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <span class="fs-4 fw-semibold text-warning">
+                    <i class="fas fa-star"></i>
+                    @($"{propiedad.CalificacionPromedio:0.0}")
+                </span>
+            </div>  
+
         <h2 class="tituloo">@propiedad.Titulo</h2>
 
         @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
@@ -102,72 +112,116 @@
                             </button>
         </div>
          
-              <div class="comments-section mt-5 px-3">
-            <h2 class="mb-4">Comentarios y Calificaciones</h2>
-        @if (PuedeComentar()){
-            <div class="comment-form bg-light p-4 rounded shadow-sm mb-4 border">
-                <h3 class="mb-3">Deja tu comentario</h3>
-                
-                <div class="mb-3">
-                    <label for="commentContent" class="form-label">Tu comentario:</label>
-                    <textarea class="form-control" id="commentContent" @bind="nuevoComentarioContenido" placeholder="Escribe tu comentario aquí..." rows="4"></textarea>
-                </div>
-                
-                @if (!string.IsNullOrEmpty(mensajeErrorComentario))
-                {
-                    <div class="alert alert-danger" role="alert">
-                        @mensajeErrorComentario
-                    </div>
-                }
-                
-                <button class="btn btn-success" @onclick="EnviarComentario"> @* ¡Cambiado a EnviarComentario! *@
-                    <i class="fas fa-comment-dots"></i> Comentar
-                </button>
-            </div>
-            }
-            else
-            {
-            <div class="alert alert-info">
-                Solo los usuarios con una reserva en esta propiedad pueden dejar un comentario.
-            </div>
-            }
-            <div class="comment-list">
-                @if (propiedad.Comentarios != null && propiedad.Comentarios.Any())
-                {
-                    @foreach (var comentario in propiedad.Comentarios
-                        .Where(c => c.Visible).OrderByDescending(c => c.FechaCreacion))
-                    {
-                        <div class="comment-item bg-white p-3 rounded shadow-sm mb-3 border">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="fw-bold text-primary">
-                                    @* Muestra el nombre del usuario si está disponible, sino "Anónimo" o "Usuario Eliminado" *@
-                                    @(comentario.Usuario != null ? comentario.Usuario.Nombre
-                                    : "Usuario Anónimo") 
-                                </span>
-                                <span class="text-muted small">
-                                    @comentario.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
-                                </span>
-                            </div>
-                            <p class="text-secondary mb-0">@comentario.Contenido</p>
-                            @if (currentUser != null && currentUser.Identity.IsAuthenticated
-                                && currentUser.IsInRole("Administrador") || currentUser.IsInRole("Encargado"))
-                            {
-                                <button class="btn btn-sm btn-danger mt-2"
-                                        @onclick="() => MostrarConfirmacionOcultarComentario(comentario.Id, currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value)">
-                                    <i class="fas fa-eye-slash"></i> Ocultar
-                                </button>
-                            }
-                        </div>
-                    }
-                }
-                else
-                {
-                    <p class="text-muted fst-italic">Aún no hay comentarios para esta propiedad.</p>
-                }
-            </div>
-        </div> 
+        <div class="comments-section mt-5 px-3">
+    <h2 class="mb-4">Comentarios y Calificaciones</h2>
+    
+    @if (PuedeComentar())
+    {
+        <div class="comment-form bg-light p-4 rounded shadow-sm mb-4 border">
+        <h3 class="mb-3">Deja tu comentario</h3>
+        <textarea class="form-control mb-3"
+                  @bind="nuevoComentarioContenido"
+                  placeholder="Escribe tu comentario aquí..."
+                  rows="3"></textarea>
+        @if (!string.IsNullOrEmpty(mensajeErrorComentario))
+        {
+            <div class="alert alert-danger">@mensajeErrorComentario</div>
+        }
+        <button class="btn btn-success" @onclick="EnviarComentario">
+            <i class="fas fa-comment-dots"></i> Comentar
+        </button>
+    </div>
     }
-</div>@if (mostrarConfirmacion)
+
+    @if (PuedeCalificar())
+{
+    @if (calificacionUsuario > 0)
+    {
+        <div class="mb-3">
+            <label class="form-label">Tu calificación:</label>
+            <div>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <span class="estrella"
+                          style="font-size:2rem; color:@(i <= calificacionUsuario ? "#FFD700" : "#CCCCCC")">
+                        &#9733;
+                    </span>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="rating-form bg-light p-4 rounded shadow-sm mb-4 border">
+            <h3 class="mb-3">Calificá esta propiedad</h3>
+            <div class="mb-3">
+                <label class="form-label">Tu calificación:</label>
+                <div>
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        var estrella = i;
+                        <span class="estrella"
+                              style="font-size:2rem; cursor:pointer; color:@(estrella <= calificacionSeleccionada ? "#FFD700" : "#CCCCCC")"
+                              @onclick="@(() => SeleccionarCalificacion(estrella))">
+                            &#9733;
+                        </span>
+                    }
+                </div>
+                @if (!string.IsNullOrEmpty(mensajeErrorCalificacion))
+                {
+                    <div class="alert alert-danger mt-2">@mensajeErrorCalificacion</div>
+                }
+            </div>
+            <button class="btn btn-warning" @onclick="EnviarCalificacion">
+                <i class="fas fa-star"></i> Calificar
+            </button>
+        </div>
+    }
+}
+    @if (!PuedeComentar() && !PuedeCalificar())
+    {
+        <div class="alert alert-info">
+            Solo los usuarios con una reserva en esta propiedad pueden dejar un comentario y calificarla.
+        </div>
+    }
+
+    <div class="comment-list">
+        @if (propiedad.Comentarios != null && propiedad.Comentarios.Any())
+        {
+            @foreach (var comentario in propiedad.Comentarios
+                .Where(c => c.Visible).OrderByDescending(c => c.FechaCreacion))
+            {
+                <div class="comment-item bg-white p-3 rounded shadow-sm mb-3 border">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-primary">
+                            @(comentario.Usuario != null ? comentario.Usuario.Nombre
+                            : "Usuario Anónimo") 
+                        </span>
+                        <span class="text-muted small">
+                            @comentario.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                        </span>
+                    </div>
+                    <p class="text-secondary mb-0">@comentario.Contenido</p>
+                    @if (currentUser != null && currentUser.Identity.IsAuthenticated
+                        && currentUser.IsInRole("Administrador") || currentUser.IsInRole("Encargado"))
+                    {
+                        <button class="btn btn-sm btn-danger mt-2"
+                                @onclick="() => MostrarConfirmacionOcultarComentario(comentario.Id, currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value)">
+                            <i class="fas fa-eye-slash"></i> Ocultar
+                        </button>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted fst-italic">Aún no hay comentarios para esta propiedad.</p>
+        }
+    </div>
+</div>
+    }
+</div>
+@if (mostrarConfirmacion)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
         <div class="modal-dialog">
@@ -198,6 +252,7 @@
     private int comentarioAEliminarId;
     private String usuarioAEliminarId;
 
+    private int calificacionUsuario = 0;
 
     private ClaimsPrincipal? currentUser;
     private Propiedad? propiedad;
@@ -205,22 +260,32 @@
     private bool mostrarConfirmacion = false;
     private string carouselId => $"carousel-{PropiedadId}";
 
+    private int calificacionSeleccionada = 0;
+    private string mensajeErrorCalificacion = "";
+
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; } // Renombrado para evitar conflicto con cu
 
     protected override async Task OnInitializedAsync()
     {
-        if (authenticationState != null)
-        {
-            var authState = await authenticationState;
-            currentUser = authState.User;
-        }
-        else
-        {
-            currentUser = new ClaimsPrincipal(new ClaimsIdentity());
-        }
+        var authState = await authenticationState;
+        currentUser = authState.User;
+
         propiedad = CUObtenerPropiedad.Ejecutar(PropiedadId);
         propiedad.Comentarios = CUListarComentarios.Ejecutar(PropiedadId);
+
+        // Buscar la calificación del usuario autenticado para esta propiedad
+        calificacionUsuario = 0;
+        if (currentUser != null && currentUser.Identity.IsAuthenticated && propiedad?.Calificaciones != null)
+        {
+            var userIdString = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int userId))
+            {
+                var calif = propiedad.Calificaciones.FirstOrDefault(c => c.UsuarioId == userId);
+                if (calif != null)
+                    calificacionUsuario = calif.Puntuacion;
+            }
+        }
     }
 
     [JSInvokable]
@@ -350,23 +415,127 @@ private void ConfirmarOcultarComentario()
     }
 
     private bool PuedeComentar()
-    {
+{
     if (currentUser == null || !currentUser.Identity.IsAuthenticated || propiedad == null)
         return false;
 
     var rol = currentUser.FindFirst(ClaimTypes.Role)?.Value;
-    if (!string.IsNullOrEmpty(rol) && !rol.Equals("Cliente", StringComparison.OrdinalIgnoreCase))
-        return true;
+    if (!string.IsNullOrEmpty(rol) && 
+        (rol.Equals("Encargado", StringComparison.OrdinalIgnoreCase) || rol.Equals("Administrador", StringComparison.OrdinalIgnoreCase)))
+        return true; // Encargado o Administrador pueden comentar siempre
 
-    var userIdString = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
-        return false;
+    // Si es cliente, solo puede comentar si tiene reserva
+    if (rol != null && rol.Equals("Cliente", StringComparison.OrdinalIgnoreCase))
+    {
+        var userIdString = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+            return false;
 
-    // Suponiendo que la propiedad tiene una lista de reservas, o consultá el backend
-    // Si no la tiene, deberías consultar el backend aquí
-    return propiedad.Reservas?.Any(r => r.Cliente.Id == userId) == true;
+        return propiedad.Reservas?.Any(r => r.Cliente.Id == userId) == true;
     }
 
+    return false;
+}
+    
+    private async Task EnviarCalificacion()
+    {
+        mensajeErrorCalificacion = string.Empty;
+
+        if (calificacionSeleccionada < 1 || calificacionSeleccionada > 5)
+        {
+            mensajeErrorCalificacion = "Debes seleccionar una calificación entre 1 y 5 estrellas.";
+            return;
+        }
+
+        if (propiedad == null)
+        {
+            mensajeErrorCalificacion = "Error: Propiedad no cargada.";
+            return;
+        }
+
+        if (currentUser == null || !currentUser.Identity.IsAuthenticated)
+        {
+            var returnUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+            NavigationManager.NavigateTo($"/Login?returnUrl={Uri.EscapeDataString(returnUrl)}");
+            return;
+        }
+
+        var userIdString = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+        {
+            mensajeErrorCalificacion = "No se pudo obtener el ID del usuario autenticado.";
+            NavigationManager.NavigateTo("/Login");
+            return;
+        }
+
+        try
+        {
+            var nuevaCalificacion = new Calificacion
+            {
+                Puntuacion = calificacionSeleccionada, // O 'Valor' según tu modelo
+                UsuarioId = userId,
+                PropiedadId = propiedad.Id,
+                FechaCalificacion = DateTime.Now
+            };
+
+            CUAgregarCalificacion.Ejecutar(nuevaCalificacion);
+
+            propiedad = CUObtenerPropiedad.Ejecutar(PropiedadId);
+
+            // Actualiza la calificación del usuario para ocultar el formulario
+            if (propiedad?.Calificaciones != null)
+            {
+                var calif = propiedad.Calificaciones.FirstOrDefault(c => c.UsuarioId == userId);
+                if (calif != null)
+                    calificacionUsuario = calif.Puntuacion;
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeErrorCalificacion = ex.Message;
+            Console.WriteLine($"Error al agregar calificación: {ex.Message}");
+        }
+
+        StateHasChanged();
+    }
+
+    private bool PuedeCalificar() 
+    {
+        if (currentUser == null || !currentUser.Identity.IsAuthenticated || propiedad == null)
+            return false;
+
+        var rol = currentUser.FindFirst(ClaimTypes.Role)?.Value;
+        if (string.IsNullOrEmpty(rol) || !rol.Equals("Cliente", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var userIdString = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+            return false;
+
+        // Solo clientes con reserva actual o pasada pueden calificar
+        return propiedad.Reservas?.Any(r => r.Cliente.Id == userId) == true;
+    }
+
+    private void SeleccionarCalificacion(int valor)
+    {
+        Console.Write($"Seleccionada: {valor}");
+        calificacionSeleccionada = valor;
+        Console.Write($"Seleccionada: {calificacionSeleccionada}");
+    }
+
+   private double mostrarCalificacion(int idPropiedad)
+    {
+        try
+        {
+            var calificacion = CUMostrarCalificacion.Ejecutar(idPropiedad);
+            return calificacion;
+        }
+        catch
+        {
+            // Si ocurre cualquier error, devolvé 0
+            return 0;
+        }
+    }
     private void CancelarConfirmacion()
     {
         mostrarConfirmacion = false;

@@ -1,7 +1,8 @@
 namespace AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
 
-public interface IPropiedadRepositorio{
+public interface IPropiedadRepositorio
+{
     void CargarPropiedad(Propiedad propiedad);
     void ModificarPropiedad(Propiedad propiedad);
     bool EliminarPropiedad(Propiedad propiedad);
@@ -13,6 +14,8 @@ public interface IPropiedadRepositorio{
     //public List<Propiedad> BuscarDisponiblesAsync(SearchFilters filtros);
     Propiedad? ObtenerPorId(int id);
     public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId);
+    
+    void ActualizarCalificacionPromedio(int propiedadId, double nuevoPromedio); // ¡Nuevo método!
 }
 
 

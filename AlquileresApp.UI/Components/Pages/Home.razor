@@ -4,6 +4,7 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.CasosDeUso.Calificacion
 @using AlquileresApp.Core.Enumerativos
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components.Forms
@@ -13,6 +14,7 @@
 @inject CasoDeUsoListarPropiedadesFiltrado CUListarPropiedadesFiltrado
 @inject CasoDeUsoCrearReserva CUReservarPropiedad
 
+@inject CasoDeUsoMostrarCalificacion CUMostrarCalificacion
 
 <link href="css/Filtradas.css" rel="stylesheet" />
 <div class="container_listar_propiedades mt-5">
@@ -112,7 +114,18 @@
                     <p><strong>Localidad:</strong> @propiedad.Localidad</p>
                     <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
                     <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
-
+                    <p class="calificacion-promedio">
+                    <strong>Calificación Promedio:</strong>
+                    @if (propiedad.CalificacionPromedio > 0)  
+                    {
+                        <span style="color:#FFD700;">&#9733;</span> @* Una sola estrella dorada *@
+                        <span>@propiedad.CalificacionPromedio.ToString("F1")</span> @* El número al lado (ej. 4.5) *@
+                    }
+                    else
+                    {
+                        <span>Sin calificaciones aún</span>
+                    }
+                    </p>
                     <a class="btn btn-secondary mt-2" href="/propiedad/@propiedad.Id">Ver más</a>
 
 

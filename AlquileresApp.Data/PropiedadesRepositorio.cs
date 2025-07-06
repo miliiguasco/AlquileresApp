@@ -139,14 +139,33 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
     public Propiedad? ObtenerPropiedadPorId(int id)
     {
         return dbContext.Propiedades
-            .Include(p => p.Imagenes)
+            .Include(p => p.Reservas)  
+            .ThenInclude(r => r.Cliente)  
+            .Include(p => p.Calificaciones)
             .FirstOrDefault(p => p.Id == id);
     }
     public Propiedad? ObtenerPorId(int id)
     {
         return dbContext.Propiedades
             .Include(p => p.Imagenes)
+            .Include(p => p.Reservas)
+            .ThenInclude(r => r.Cliente)
+            .Include(p => p.Calificaciones)
+            
             .FirstOrDefault(p => p.Id == id);
+    }
+
+    public void ActualizarCalificacionPromedio(int propiedadId, double nuevoPromedio)
+    {
+        var propiedad = dbContext.Propiedades.Find(propiedadId); // Usamos Find para obtener la entidad directamente por PK
+
+        if (propiedad == null)
+        {
+            throw new Exception($"La propiedad con ID {propiedadId} no fue encontrada para actualizar su calificación promedio.");
+        }
+
+        propiedad.CalificacionPromedio = nuevoPromedio; // Actualizamos solo este campo
+        dbContext.SaveChanges(); // Guardamos los cambios
     }
 
     private Boolean existePropiedad(string titulo)

@@ -61,7 +61,7 @@
             errorMensaje = null;
             Usuario usuario = await CUIniciarSesion.Ejecutar(loginModel.Correo, loginModel.Contraseña);
             nombreUsuario = usuario.Nombre;
-            NavigationManager.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
+            NavigationManager.NavigateTo(ReturnUrl ?? "/", true);
         }
         catch (Exception ex)
         {   

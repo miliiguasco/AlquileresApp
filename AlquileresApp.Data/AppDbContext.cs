@@ -30,6 +30,7 @@ namespace AlquileresApp.Data
         public DbSet<Tarjeta> Tarjetas { get; set; }
         public DbSet<Imagen> Imagenes { get; set; }
         public DbSet<Comentario> Comentarios { get; set; }
+        public DbSet<Calificacion> Calificaciones { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -87,17 +88,28 @@ namespace AlquileresApp.Data
 
             // Relación Uno a Muchos: Propiedad con Comentarios
             modelBuilder.Entity<Propiedad>()
-                .HasMany(p => p.Comentarios) // Una Propiedad tiene muchos Comentarios
-                .WithOne(c => c.Propiedad)    // Un Comentario pertenece a una Propiedad
-                .HasForeignKey(c => c.PropiedadId) // La clave foránea en Comentario es PropiedadId
-                .OnDelete(DeleteBehavior.Cascade); // Cuando se borra una propiedad, se borran sus comentarios
+                .HasMany(p => p.Comentarios)
+                .WithOne(c => c.Propiedad)
+                .HasForeignKey(c => c.PropiedadId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Relación Uno a Muchos: Usuario con Comentarios
-                modelBuilder.Entity<Usuario>()
-            .HasMany(u => u.ComentariosRealizados)
-            .WithOne(c => c.Usuario)
-            .HasForeignKey(c => c.UsuarioId)
-            .OnDelete(DeleteBehavior.SetNull); // O Restrict, según tu preferencia. SetNull si UsuarioId es nullable.
+                    modelBuilder.Entity<Usuario>()
+                .HasMany(u => u.ComentariosRealizados)
+                .WithOne(c => c.Usuario)
+                .HasForeignKey(c => c.UsuarioId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Calificacion>()
+                .HasOne(c => c.Propiedad)
+                .WithMany(p => p.Calificaciones)
+                .HasForeignKey(c => c.PropiedadId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Calificacion>()
+                .HasOne(c => c.Usuario)
+                .WithMany(u => u.CalificacionesRealizadas)
+                .HasForeignKey(c => c.UsuarioId)
+                .OnDelete(DeleteBehavior.SetNull); 
         }
 
         public void EnsureDatabaseCreated()

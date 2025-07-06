@@ -66,15 +66,15 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
 
     public void ModificarReserva2(Reserva reserva)
     {
-        var existingReserva = dbContext.Reservas.Find(reserva.Id); // O alguna forma de obtener la reserva existente
+        var existingReserva = dbContext.Reservas.Find(reserva.Id);
 
         if (existingReserva != null)
         {
             // Actualizar las propiedades necesarias
-            existingReserva.PropiedadId = reserva.Propiedad.Id; // Asegúrate de asignar el ID
-            existingReserva.Propiedad = reserva.Propiedad;     // También podrías necesitar asignar la navegación
+            existingReserva.PropiedadId = reserva.Propiedad.Id; 
+            existingReserva.Propiedad = reserva.Propiedad;    
 
-            dbContext.Reservas.Update(existingReserva); // O _dbContext.Entry(existingReserva).State = EntityState.Modified;
+            dbContext.Reservas.Update(existingReserva); 
             dbContext.SaveChanges();
         }
         else
