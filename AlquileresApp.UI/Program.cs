@@ -5,6 +5,7 @@ using AlquileresApp.Data;
 using AlquileresApp.Core.CasosDeUso.Usuario;
 using AlquileresApp.Core.CasosDeUso.Administrador;
 using AlquileresApp.Core.CasosDeUso.Propiedad;
+
 using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Servicios;
@@ -16,6 +17,7 @@ using AlquileresApp.Core.CasosDeUso.Tarjeta;
 using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 using AlquileresApp.Core.CasosDeUso.Promocion;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,7 +79,9 @@ builder.Services.AddScoped<CasoDeUsoListarPropiedades>();
 builder.Services.AddScoped<CasoDeUsoAgregarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoCargarImagen>();
 builder.Services.AddScoped<CasoDeUsoModificarPropiedad>();
+builder.Services.AddScoped<CasoDeUsoCalcularPrecioConPromocion>();
 builder.Services.AddScoped<CasoDeUsoEliminarPropiedad>();
+builder.Services.AddScoped<CasoDeUsoObtenerPropiedades>();
 builder.Services.AddScoped<CasoDeUsoMostrarImagenes>();
 builder.Services.AddScoped<CasoDeUsoEliminarImagen>();
 builder.Services.AddScoped<CasoDeUsoEliminarPropiedad>();
@@ -122,7 +126,7 @@ builder.Services.AddScoped<CasoDeUsoCrearPromocion>();
 builder.Services.AddScoped<CasoDeUsoListarPromociones>();
 builder.Services.AddScoped<CasoDeUsoModificarPromocion>();
 builder.Services.AddScoped<CasoDeUsoObtenerPromocion>();
-builder.Services.AddScoped<CasoDeUsoListarPromocionesActivas>();
+builder.Services.AddScoped<CasoDeUsoListarPromocionesActivas>(); 
 var app = builder.Build();
 
 // Initialize Database and Seed Data

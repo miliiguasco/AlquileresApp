@@ -10,7 +10,7 @@ public class CasoDeUsoModificarPromocion
         _repositorio = repositorio;
     }
 
-    public void Ejecutar(int id, string titulo, string descripcion, DateTime fechaInicio, DateTime fechaFin, decimal porcentajeDescuento)
+    public void Ejecutar(int id, string titulo, string descripcion, DateTime fechaInicio, DateTime fechaFin, DateTime fechaInicioReserva, DateTime fechaFinReserva, decimal porcentajeDescuento, List<int> propiedadesSeleccionadas)
     {
         if (string.IsNullOrWhiteSpace(titulo))
         throw new ArgumentException("El título es obligatorio.");
@@ -26,6 +26,6 @@ public class CasoDeUsoModificarPromocion
 
     if (porcentajeDescuento <= 0 || porcentajeDescuento > 100)
         throw new ArgumentException("El porcentaje de descuento debe ser mayor a 0 y menor o igual a 100.");
-        _repositorio.Actualizar(id, titulo, descripcion, fechaInicio, fechaFin, porcentajeDescuento);
+        _repositorio.Actualizar(id, titulo, descripcion, fechaInicio, fechaFin,fechaInicioReserva,fechaFinReserva, porcentajeDescuento, propiedadesSeleccionadas);
     }
 }

@@ -6,8 +6,8 @@ namespace AlquileresApp.Core.Interfaces
     {
         List<Promocion> ObtenerTodas();
         List<Promocion> ObtenerTodasActivas();
-        void Guardar(Promocion promocion);
-        void Actualizar(int id, string titulo, string descripcion, DateTime fechaInicio, DateTime fechaFin, decimal porcentajeDescuento);
+        void Guardar(Promocion promocion, List<int> propiedadesSeleccionadas);
+        void Actualizar(int id, string titulo, string descripcion, DateTime fechaInicio, DateTime fechaFin, DateTime fechaInicioReserva, DateTime fechaFinReserva,  decimal porcentajeDescuento, List<int> propiedadesSeleccionadas);
         void Eliminar(int id);
         Promocion? ObtenerPorId(int id);
     }

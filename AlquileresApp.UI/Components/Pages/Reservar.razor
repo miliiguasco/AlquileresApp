@@ -8,6 +8,7 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.Interfaces
 @inject CasoDeUsoObtenerPropiedad CUObtenerPropiedad
+@inject CasoDeUsoCalcularPrecioConPromocion CUCalcularPrecioConPromocion
 @inject CasoDeUsoCrearReserva CUCrearReserva
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider ServicioAutenticacion
@@ -115,7 +116,11 @@
                     <div class="resumen-details">
                         <p>Precio por noche: $@propiedad.PrecioPorNoche</p>
                         <p>Noches: @CalcularNoches()</p>
-                        <p class="total">Total: $@CalcularTotal()</p>
+                        <p class="total">Total: $@CalcularTotal( )</p>
+                        @if (!string.IsNullOrEmpty(mensajePromocion))
+                        {
+                            <p class="text-success">@mensajePromocion</p>
+                        }
                     </div>
                 </div>
 
@@ -164,6 +169,7 @@
     private string? errorMensaje;
     private bool isLoading = true;
     private bool isSubmitting = false;
+    private string? mensajePromocion;
 
     protected override async Task OnInitializedAsync()
     {
@@ -209,7 +215,12 @@
         if (propiedad == null) return 0;
         var noches = CalcularNoches();
         if (noches <= 0) return 0;
-        return propiedad.PrecioPorNoche * noches;
+        var total= CUCalcularPrecioConPromocion.Ejecutar(propiedad, DateTime.Now, fechaInicio, fechaFin ) * noches;
+        if (total!= propiedad.PrecioPorNoche * noches)
+        {
+            mensajePromocion = "Se aplicó una promoción";
+        }
+        return total;
     }
 
     private void ActualizarFechas()

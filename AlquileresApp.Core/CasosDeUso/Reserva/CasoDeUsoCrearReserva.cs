@@ -82,17 +82,7 @@ public class CasoDeUsoCrearReserva(
 
             // Calcular el monto total de la reserva
             var dias = (fechaFin - fechaInicio).Days;
-            var montoBase = propiedad.PrecioPorNoche * dias;
-            
-            // Calcular el total del descuento en porcentaje
-            //var totalPorcentajeDescuento = promocionesAplicables.Sum(p => p.PorcentajeDescuento);
-
-// Asegurarse de que no supere el 100%
-//if (totalPorcentajeDescuento > 100)
-//    totalPorcentajeDescuento = 100;
-
-// Aplicar el descuento al monto base
-//montoBase = montoBase * (1 - totalPorcentajeDescuento / 100.0);
+            var montoBase = propiedadRepositorio.CalcularPrecioConPromocion(propiedad, DateTime.Now, fechaInicio, fechaFin ) * dias;
             var montoTotal = propiedad.TipoPago switch //actualizar tmb deuda 
             {
                 TipoPago.SinAnticipo => 0,
@@ -110,7 +100,7 @@ public class CasoDeUsoCrearReserva(
             }
 
             Console.WriteLine("Pago procesado correctamente");
-            Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes, montoTotal);
+            Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes,montoBase, montoTotal);
             if (reserva.FechaInicio == DateTime.Today) 
                 reserva.Estado = EstadoReserva.Activa;
             else    

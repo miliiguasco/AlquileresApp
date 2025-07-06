@@ -20,13 +20,21 @@ public class Promocion
     [DataType(DataType.Date)]
     [CustomValidation(typeof(Promocion), nameof(ValidarFechaFin))]
     public DateTime FechaFin { get; set; }
+    [Required]
+    [DataType(DataType.Date)]
+    [CustomValidation(typeof(Promocion), nameof(ValidarFechaInicio))]
+    public DateTime FechaInicioReserva { get; set; }
+
+    [Required]
+    [DataType(DataType.Date)]
+    [CustomValidation(typeof(Promocion), nameof(ValidarFechaFin))]
+    public DateTime FechaFinReserva { get; set; }
 
     [Range(1, 100, ErrorMessage = "El descuento debe ser mayor a 0 y menor o igual al 100%.")]
     public decimal PorcentajeDescuento { get; set; }
 
-    public bool Activa { get; set; } = true;
-
     public bool borrada { get; set; } = false;
+    public List<Propiedad> Propiedades { get; set; } = new();
     
     public static ValidationResult? ValidarFechaInicio(DateTime fecha, ValidationContext context)
     {

@@ -50,7 +50,10 @@ namespace AlquileresApp.Data
                 .HasValue<Cliente>(RolUsuario.Cliente)
                 .HasValue<Administrador>(RolUsuario.Administrador)
                 .HasValue<Encargado>(RolUsuario.Encargado);
-
+modelBuilder.Entity<Promocion>()
+    .HasMany(p => p.Propiedades)
+    .WithMany(p => p.Promociones);
+            
             // Email único
             modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Email)

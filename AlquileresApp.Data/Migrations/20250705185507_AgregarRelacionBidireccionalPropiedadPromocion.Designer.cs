@@ -3,6 +3,7 @@ using System;
 using AlquileresApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlquileresApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250705185507_AgregarRelacionBidireccionalPropiedadPromocion")]
+    partial class AgregarRelacionBidireccionalPropiedadPromocion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
@@ -50,13 +53,7 @@ namespace AlquileresApp.Data.Migrations
                     b.Property<DateTime>("FechaFin")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("FechaFinReserva")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("FechaInicio")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("FechaInicioReserva")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("PorcentajeDescuento")
@@ -86,9 +83,6 @@ namespace AlquileresApp.Data.Migrations
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("Destacada")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Direccion")
                         .IsRequired()

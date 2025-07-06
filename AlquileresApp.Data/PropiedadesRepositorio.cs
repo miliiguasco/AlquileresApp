@@ -7,7 +7,8 @@ using System;
 
 public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadRepositorio
 {
-    public void CargarPropiedad(Propiedad propiedad) {
+    public void CargarPropiedad(Propiedad propiedad)
+    {
         verificarPropiedadDuplicada(propiedad.Titulo);
         dbContext.Propiedades.Add(propiedad);
         dbContext.SaveChanges();
@@ -30,16 +31,21 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         return true;
     }
 
-    public List<Propiedad> ListarPropiedades(){
-        List<Propiedad> propiedades = dbContext.Propiedades
-            .Include(p => p.Imagenes)
-            .ToList();
-        if (propiedades.Count == 0)
-            throw new Exception("No se encontraron propiedades.");
-        return propiedades;
-    }
+   public List<Propiedad> ListarPropiedades()
+{
+    List<Propiedad> propiedades = dbContext.Propiedades
+        .Include(p => p.Imagenes)
+        .Include(p => p.Promociones) // 👈 Incluye las promociones asociadas
+        .ToList();
 
-    public void ModificarPropiedad(Propiedad propiedad) {
+    if (propiedades.Count == 0)
+        throw new Exception("No se encontraron propiedades.");
+
+    return propiedades;
+}
+
+    public void ModificarPropiedad(Propiedad propiedad)
+    {
         var propiedadExistente = dbContext.Propiedades.FirstOrDefault(p => p.Id == propiedad.Id);
         if (propiedadExistente == null)
             throw new Exception("La propiedad no existe");
@@ -54,20 +60,20 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         dbContext.SaveChanges();
     }
     public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin)
-{
-    var reservasExistentes = dbContext.Reservas
-        .Where(r => r.Propiedad.Id == propiedad.Id &&
-                    r.FechaInicio <= fechaFin &&
-                    r.FechaFin >= fechaInicio &&
-                    r.Estado != EstadoReserva.Cancelada &&
-                    r.Estado != EstadoReserva.Finalizada)
-        .ToList();
-
-    if (reservasExistentes.Any())
     {
-        throw new Exception("La propiedad no está disponible en las fechas seleccionadas.");
+        var reservasExistentes = dbContext.Reservas
+            .Where(r => r.Propiedad.Id == propiedad.Id &&
+                        r.FechaInicio <= fechaFin &&
+                        r.FechaFin >= fechaInicio &&
+                        r.Estado != EstadoReserva.Cancelada &&
+                        r.Estado != EstadoReserva.Finalizada)
+            .ToList();
+
+        if (reservasExistentes.Any())
+        {
+            throw new Exception("La propiedad no está disponible en las fechas seleccionadas.");
+        }
     }
-}
 
     public void MarcarPropiedadComoNoHabitable(Propiedad propiedad)
     {
@@ -77,8 +83,8 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
 
     private void verificarPropiedadDuplicada(string nombre)
     {
-        
-         string nombreTrimmed = nombre.Trim().ToLower();
+
+        string nombreTrimmed = nombre.Trim().ToLower();
 
         bool existe = dbContext.Propiedades
         .Any(p => p.Titulo.Trim().ToLower() == nombreTrimmed);
@@ -88,39 +94,62 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         }
     }
 
-   public List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros)
-{
-    var query = dbContext.Propiedades
-        .Include(p => p.Imagenes)
-        .Include(p => p.Reservas) // Asegurarse de incluirlas si se usan en la condición
-        .AsQueryable();
-
-    if (!string.IsNullOrWhiteSpace(filtros.Localidad))
+    public List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros)
     {
-        query = query.Where(p => p.Localidad.ToLower().Contains(filtros.Localidad.ToLower()));
-    }
+        var query = dbContext.Propiedades
+            .Include(p => p.Imagenes)
+            .Include(p => p.Reservas)
+            .Include(p => p.Promociones)
+            .AsQueryable();
 
-    if (filtros.CantidadHuespedes.HasValue)
-    {
-        query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
-    }
+        if (!string.IsNullOrWhiteSpace(filtros.Localidad))
+        {
+            query = query.Where(p => p.Localidad.ToLower().Contains(filtros.Localidad.ToLower()));
+        }
 
-    // Verificar disponibilidad por fechas ignorando reservas canceladas o finalizadas
-    query = query.Where(p =>
-        !p.Reservas.Any(r =>
-            r.Estado != EstadoReserva.Cancelada &&
-            r.Estado != EstadoReserva.Finalizada &&
-            (
-                (filtros.FechaInicio >= r.FechaInicio && filtros.FechaInicio < r.FechaFin) ||
-                (filtros.FechaFin > r.FechaInicio && filtros.FechaFin <= r.FechaFin) ||
-                (filtros.FechaInicio <= r.FechaInicio && filtros.FechaFin >= r.FechaFin)
+        if (filtros.CantidadHuespedes.HasValue)
+        {
+            query = query.Where(p => p.Capacidad >= filtros.CantidadHuespedes.Value);
+        }
+
+        // Verificar disponibilidad por fechas ignorando reservas canceladas o finalizadas
+        query = query.Where(p =>
+            !p.Reservas.Any(r =>
+                r.Estado != EstadoReserva.Cancelada &&
+                r.Estado != EstadoReserva.Finalizada &&
+                (
+                    (filtros.FechaInicio >= r.FechaInicio && filtros.FechaInicio < r.FechaFin) ||
+                    (filtros.FechaFin > r.FechaInicio && filtros.FechaFin <= r.FechaFin) ||
+                    (filtros.FechaInicio <= r.FechaInicio && filtros.FechaFin >= r.FechaFin)
+                )
             )
-        )
-    );
+        );
 
-    return query.ToList();
-}
+        return query.ToList();
+    }
 
+    public decimal CalcularPrecioConPromocion(Propiedad propiedad, DateTime fechaActual, DateTime fechaInicio, DateTime fechaFin)
+    {
+        var promocionesActivas = propiedad.Promociones
+        .Where(p => !p.borrada &&
+                    p.FechaInicio.Date <= fechaActual.Date &&
+                    p.FechaFin.Date >= fechaActual.Date &&
+                    p.FechaInicioReserva.Date <= fechaInicio.Date &&
+                    p.FechaFinReserva.Date >= fechaFin.Date)
+        .ToList();
+
+
+        if (!promocionesActivas.Any())
+            return propiedad.PrecioPorNoche;
+
+        // Elegí la mayor promoción, o aplicá todas si así lo querés.
+        var mejorPromocion = promocionesActivas
+            .OrderByDescending(p => p.PorcentajeDescuento)
+            .First();
+
+        var descuento = propiedad.PrecioPorNoche * (mejorPromocion.PorcentajeDescuento / 100);
+        return propiedad.PrecioPorNoche - descuento;
+    }
     public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId)
     {
         return !dbContext.Reservas.Any(r =>
@@ -133,8 +162,9 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
     }
 
 
-   // public void ValidarDisponibilidad(DateTime fechaInicio, DateTime fechaFin){ //verificar este metodo
-    public void ValidarDisponibilidad(DateTime fechaInicio, DateTime fechaFin) { //verificar este metodo
+    // public void ValidarDisponibilidad(DateTime fechaInicio, DateTime fechaFin){ //verificar este metodo
+    public void ValidarDisponibilidad(DateTime fechaInicio, DateTime fechaFin)
+    { //verificar este metodo
         var reservasExistentes = dbContext.Reservas
             .Where(r => r.FechaInicio <= fechaFin && r.FechaFin >= fechaInicio)
             .ToList();
@@ -144,18 +174,34 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
     {
         return dbContext.Propiedades
             .Include(p => p.Imagenes)
+            .Include(p => p.Promociones)
+            .Include(p => p.Reservas)
             .FirstOrDefault(p => p.Id == id);
     }
     public Propiedad? ObtenerPorId(int id)
     {
         return dbContext.Propiedades
             .Include(p => p.Imagenes)
+            .Include(p => p.Promociones)
+            .Include(p => p.Reservas)
             .FirstOrDefault(p => p.Id == id);
     }
 
     private Boolean existePropiedad(string titulo)
     {
         return dbContext.Propiedades.Any(p => p.Titulo == titulo);
+    }
+    public List<Propiedad> obtenerPropiedades()
+    {
+         var propiedades = dbContext.Propiedades
+        .Include(p => p.Imagenes)
+        .Include(p => p.Promociones)
+        .Include(p => p.Reservas)
+        .Where(p => !p.NoHabitable) 
+        .ToList();
+
+
+        return propiedades;
     }
 }
 /*

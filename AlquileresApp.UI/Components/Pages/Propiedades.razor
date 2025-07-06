@@ -62,6 +62,10 @@
                                 <button class="btn btn-danger" @onclick="() => EliminarPropiedad(prop)">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                <button class="@GetClaseBotonDestacar(prop)" @onclick="() => DestacarPropiedad(prop)">
+    <i class="@GetIconoBotonDestacar(prop)"></i>
+</button>
+
                             </td>
                         </tr>
                     }
@@ -157,7 +161,21 @@
             mostrarConfirmacion = false;
         }
     }
+    private string GetClaseBotonDestacar(Propiedad propiedad)
+{
+    return propiedad.Destacada ? "btn btn-success" : "btn btn-warning";
+}
 
+private string GetIconoBotonDestacar(Propiedad propiedad)
+{
+    return propiedad.Destacada ? "fas fa-star" : "far fa-star";
+}
+private async Task DestacarPropiedad(Propiedad propiedad)
+{
+    propiedad.Destacada = !propiedad.Destacada; // Toggle: si ya estaba destacada, la desdestaca
+    CUModificarPropiedad.Ejecutar(propiedad);
+    propiedades = CUListarPropiedades.Ejecutar();
+}
     private void CancelarConfirmacion()
     {
         mostrarConfirmacion = false;

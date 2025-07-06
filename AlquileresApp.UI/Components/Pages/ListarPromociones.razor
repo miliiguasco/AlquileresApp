@@ -46,6 +46,7 @@
                         <th>Fin</th>
                         <th>Descuento (%)</th>
                         <th>Estado</th>
+                        <th>Propiedades</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -59,6 +60,11 @@
                             <td>@promo.FechaFin.ToShortDateString()</td>
                             <td>@promo.PorcentajeDescuento</td>
                             <td>@CalcularEstado(promo)</td>
+                           <td>
+                    <button class="btn btn-info btn-sm" @onclick="() => AbrirModalPropiedades(promo)">
+                        Propiedades
+                    </button>
+                </td>
                             <td class="actions-cell">
     <button class="btn btn-primary"
             @onclick="@(() => IrAEditar(promo.Id))"
@@ -85,7 +91,37 @@
     Nueva promoción
 </button>
 </div>
-
+@if (mostrarModalPropiedades)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Propiedades de @promocionSeleccionada?.Titulo</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="CerrarModalPropiedades"></button>
+                </div>
+                <div class="modal-body">
+                    @if (promocionSeleccionada?.Propiedades != null && promocionSeleccionada.Propiedades.Any())
+                    {
+                        <ul>
+                            @foreach (var propiedad in promocionSeleccionada.Propiedades)
+                            {
+                                <li>@propiedad.Titulo - @propiedad.Direccion</li> <!-- adapta según propiedades -->
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No hay propiedades asociadas a esta promoción.</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CerrarModalPropiedades">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @if (mostrarConfirmacion)
 {
@@ -111,12 +147,10 @@
 
 @code {
     private List<Promocion> promociones = new();
-    private Promocion nuevaPromocion = new();
-    private Promocion promocionEnEdicion = null;
 
-    private bool mostrarModalEdicion = false;
     private bool mostrarConfirmacion = false;
-
+    private bool mostrarModalPropiedades = false;
+    private Promocion? promocionSeleccionada;
     private int promocionAEliminar;
     private string mensajeExito;
     private string mensajeError;
@@ -147,23 +181,6 @@
         }
     }
 
-    private async Task Crear()
-    {
-        try
-        {
-            mensajeError = null;
-            mensajeExito = null;
-            CUCrearPromocion.Ejecutar(nuevaPromocion);
-            mensajeExito = "Promoción creada exitosamente.";
-
-            nuevaPromocion = new Promocion();
-            await CargarPromociones();
-        }
-        catch (Exception ex)
-        {
-            mensajeError = $"Error al crear promoción: {ex.Message}";
-        }
-    }
 
     private void MostrarConfirmacion(int id)
     {
@@ -215,4 +232,16 @@ private bool EsBorrada(Promocion promo)
 {
     return CalcularEstado(promo) == "Borrada";
 }
+
+private void AbrirModalPropiedades(Promocion promo)
+    {
+        promocionSeleccionada = promo;
+        mostrarModalPropiedades = true;
+    }
+
+    private void CerrarModalPropiedades()
+    {
+        mostrarModalPropiedades = false;
+        promocionSeleccionada = null;
+    }
 }
