@@ -82,6 +82,7 @@ builder.Services.AddScoped<IPropiedadValidador, PropiedadValidador>();
 builder.Services.AddScoped<IReservaRepositorio, ReservaRepositorio>();
 builder.Services.AddScoped<IServicioAutenticacion, ServicioAutenticacion>();
 builder.Services.AddScoped<CasoDeUsoListarPropiedades>();
+builder.Services.AddScoped<CasoDeUsoListarPropiedadesDestacadas>();
 builder.Services.AddScoped<CasoDeUsoAgregarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoCargarImagen>();
 builder.Services.AddScoped<CasoDeUsoModificarPropiedad>();

@@ -32,18 +32,18 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         return true;
     }
 
-   public List<Propiedad> ListarPropiedades()
-{
-    List<Propiedad> propiedades = dbContext.Propiedades
-        .Include(p => p.Imagenes)
-        .Include(p => p.Promociones) // 👈 Incluye las promociones asociadas
-        .ToList();
+    public List<Propiedad> ListarPropiedades()
+    {
+        List<Propiedad> propiedades = dbContext.Propiedades
+            .Include(p => p.Imagenes)
+            .Include(p => p.Promociones) // 👈 Incluye las promociones asociadas
+            .ToList();
 
-    if (propiedades.Count == 0)
-        throw new Exception("No se encontraron propiedades.");
+        if (propiedades.Count == 0)
+            throw new Exception("No se encontraron propiedades.");
 
-    return propiedades;
-}
+        return propiedades;
+    }
 
     public void ModificarPropiedad(Propiedad propiedad)
     {
@@ -176,8 +176,8 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         return dbContext.Propiedades
             .Include(p => p.Imagenes)
             .Include(p => p.Promociones)
-            .Include(p => p.Reservas) 
-            .ThenInclude(r => r.Cliente)  
+            .Include(p => p.Reservas)
+            .ThenInclude(r => r.Cliente)
             .Include(p => p.Calificaciones)
             .FirstOrDefault(p => p.Id == id);
     }
@@ -211,16 +211,23 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
     }
     public List<Propiedad> obtenerPropiedades()
     {
-         var propiedades = dbContext.Propiedades
-        .Include(p => p.Imagenes)
-        .Include(p => p.Promociones)
-        .Include(p => p.Reservas)
-        .Where(p => !p.NoHabitable) 
-        .ToList();
+        var propiedades = dbContext.Propiedades
+       .Include(p => p.Imagenes)
+       .Include(p => p.Promociones)
+       .Include(p => p.Reservas)
+       .Where(p => !p.NoHabitable)
+       .ToList();
 
 
         return propiedades;
     }
+    public List<Propiedad> ObtenerDestacadas()
+{
+    return dbContext.Propiedades
+        .Include(p => p.Imagenes)
+        .Where(p => p.Destacada) 
+        .ToList();
+}
 }
 /*
     public List<Propiedad> ListarPropiedadesConReservas()
