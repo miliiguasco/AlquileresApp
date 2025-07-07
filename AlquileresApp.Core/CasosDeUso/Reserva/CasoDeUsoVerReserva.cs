@@ -1,4 +1,6 @@
 namespace AlquileresApp.Core.CasosDeUso.Reserva;
+
+using System.Threading.Tasks;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Core.Interfaces;
 
@@ -15,7 +17,7 @@ public class CasoDeUsoVerReserva : ICasoDeUsoVerReserva
         _usuarioRepositorio = usuarioRepositorio;
     }
 
-    public Reserva? Ejecutar(int reservaId, int usuarioId)
+    public async Task<Reserva?> Ejecutar(int reservaId, int usuarioId)
     {
         var usuario = _usuarioRepositorio.ObtenerUsuarioPorId(usuarioId);
         if (usuario == null)
@@ -23,7 +25,7 @@ public class CasoDeUsoVerReserva : ICasoDeUsoVerReserva
             throw new Exception("El usuario no existe.");
         }
 
-        var reserva = _reservaRepositorio.ObtenerReservaPorId(reservaId);
+        var reserva = await _reservaRepositorio.ObtenerReservaPorId(reservaId);
         if (reserva == null)
         {
             return null;

@@ -429,23 +429,6 @@ private async Task GuardarCambios()
         // Recargar la propiedad actualizada
         propiedad = CUObtenerPropiedad.Ejecutar(propiedadEditada.Id);
 
-        // Cambiar el estado de NoHabitable según el valor del checkbox
-        /*if (propiedad.NoHabitable)
-        {
-            // Marcar como no habitable
-            Console.WriteLine("Intentando marcar propiedad como no habitable...");
-            CUMarcarPropiedadComoNoHabitable.Ejecutar(propiedad);
-            propiedad = CUObtenerPropiedad.Ejecutar(propiedad.Id);
-        }
-        else
-        {
-            // Volver a habitable
-            Console.WriteLine("Marcando propiedad como habitable nuevamente...");
-            propiedad.NoHabitable = false;
-            await Task.Run(() => CUModificarPropiedad.Ejecutar(propiedad));
-            propiedad = CUObtenerPropiedad.Ejecutar(propiedad.Id);
-        }   */
-
         modoEdicion = false;
         await InvokeAsync(StateHasChanged);
         //await Task.Delay(100);

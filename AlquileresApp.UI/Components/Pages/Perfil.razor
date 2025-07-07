@@ -7,6 +7,7 @@
 @using AlquileresApp.Core.Interfaces
 @using AlquileresApp.Core.CasosDeUso.Tarjeta
 @using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.CasosDeUso.ContactarAdmin
 @using AlquileresApp.UI.Components
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Data
@@ -20,6 +21,7 @@
 @inject CasoDeUsoEliminarTarjeta CUEliminarTarjeta
 @inject CasoDeUsoVisualizarReserva CUVisualizarReserva
 @inject IJSRuntime JS
+@inject CasoDeUsoContactarAdmin CasoDeUsoContactarAdmin
 @attribute [Authorize]
 
 <PageTitle>Mi Perfil</PageTitle>
@@ -227,7 +229,9 @@
                             }
                             else
                             {
-                                <span class="text-muted">Sin acciones</span>
+                                <button class="btn btn-otro" @onclick="() => AbrirFormularioMensaje(reserva)">
+    <i class="bi bi-envelope"></i> Enviar mensaje sobre esta reserva
+</button>
                             }
                         </td>
                     </tr>
@@ -247,11 +251,13 @@
                     <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Estás seguro de que querés cancelar esta reserva?</p>
+                    <p>@(mensajeCancelacion ?? "¿No se encontró mensaje de cancelación?")</p>
+                    <p>¿Estás seguro de que deseas cancelar esta reserva?</p>
+                    <p>Esta acción no se puede deshacer.</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-otro btn-secondary" @onclick="CancelarConfirmacion">No</button>
-                    <button class="btn-otro btn-danger" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-danger" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
                 </div>
             </div>
         </div>
@@ -276,8 +282,29 @@
             }
         </div>
     }
-</div>
+</div> <!-- cierre de .profile-container -->
 
+@if (reservaSeleccionada != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 2000;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Enviar mensaje sobre la reserva</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarFormularioMensaje"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Propiedad:</strong> @reservaSeleccionada.Propiedad.Titulo</p>
+                    <textarea class="form-control" @bind="mensajeAEnviar" rows="5" placeholder="Escriba su mensaje aquí..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CerrarFormularioMensaje">Cancelar</button>
+                    <button class="btn btn-primary" @onclick="EnviarMensajeEmail" disabled="@enviandoMensaje">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
 
@@ -299,6 +326,8 @@
     private int reservaAEliminarId;
     private string mensajeError ;
     private string mensajeExito_misReservas;
+     private string? mensajeCancelacion;
+    private bool enviandoMensaje = false;
 
 
 
@@ -525,30 +554,29 @@
         NavigationManager.NavigateTo($"/modificarreserva/{id}");
     }
 
-    private void CancelarReserva(int id)
-    {
-        reservaAEliminarId = id;
-        mostrarConfirmacion = true; 
-        mensajeError = null;
-        mensajeExito = null;
-    }
+    private async Task CancelarReserva(int id)
+{
+    reservaAEliminarId = id;
+    var resultadoPreliminar = await casoDeUsoCancelarReserva.calcularCancelacion(id);
+    mensajeCancelacion = resultadoPreliminar.Mensaje;
+    mostrarConfirmacion = true;
+    mensajeError = null;
+    mensajeExito = null;
+    await InvokeAsync(StateHasChanged); 
+}
 
-    private void ConfirmarCancelacion()
+    private async Task ConfirmarCancelacion()
 {
     try
     {
-        var resultado = casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
+        var resultado = await casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
 
         if (resultado.EsExitosa)
         {
             mensajeExito_misReservas = resultado.Mensaje;
 
-            if (resultado.MontoReembolsado.HasValue)
-            {
-                mensajeExito_misReservas += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
-            }
 
-            CargarmisReservas();
+            await CargarmisReservas();
         }
         else
         {
@@ -581,7 +609,90 @@
     {
         mostrarConfirmacion = false;
     }
+
+private void RedirigirAlChat(int reservaId)
+{
+    NavigationManager.NavigateTo($"/chat?reservaId={reservaId}");
 }
+
+
+
+
+
+
+
+private Reserva? reservaSeleccionada;
+private string mensajeAEnviar;
+
+private void AbrirFormularioMensaje(Reserva reserva)
+{
+    reservaSeleccionada = reserva;
+    mensajeAEnviar = "";
+}
+
+private void CerrarFormularioMensaje()
+{
+    reservaSeleccionada = null;
+    mensajeAEnviar = "";
+}
+
+private async Task EnviarMensajeEmail()
+{
+    if (reservaSeleccionada is null || string.IsNullOrWhiteSpace(mensajeAEnviar))
+        return;
+
+    enviandoMensaje = true;
+    try
+    {
+        string asunto = reservaSeleccionada.Propiedad.Titulo;
+        string emailCliente = reservaSeleccionada.Cliente.Email;
+        string cuerpo = mensajeAEnviar;
+
+        await Task.Run(() =>
+        {
+            CasoDeUsoContactarAdmin.Ejecutar(reservaSeleccionada, cuerpo);
+        });
+
+        mensajeExito_misReservas = "Mensaje enviado exitosamente al administrador.";
+        reservaSeleccionada = null;
+    }
+    catch (Exception ex)
+    {
+        mensajeError = $"Error al enviar mensaje: {ex.Message}";
+    }
+    finally
+    {
+        enviandoMensaje = false;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
 
 <style>
 .profile-actions {

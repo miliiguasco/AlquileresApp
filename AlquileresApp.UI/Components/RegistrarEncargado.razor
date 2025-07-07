@@ -29,9 +29,7 @@
                             StateHasChanged(); 
                         })" />
                 <label for="email" class="form-label">Email</label>
-                <Error Mensaje="@errorEmail" />
             </div>
-
             <div class="button-container">
                 <button class="@ButtonClass" @onclick="@CancelarEdicion">
                         Volver
@@ -61,6 +59,7 @@
     public string ButtonClass { get; set; } = "";
     [Parameter]
     public EventCallback CancelarEdicion { get; set; }
+
 
     private string? errorNombre;
     private string? errorApellido;

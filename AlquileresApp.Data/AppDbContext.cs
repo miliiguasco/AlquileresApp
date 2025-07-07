@@ -29,13 +29,17 @@ namespace AlquileresApp.Data
         public DbSet<Reserva> Reservas { get; set; }
         public DbSet<Tarjeta> Tarjetas { get; set; }
         public DbSet<Imagen> Imagenes { get; set; }
+        public DbSet<Comentario> Comentarios { get; set; }
+        public DbSet<Calificacion> Calificaciones { get; set; }
+        public DbSet<Promocion> Promociones { get; set; }
+        public DbSet<PreguntaFrecuente> PreguntasFrecuentes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // Solo configurar si no está configurado desde afuera (evitar conflicto con AddDbContext)
-                var path = DbPath;
-                Console.WriteLine($"Configurando base de datos en: {path}");
-                optionsBuilder.UseSqlite($"Data Source={path}");
+            var path = DbPath;
+            Console.WriteLine($"Configurando base de datos en: {path}");
+            optionsBuilder.UseSqlite($"Data Source={path}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -70,6 +74,10 @@ namespace AlquileresApp.Data
                 .HasForeignKey(r => r.ClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Promocion>()
+               .HasMany(p => p.Propiedades)
+               .WithMany(p => p.Promociones);
+
             modelBuilder.Entity<Reserva>()
                 .HasOne(r => r.Propiedad)
                 .WithMany(p => p.Reservas)
@@ -83,6 +91,31 @@ namespace AlquileresApp.Data
                 .WithMany()
                 .HasForeignKey(t => t.ClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Relación Uno a Muchos: Propiedad con Comentarios
+            modelBuilder.Entity<Propiedad>()
+                .HasMany(p => p.Comentarios)
+                .WithOne(c => c.Propiedad)
+                .HasForeignKey(c => c.PropiedadId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                    modelBuilder.Entity<Usuario>()
+                .HasMany(u => u.ComentariosRealizados)
+                .WithOne(c => c.Usuario)
+                .HasForeignKey(c => c.UsuarioId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Calificacion>()
+                .HasOne(c => c.Propiedad)
+                .WithMany(p => p.Calificaciones)
+                .HasForeignKey(c => c.PropiedadId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Calificacion>()
+                .HasOne(c => c.Usuario)
+                .WithMany(u => u.CalificacionesRealizadas)
+                .HasForeignKey(c => c.UsuarioId)
+                .OnDelete(DeleteBehavior.SetNull); 
         }
 
         public void EnsureDatabaseCreated()

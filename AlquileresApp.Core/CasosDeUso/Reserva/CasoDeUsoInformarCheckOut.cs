@@ -8,7 +8,7 @@ public class CasoDeUsoInformarCheckOut(IReservaRepositorio reservasRepositorio)
 {
     public async Task Ejecutar(int  reservaId, int empleadoId)
     {
-        var reserva = reservasRepositorio.ObtenerReservaPorId(reservaId);
+        var reserva = await reservasRepositorio.ObtenerReservaPorId(reservaId);
         if (reserva == null)
         {
             throw new Exception("La reserva no existe.");

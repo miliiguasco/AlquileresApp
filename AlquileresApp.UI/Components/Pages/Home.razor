@@ -4,7 +4,9 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.CasosDeUso.Calificacion
 @using AlquileresApp.Core.Enumerativos
+@using AlquileresApp.Core.CasosDeUso.Promocion
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components.Forms
 @using System.IO
@@ -12,9 +14,45 @@
 @inject IWebHostEnvironment Environment
 @inject CasoDeUsoListarPropiedadesFiltrado CUListarPropiedadesFiltrado
 @inject CasoDeUsoCrearReserva CUReservarPropiedad
+@inject CasoDeUsoListarPromocionesActivas CUListarPromocionesActivas
 
+@inject CasoDeUsoMostrarCalificacion CUMostrarCalificacion
 
 <link href="css/Filtradas.css" rel="stylesheet" />
+@if (Promociones != null && Promociones.Any())
+{
+    <div id="carouselPromociones" class="carousel slide mb-5" data-bs-ride="carousel">
+        <div class="carousel-inner text-center text-white">
+            @for (int i = 0; i < Promociones.Count; i++)
+            {
+                var promo = Promociones[i];
+                var isActive = i == 0 ? "active" : "";
+                string bgClass;
+if (i % 3 == 0)
+    bgClass = "bg-primary";
+else if (i % 3 == 1)
+    bgClass = "bg-success";
+else
+    bgClass = "bg-warning text-dark";
+
+                <div class="carousel-item @isActive @bgClass p-5 rounded">
+                    <h3>@promo.Titulo</h3>
+                    <p>@promo.Descripcion</p>
+                    <h4 class="display-6 fw-bold">@promo.PorcentajeDescuento% OFF</h4>
+                </div>
+            }
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPromociones" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselPromociones" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+            <span class="visually-hidden">Siguiente</span>
+        </button>
+    </div>
+}
 <div class="container_listar_propiedades mt-5">
     <h2 class="tituloo">Busca tu lugar ideal</h2> 
 
@@ -112,7 +150,18 @@
                     <p><strong>Localidad:</strong> @propiedad.Localidad</p>
                     <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
                     <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
-
+                    <p class="calificacion-promedio">
+                    <strong>Calificación Promedio:</strong>
+                    @if (propiedad.CalificacionPromedio > 0)  
+                    {
+                        <span style="color:#FFD700;">&#9733;</span> @* Una sola estrella dorada *@
+                        <span>@propiedad.CalificacionPromedio.ToString("F1")</span> @* El número al lado (ej. 4.5) *@
+                    }
+                    else
+                    {
+                        <span>Sin calificaciones aún</span>
+                    }
+                    </p>
                     <a class="btn btn-secondary mt-2" href="/propiedad/@propiedad.Id">Ver más</a>
 
 
@@ -153,6 +202,7 @@
 </div>
 
 @code {
+private List<Promocion> Promociones = new();
     private SearchFilters Filtros = new()
 {
     FechaInicio = DateTime.Today,
@@ -169,7 +219,10 @@
         FechaNacimiento = new DateTime(1990, 1, 1)
     };
     private HashSet<int> PropiedadesExpandida = new();
-
+protected override void OnInitialized()
+    {
+        Promociones = CUListarPromocionesActivas.Ejecutar();
+    }
     private void Buscar()
     {
         Propiedades = CUListarPropiedadesFiltrado.Ejecutar(Filtros);

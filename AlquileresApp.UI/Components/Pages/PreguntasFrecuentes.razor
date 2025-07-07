@@ -1,0 +1,39 @@
+@page "/preguntas-frecuentes"
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes
+@inject CasoDeUsoMostrarPreguntasFrecuentes MostrarPreguntasFrecuentes
+
+<link href="css/PreguntasFrecuentes.css" rel="stylesheet" />
+
+<div class="preguntas-container">
+    <h3 class="preguntas-title">Preguntas Frecuentes</h3>
+
+    @if (preguntas == null)
+    {
+        <p>Cargando preguntas frecuentes...</p>
+    }
+    else if (preguntas.Count == 0)
+    {
+        <p>No hay preguntas frecuentes registradas.</p>
+    }
+    else
+    {
+        @foreach (var pregunta in preguntas)
+        {
+            <div class="pregunta-card">
+                <div class="pregunta-titulo">@pregunta.Pregunta</div>
+                <div class="pregunta-respuesta">@pregunta.Respuesta</div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<PreguntaFrecuente> preguntas;
+
+    protected override void OnInitialized()
+    {
+        preguntas = MostrarPreguntasFrecuentes.Ejecutar();
+    }
+}
+

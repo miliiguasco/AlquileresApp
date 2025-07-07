@@ -5,7 +5,8 @@ public interface IReservaRepositorio{
     void CrearReserva(Reserva reserva);
     void ModificarReserva(Reserva reserva);
     //cancelar reserva
-    public Reserva? ObtenerReservaPorId(int id);
+    Task<Reserva?> ObtenerReservaPorId(int id);
+   
 
 
     public Task EliminarAsync(int id);
@@ -16,10 +17,9 @@ public interface IReservaRepositorio{
     public List<Reserva> ListarMisReservas(int usuario);
     void Actualizar(Reserva reserva);
     public void RegistrarCheckout(Reserva reserva);
-   
+
+    IEnumerable<Reserva> ObtenerReservasPorUsuarioYPropiedad(int? usuarioId, int propiedadId);
     public void ModificarReserva2(Reserva reserva);
-
-
 }
 
 

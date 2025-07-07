@@ -48,13 +48,13 @@ namespace AlquileresApp.Data
                     Contraseña = hashService.HashPassword("password456"),
                     FechaNacimiento = new DateTime(1985, 5, 15),
                 },
-                new Encargado
+                /* new Encargado
                 {
                     Nombre = "Pablo",
                     Apellido = "Gomez",
                     Email = "pablogomez@test.com",
                     Contraseña = hashService.HashPassword("Encargado1"),
-                }
+                } */
             };
             context.Usuarios.AddRange(usuarios);
             context.SaveChanges();
@@ -168,9 +168,9 @@ namespace AlquileresApp.Data
                 {
                     ClienteId = usuarios[1].Id, // Milagros Guasco
                     PropiedadId = propiedades[0].Id, // Casa en la playa
-                    FechaInicio = DateTime.Now.AddDays(10),
+                    FechaInicio = DateTime.Now,
                     FechaFin = DateTime.Now.AddDays(15),
-                    Estado = EstadoReserva.Pendiente,
+                    Estado = EstadoReserva.Activa,
                     PrecioTotal = 3750,
                     MontoAPagar = 3750,
                     MontoRestante = 0,
@@ -207,6 +207,15 @@ namespace AlquileresApp.Data
             context.Reservas.AddRange(reservas);
             context.SaveChanges();
 
+            //Crear preguntas frecuentes de prueba
+            var preguntasFrecuentes = new List<PreguntaFrecuente>
+            {
+                new PreguntaFrecuente { Pregunta = "¿Cómo puedo reservar una propiedad?", Respuesta = "Para reservar una propiedad, debes iniciar sesión y seleccionar la propiedad que deseas alquilar. Luego, completa los datos de contacto y confirma la reserva." },
+                new PreguntaFrecuente { Pregunta = "¿Cuáles son los métodos de pago disponibles?", Respuesta = "Disponemos de varios métodos de pago, como tarjeta de crédito, transferencia bancaria y pago en efectivo. Puedes seleccionar el método que prefieras al momento de realizar la reserva." },
+            };
+            context.PreguntasFrecuentes.AddRange(preguntasFrecuentes);
+            context.SaveChanges();
+            
             //Tarjetas de prueba
             var tarjetas = new List<Tarjeta>
             {
