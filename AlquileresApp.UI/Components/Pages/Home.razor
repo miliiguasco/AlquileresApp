@@ -1,4 +1,3 @@
-
 @page "/"
 @rendermode InteractiveServer
 @using AlquileresApp.Core.Entidades
@@ -15,10 +14,10 @@
 
 
 <link href="css/Filtradas.css" rel="stylesheet" />
-<div class="container_listar_propiedades mt-5">
     <h2 class="tituloo">Busca tu lugar ideal</h2> 
 
-    <EditForm Model="Filtros" OnValidSubmit="Buscar">
+<div class="container_listar_propiedades">
+    <EditForm Model="Filtros" class="formulario-filtros" OnValidSubmit="Buscar">
         <DataAnnotationsValidator />
        <div class="validation-summary">
            <ValidationSummary />
@@ -32,7 +31,7 @@
 
             <div>
                 <label>Cantidad de personas:</label>
-                <InputNumber @bind-Value="Filtros.CantidadHuespedes" class="input" />
+                <InputNumber @bind-Value="Filtros.CantidadHuespedes" class="input" min="1" />
             </div>
 
             <div>
@@ -50,12 +49,11 @@
             </div>
         </div>
     </EditForm>
-
-    @if (Propiedades is null)
+</div>
+<div class="contenedor-resultados"> 
+     @if (Propiedades is null)
     {
-        <div class="text-center">
-            <p>...</p>
-        </div>
+        
     }
     else if (!Propiedades.Any())
     {
@@ -141,7 +139,7 @@
                     }
 
                     <div class="info-grupo">
-                            <button class="btn btn-primary" @onclick="() => IrAReservar(propiedad.Id)">
+                            <button class="btn-reservar" @onclick="() => IrAReservar(propiedad.Id)">
                                 <i class="fas fa-calendar-check"></i> Reservar esta propiedad
                             </button>
                         </div>
