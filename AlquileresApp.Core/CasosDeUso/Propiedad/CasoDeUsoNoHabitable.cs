@@ -4,6 +4,7 @@ using AlquileresApp.Core.Entidades;
 using AlquileresApp.Core.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using AlquileresApp.Core.Enumerativos;
 
 public class CasoDeUsoMarcarPropiedadComoNoHabitable(IPropiedadRepositorio propiedadesRepositorio, IReservaRepositorio reservasRepositorio)
 {
@@ -11,6 +12,7 @@ public class CasoDeUsoMarcarPropiedadComoNoHabitable(IPropiedadRepositorio propi
     {
         List<Reserva> reservasAfectadas = reservasRepositorio.ListarReservas()
             .Where(r => r.PropiedadId == propiedad.Id)
+            .Where(r => r.Estado != EstadoReserva.Cancelada && r.Estado != EstadoReserva.Finalizada)
             .ToList();
 
         var opcionesDeReubicacion = new Dictionary<Reserva, List<Propiedad>>();

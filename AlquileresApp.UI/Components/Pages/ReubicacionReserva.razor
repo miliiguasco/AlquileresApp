@@ -14,8 +14,8 @@
             <div class="modal-body">
                 @if (ReservaAfectada != null)
                 {
-                    <p>La ReservaAfectada.Propiedad.Titulo se ha marcado como no habitable.</p>
-                    <p>La ReservaAfectada.Propiedad.Titulo (del @ReservaAfectada.FechaInicio.ToShortDateString() al @ReservaAfectada.FechaFin.ToShortDateString()) para el cliente **@ReservaAfectada.Cliente.Nombre @ReservaAfectada.Cliente.Apellido** necesita ser reubicada.</p>
+                    <p>La @ReservaAfectada.Propiedad.Titulo se ha marcado como no habitable.</p>
+                    <p>La @ReservaAfectada.Propiedad.Titulo (del @ReservaAfectada.FechaInicio.ToShortDateString() al @ReservaAfectada.FechaFin.ToShortDateString()) para el cliente **@ReservaAfectada.Cliente.Nombre @ReservaAfectada.Cliente.Apellido** necesita ser reubicada.</p>
 
                     @if (AlternativasDisponibles != null && AlternativasDisponibles.Any())
                     {
