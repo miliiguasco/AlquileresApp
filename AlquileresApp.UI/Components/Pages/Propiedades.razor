@@ -66,7 +66,10 @@
                                 <button class="btn btn-danger" @onclick="() => EliminarPropiedad(prop)">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                                <button class="@GetClaseBotonDestacar(prop)" @onclick="() => DestacarPropiedad(prop)">
+                                <button style="background-color: @(prop.Destacada ? "green" : "gray"); color: white"
+        class="@GetClaseBotonDestacar(prop)"
+        @onclick="() => DestacarPropiedad(prop)"
+        disabled="@prop.NoHabitable">
     <i class="@GetIconoBotonDestacar(prop)"></i>
 </button>
 
@@ -192,6 +195,10 @@
                 // Recargar las propiedades para reflejar el cambio persistido en la DB
                 propiedades = CUListarPropiedades.Ejecutar();
             }
+             if (propiedad.NoHabitable)
+    {
+        propiedad.Destacada = false; // Quitar el destacado si no es habitable
+    }
         }
         catch (Exception ex)
         {
@@ -291,19 +298,22 @@
             mostrarConfirmacion = false;
         }
     }
-    private string GetClaseBotonDestacar(Propiedad propiedad)
+   private string GetClaseBotonDestacar(Propiedad propiedad)
 {
-    return propiedad.Destacada ? "btn btn-success" : "btn btn-warning";
+    return propiedad.Destacada ? "btn btn-success" : "btn btn-outline-secondary";
 }
 
 private string GetIconoBotonDestacar(Propiedad propiedad)
 {
     return propiedad.Destacada ? "fas fa-star" : "far fa-star";
 }
+
 private async Task DestacarPropiedad(Propiedad propiedad)
 {
-    propiedad.Destacada = !propiedad.Destacada; // Toggle: si ya estaba destacada, la desdestaca
+    propiedad.Destacada = !propiedad.Destacada;
+
     CUModificarPropiedad.Ejecutar(propiedad);
+
     propiedades = CUListarPropiedades.Ejecutar();
 }
     private void CancelarConfirmacion()

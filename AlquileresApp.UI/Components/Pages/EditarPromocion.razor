@@ -141,8 +141,7 @@ private List<int> propiedadesSeleccionadas = new();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error al guardar los cambios.");
-            errorMensaje = "No se pudo guardar la promoción. Revisá los campos.";
+           errorMensaje = $"Error al modificar la promoción: {ex.Message}";
         }
     }
 
