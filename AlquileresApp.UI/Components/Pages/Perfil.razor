@@ -241,6 +241,28 @@
     }
 </div>
 
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Cancelación</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@(mensajeCancelacion ?? "¿No se encontró mensaje de cancelación?")</p>
+                    <p>¿Estás seguro de que deseas cancelar esta reserva?</p>
+                    <p>Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-danger" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
                                 
                             </div>
                     }
@@ -304,6 +326,7 @@
     private int reservaAEliminarId;
     private string mensajeError ;
     private string mensajeExito_misReservas;
+     private string? mensajeCancelacion;
     private bool enviandoMensaje = false;
 
 
@@ -531,30 +554,29 @@
         NavigationManager.NavigateTo($"/modificarreserva/{id}");
     }
 
-    private void CancelarReserva(int id)
-    {
-        reservaAEliminarId = id;
-        mostrarConfirmacion = true; 
-        mensajeError = null;
-        mensajeExito = null;
-    }
+    private async Task CancelarReserva(int id)
+{
+    reservaAEliminarId = id;
+    var resultadoPreliminar = await casoDeUsoCancelarReserva.calcularCancelacion(id);
+    mensajeCancelacion = resultadoPreliminar.Mensaje;
+    mostrarConfirmacion = true;
+    mensajeError = null;
+    mensajeExito = null;
+    await InvokeAsync(StateHasChanged); 
+}
 
-    private void ConfirmarCancelacion()
+    private async Task ConfirmarCancelacion()
 {
     try
     {
-        var resultado = casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
+        var resultado = await casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
 
         if (resultado.EsExitosa)
         {
             mensajeExito_misReservas = resultado.Mensaje;
 
-            if (resultado.MontoReembolsado.HasValue)
-            {
-                mensajeExito_misReservas += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
-            }
 
-            CargarmisReservas();
+            await CargarmisReservas();
         }
         else
         {

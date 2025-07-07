@@ -4,6 +4,7 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.CasosDeUso.Promocion
 @using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.Interfaces
@@ -11,6 +12,10 @@
 @inject CasoDeUsoListarPropiedades CUListarPropiedades
 @inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
 @inject CasoDeUsoModificarPropiedad CUModificarPropiedad
+@inject CasoDeUsoListarPromociones CUListarPromociones
+@inject CasoDeUsoCrearPromocion CUCrearPromocion
+@inject CasoDeUsoEliminarPromocion CUEliminarPromocion
+@inject CasoDeUsoModificarPromocion CUModificarPromocion
 @inject IJSRuntime JS
 @inject CasoDeUsoCrearPreguntaFrecuente CUCrearPreguntaFrecuente
 @inject CasoDeUsoModificarPreguntaFrecuente CUModificarPreguntaFrecuente
@@ -42,6 +47,10 @@
                     @onclick='@(() => CambiarTab("propiedades"))'>
                 Propiedades
             </button>
+            <button class="tab-button @(tabActiva == "promociones" ? "active" : "")" 
+                    @onclick='@(() => CambiarTab("promociones"))'>
+                Promociones
+            </button>
             <button class="tab-button @(tabActiva == "preguntas-frecuentes" ? "active" : "")" 
                     @onclick='@(() => CambiarTab("preguntas-frecuentes"))'>
                 Preguntas Frecuentes
@@ -52,9 +61,6 @@
             @if (tabActiva == "reservas")
             {
                 <div class="tab-pane active">
-                    @{
-                        Console.WriteLine("🔄 Administrar - Renderizando ListaReservasadm");
-                    }
                     <ListaReservasadm />
                 </div>
             }
@@ -68,6 +74,12 @@
             {
                 <div class="tab-pane active">
                     <Propiedades />
+                </div>
+            }
+            else if (tabActiva == "promociones")
+            {
+                <div class="tab-pane active">
+                    <ListarPromociones />
                 </div>
             }
             else if (tabActiva == "preguntas-frecuentes")
@@ -195,6 +207,8 @@
 @code {
     private string tabActiva = "reservas";
     private List<Propiedad>? propiedades;
+    private List<Promocion>? promociones;
+
     private List<PreguntaFrecuente> preguntas = new();
     private bool mostrarModalEdicion = false;
     private PreguntaFrecuente preguntaEditada = new();
@@ -214,49 +228,21 @@
 
     private async Task CambiarTab(string tab)
     {
-        Console.WriteLine($"🔄 Cambiando a tab: {tab}");
         tabActiva = tab;
         await InvokeAsync(StateHasChanged);
     }
 
     private Task CargarPropiedades()
     {
-        try
-        {
-            propiedades = CUListarPropiedades.Ejecutar();
-            StateHasChanged();
-        }
-        catch
-        {
-            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
-        }
+        propiedades = CUListarPropiedades.Ejecutar();
+        StateHasChanged();
         return Task.CompletedTask;
-    }
-
-    private async Task EditarPropiedad(Propiedad propiedad)
-    {
-        try
-        {
-            CUModificarPropiedad.Ejecutar(propiedad);
-            await CargarPropiedades();
-        }
-        catch
-        {
-            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
-        }
     }
 
     private async Task EliminarPropiedad(Propiedad propiedad)
     {
-        try
-        {
-            CUEliminarPropiedad.Ejecutar(propiedad);
-            await CargarPropiedades();
-        }
-        catch
-        {
-            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
-        }
+        CUEliminarPropiedad.Ejecutar(propiedad);
+        await CargarPropiedades();
     }
 
     private void EditarPregunta(PreguntaFrecuente pregunta)

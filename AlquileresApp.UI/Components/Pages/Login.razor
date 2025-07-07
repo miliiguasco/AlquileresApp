@@ -5,6 +5,7 @@
 @using System.ComponentModel.DataAnnotations
 @using AlquileresApp.Core.Entidades
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
 @inject NavigationManager NavigationManager
 @inject CasoDeUsoIniciarSesion CUIniciarSesion
 <link href="css/RegistrarUsuario.css" rel="stylesheet" />
@@ -40,6 +41,9 @@
     private string? errorMensaje;
     private string nombreUsuario = "";
 
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
     private class LoginModel
     {
         [Required(ErrorMessage = "El email es requerido")]
@@ -57,7 +61,7 @@
             errorMensaje = null;
             Usuario usuario = await CUIniciarSesion.Ejecutar(loginModel.Correo, loginModel.Contraseña);
             nombreUsuario = usuario.Nombre;
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo(ReturnUrl ?? "/", true);
         }
         catch (Exception ex)
         {   

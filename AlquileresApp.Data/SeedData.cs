@@ -48,13 +48,13 @@ namespace AlquileresApp.Data
                     Contraseña = hashService.HashPassword("password456"),
                     FechaNacimiento = new DateTime(1985, 5, 15),
                 },
-                new Encargado
+                /* new Encargado
                 {
                     Nombre = "Pablo",
                     Apellido = "Gomez",
                     Email = "pablogomez@test.com",
                     Contraseña = hashService.HashPassword("Encargado1"),
-                }
+                } */
             };
             context.Usuarios.AddRange(usuarios);
             context.SaveChanges();
@@ -168,9 +168,9 @@ namespace AlquileresApp.Data
                 {
                     ClienteId = usuarios[1].Id, // Milagros Guasco
                     PropiedadId = propiedades[0].Id, // Casa en la playa
-                    FechaInicio = DateTime.Now.AddDays(10),
+                    FechaInicio = DateTime.Now,
                     FechaFin = DateTime.Now.AddDays(15),
-                    Estado = EstadoReserva.Pendiente,
+                    Estado = EstadoReserva.Activa,
                     PrecioTotal = 3750,
                     MontoAPagar = 3750,
                     MontoRestante = 0,

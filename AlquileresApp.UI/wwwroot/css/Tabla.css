@@ -2,6 +2,14 @@
     padding: 1rem;
 }
 
+.registro-container {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem; 
+}
+
 .table-container {
     margin-top: 0.3rem;
     overflow-x: auto;

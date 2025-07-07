@@ -4776,19 +4776,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Admin\\.nuget\\packages\\": {}
+    "C:\\Users\\Manu\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp-1\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
+      "projectUniqueName": "C:\\Users\\Manu\\Desktop\\AlquilandoApp\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
       "projectName": "AlquileresApp.Data",
-      "projectPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp-1\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
-      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp-1\\AlquileresApp.Data\\obj\\",
+      "projectPath": "C:\\Users\\Manu\\Desktop\\AlquilandoApp\\AlquileresApp\\AlquileresApp.Data\\AlquileresApp.Data.csproj",
+      "packagesPath": "C:\\Users\\Manu\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Manu\\Desktop\\AlquilandoApp\\AlquileresApp\\AlquileresApp.Data\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Manu\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -4800,8 +4800,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp-1\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
-              "projectPath": "C:\\Users\\Admin\\Desktop\\Alquilando\\AlquileresApp-1\\AlquileresApp.Core\\AlquileresApp.Core.csproj"
+            "C:\\Users\\Manu\\Desktop\\AlquilandoApp\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj": {
+              "projectPath": "C:\\Users\\Manu\\Desktop\\AlquilandoApp\\AlquileresApp\\AlquileresApp.Core\\AlquileresApp.Core.csproj"
             }
           }
         }
@@ -4859,7 +4859,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

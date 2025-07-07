@@ -21,7 +21,7 @@ public class Reserva
 
     public Reserva() { }
 
-    public Reserva(Cliente cliente, Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin, int cantidadHuespedes, decimal montoAPagar)
+    public Reserva(Cliente cliente, Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin, int cantidadHuespedes, decimal montoTotal, decimal montoAPagar)
     {
         Cliente = cliente;
         ClienteId = cliente.Id;
@@ -30,7 +30,7 @@ public class Reserva
         FechaInicio = fechaInicio;
         FechaFin = fechaFin;
         Estado = EstadoReserva.Pendiente;
-        PrecioTotal = propiedad.PrecioPorNoche * (decimal)(fechaFin - fechaInicio).TotalDays;
+        PrecioTotal = montoTotal;
         TipoPago = propiedad.TipoPago;
         CantidadHuespedes = cantidadHuespedes;
         MontoAPagar = montoAPagar;

@@ -5,6 +5,7 @@ using AlquileresApp.Data;
 using AlquileresApp.Core.CasosDeUso.Usuario;
 using AlquileresApp.Core.CasosDeUso.Administrador;
 using AlquileresApp.Core.CasosDeUso.Propiedad;
+
 using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Validadores;
 using AlquileresApp.Core.Servicios;
@@ -13,8 +14,12 @@ using AlquileresApp.Core.Entidades;
 using AlquileresApp.Core.CasosDeUso.Imagen;
 using AlquileresApp.Core.CasosDeUso.Reserva;
 using AlquileresApp.Core.CasosDeUso.Tarjeta;
+using AlquileresApp.Core.CasosDeUso.Comentario;
+using AlquileresApp.Core.CasosDeUso.Calificacion;
 using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
+using AlquileresApp.Core.CasosDeUso.Promocion;
+
 using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes;
 using AlquileresApp.Core.CasosDeUso.ContactarAdmin;
 
@@ -77,10 +82,13 @@ builder.Services.AddScoped<IPropiedadValidador, PropiedadValidador>();
 builder.Services.AddScoped<IReservaRepositorio, ReservaRepositorio>();
 builder.Services.AddScoped<IServicioAutenticacion, ServicioAutenticacion>();
 builder.Services.AddScoped<CasoDeUsoListarPropiedades>();
+builder.Services.AddScoped<CasoDeUsoListarPropiedadesDestacadas>();
 builder.Services.AddScoped<CasoDeUsoAgregarPropiedad>();
 builder.Services.AddScoped<CasoDeUsoCargarImagen>();
 builder.Services.AddScoped<CasoDeUsoModificarPropiedad>();
+builder.Services.AddScoped<CasoDeUsoCalcularPrecioConPromocion>();
 builder.Services.AddScoped<CasoDeUsoEliminarPropiedad>();
+builder.Services.AddScoped<CasoDeUsoObtenerPropiedades>();
 builder.Services.AddScoped<CasoDeUsoMostrarImagenes>();
 builder.Services.AddScoped<CasoDeUsoEliminarImagen>();
 builder.Services.AddScoped<CasoDeUsoEliminarPropiedad>();
@@ -97,6 +105,7 @@ builder.Services.AddScoped<CasoDeUsoModificarReserva>();
 builder.Services.AddScoped<CasoDeUsoObtenerReserva>();
 builder.Services.AddScoped<CasoDeUsoRegistrarEncargado>(); 
 builder.Services.AddScoped<CasoDeUsoListarEncargados>();
+builder.Services.AddScoped<CasoDeUsoEliminarEncargado>();
 builder.Services.AddTransient<INotificadorEmail>(provider =>
     new NotificadorEmail(
         "reservaenalquilando@gmail.com",
@@ -111,14 +120,25 @@ builder.Services.AddScoped<CasoDeUsoModificarTarjeta>();
 builder.Services.AddScoped<ICasoDeUsoVerReserva, CasoDeUsoVerReserva>();
 builder.Services.AddScoped<CasoDeUsoCerrarSesion>();
 builder.Services.AddScoped<CasoDeUsoListarReservasAdm>();
+builder.Services.AddScoped<IComentarioRepositorio, ComentarioRepositorio>();
+builder.Services.AddScoped<CasoDeUsoAgregarComentario>();
+builder.Services.AddScoped<CasoDeUsoListarComentarios>();
+builder.Services.AddScoped<CasoDeUsoOcultarComentario>();
+builder.Services.AddScoped<CasoDeUsoRegistrarCheckout>();
+builder.Services.AddScoped<ICalificacionRepositorio, CalificacionRepositorio>();
+builder.Services.AddScoped<CasoDeUsoAgregarCalificacion>();
+builder.Services.AddScoped<CasoDeUsoMostrarCalificacion>();
+builder.Services.AddScoped<CasoDeUsoMarcarPropiedadComoNoHabitable>();
+
 
 builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
-builder.Services.AddTransient<INotificadorEmail>(provider =>
-    new NotificadorEmail(
-        "reservaenalquilando@gmail.com",
-        "fxsl hsck basy pamv"
-    )
-);
+builder.Services.AddScoped<CasoDeUsoEliminarPromocion>();
+builder.Services.AddScoped<IPromocionRepositorio, PromocionRepositorio>();
+builder.Services.AddScoped<CasoDeUsoCrearPromocion>();
+builder.Services.AddScoped<CasoDeUsoListarPromociones>();
+builder.Services.AddScoped<CasoDeUsoModificarPromocion>();
+builder.Services.AddScoped<CasoDeUsoObtenerPromocion>();
+builder.Services.AddScoped<CasoDeUsoListarPromocionesActivas>(); 
 
 builder.Services.AddScoped<IPreguntasFrecuentesRepositorio, PreguntaFrecuenteRepositorio>();
 builder.Services.AddScoped<CasoDeUsoMostrarPreguntasFrecuentes>();

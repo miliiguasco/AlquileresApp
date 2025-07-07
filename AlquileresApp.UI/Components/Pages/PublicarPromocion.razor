@@ -1,0 +1,153 @@
+@page "/PublicarPromocion"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Promocion
+@using AlquileresApp.Core.Interfaces
+@inject CasoDeUsoCrearPromocion CUCrearPromocion
+@inject IPropiedadRepositorio PropiedadRepo
+@inject NavigationManager NavigationManager
+
+<PageTitle>Publicar Promoción</PageTitle>
+<link href="css/VerPropiedad.css" rel="stylesheet" />
+
+<div class="propiedad-container bg-light p-4 rounded shadow-sm my-5">
+    <h1 class="registro-title">Publicar Nueva Promoción</h1>
+
+    <EditForm Model="@nuevaPromocion" OnValidSubmit="CrearPromocion">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="titulo">Título</label>
+            <InputText id="titulo" class="form-control" @bind-Value="nuevaPromocion.Titulo" />
+            <ValidationMessage For="@(() => nuevaPromocion.Titulo)" />
+        </div>
+
+        <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <InputTextArea id="descripcion" class="form-control" @bind-Value="nuevaPromocion.Descripcion" rows="3" />
+            <ValidationMessage For="@(() => nuevaPromocion.Descripcion)" />
+        </div>
+
+        <div class="form-group">
+            <label for="fechaInicio">Fecha de Inicio</label>
+            <InputDate id="fechaInicio" class="form-control" @bind-Value="nuevaPromocion.FechaInicio" />
+            <ValidationMessage For="@(() => nuevaPromocion.FechaInicio)" />
+        </div>
+
+        <div class="form-group">
+            <label for="fechaFin">Fecha de Fin</label>
+            <InputDate id="fechaFin" class="form-control" @bind-Value="nuevaPromocion.FechaFin" />
+            <ValidationMessage For="@(() => nuevaPromocion.FechaFin)" />
+        </div>
+        <div class="form-group">
+            <label for="fechaInicio">Fecha de Inicio de reserva</label>
+            <InputDate id="fechaInicio" class="form-control" @bind-Value="nuevaPromocion.FechaInicioReserva" />
+            <ValidationMessage For="@(() => nuevaPromocion.FechaInicioReserva)" />
+        </div>
+
+        <div class="form-group">
+            <label for="fechaFin">Fecha de Fin de reserva</label>
+            <InputDate id="fechaFin" class="form-control" @bind-Value="nuevaPromocion.FechaFinReserva" />
+            <ValidationMessage For="@(() => nuevaPromocion.FechaFinReserva)" />
+        </div>
+
+        <div class="form-group">
+            <label for="descuento">Porcentaje de Descuento</label>
+            <InputNumber id="descuento" class="form-control" @bind-Value="nuevaPromocion.PorcentajeDescuento" />
+            <ValidationMessage For="@(() => nuevaPromocion.PorcentajeDescuento)" />
+        </div>
+
+        <div class="form-group mt-3">
+    <label>Propiedades a las que se aplicará la promoción:</label>
+    @if (propiedadesDisponibles?.Any() == true)
+    {
+        foreach (var propiedad in propiedadesDisponibles)
+        {
+             <div class="form-check">
+                <input 
+                    type="checkbox" 
+                    class="form-check-input"
+                    id="@($"propiedad-{propiedad.Id}")"
+                    checked="@BindPropiedad(propiedad.Id)"
+                    @onchange="e => BindPropiedad(propiedad.Id, ((ChangeEventArgs)e).Value is true)" />
+
+                <label class="form-check-label" for="@($"propiedad-{propiedad.Id}")">@propiedad.Titulo</label>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-muted">No hay propiedades disponibles.</p>
+    }
+</div>
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary">Publicar Promoción</button>
+            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(errorMensaje))
+        {
+            <div class="alert alert-danger mt-2">@errorMensaje</div>
+        }
+        @if (!string.IsNullOrEmpty(mensajeExito))
+        {
+            <div class="alert alert-success mt-2">@mensajeExito</div>
+        }
+    </EditForm>
+</div>
+
+@code {
+    private Promocion nuevaPromocion = new();
+    private List<Propiedad> propiedadesDisponibles = new();
+    private List<int> propiedadesSeleccionadas = new();
+    private string? errorMensaje;
+    private string? mensajeExito;
+
+protected override void OnInitialized()
+{
+    var hoy = DateTime.Today;
+    nuevaPromocion.FechaInicio = hoy;
+    nuevaPromocion.FechaFin = hoy.AddDays(1);
+    nuevaPromocion.FechaInicioReserva = hoy;
+    nuevaPromocion.FechaFinReserva = hoy.AddDays(1);
+    propiedadesDisponibles = PropiedadRepo.obtenerPropiedades();
+}
+    private async Task CrearPromocion()
+    {
+        try
+        {
+            CUCrearPromocion.Ejecutar(nuevaPromocion, propiedadesSeleccionadas);
+            mensajeExito = "Promoción creada exitosamente.";
+            NavigationManager.NavigateTo("/Administrar");
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al crear promoción: {ex.Message}";
+        }
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/Administrar");
+    }
+
+    private bool BindPropiedad(int id)
+{
+    return propiedadesSeleccionadas.Contains(id);
+}
+
+private void BindPropiedad(int id, bool seleccionado)
+{
+    if (seleccionado)
+    {
+        if (!propiedadesSeleccionadas.Contains(id))
+            propiedadesSeleccionadas.Add(id);
+    }
+    else
+    {
+        propiedadesSeleccionadas.Remove(id);
+    }
+}
+}

@@ -70,7 +70,7 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
 
         if (existe)
         {
-            throw new Exception("El correo ya se encuentra registrado");
+            throw new Exception("El email ya se encuentra registrado");
         }
     }
      public bool tieneTarjeta(Usuario cliente)
