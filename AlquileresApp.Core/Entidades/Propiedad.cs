@@ -25,5 +25,8 @@ public class Propiedad
     public decimal MontoPagoAnticipado { get; set; }
     public List<Promocion> Promociones { get; set; } = new();
     public bool Destacada { get; set; } = false;
+    public ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
+    public double CalificacionPromedio { get; set; } = 0; 
+    public ICollection<Calificacion> Calificaciones { get; set; } = new List<Calificacion>();
 }
 

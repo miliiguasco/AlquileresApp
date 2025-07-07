@@ -2,6 +2,7 @@ using AlquileresApp.Core.Interfaces;
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Data;
 using Microsoft.EntityFrameworkCore;
+
 using AlquileresApp.Core.Enumerativos;
 using System;
 
@@ -175,7 +176,9 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         return dbContext.Propiedades
             .Include(p => p.Imagenes)
             .Include(p => p.Promociones)
-            .Include(p => p.Reservas)
+            .Include(p => p.Reservas) 
+            .ThenInclude(r => r.Cliente)  
+            .Include(p => p.Calificaciones)
             .FirstOrDefault(p => p.Id == id);
     }
     public Propiedad? ObtenerPorId(int id)
@@ -184,7 +187,22 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             .Include(p => p.Imagenes)
             .Include(p => p.Promociones)
             .Include(p => p.Reservas)
+            .ThenInclude(r => r.Cliente)
+            .Include(p => p.Calificaciones)
             .FirstOrDefault(p => p.Id == id);
+    }
+
+    public void ActualizarCalificacionPromedio(int propiedadId, double nuevoPromedio)
+    {
+        var propiedad = dbContext.Propiedades.Find(propiedadId); // Usamos Find para obtener la entidad directamente por PK
+
+        if (propiedad == null)
+        {
+            throw new Exception($"La propiedad con ID {propiedadId} no fue encontrada para actualizar su calificación promedio.");
+        }
+
+        propiedad.CalificacionPromedio = nuevoPromedio; // Actualizamos solo este campo
+        dbContext.SaveChanges(); // Guardamos los cambios
     }
 
     private Boolean existePropiedad(string titulo)

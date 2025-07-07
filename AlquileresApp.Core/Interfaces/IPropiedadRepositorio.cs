@@ -17,6 +17,8 @@ public interface IPropiedadRepositorio
     public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId);
     public decimal CalcularPrecioConPromocion(Propiedad propiedad, DateTime fecha, DateTime fechaInicio, DateTime fechaFin);
     public List<Propiedad> obtenerPropiedades();
+    
+    void ActualizarCalificacionPromedio(int propiedadId, double nuevoPromedio); // ¡Nuevo método!
 }
 
 

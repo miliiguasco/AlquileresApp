@@ -53,18 +53,27 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
             .Include(r => r.Propiedad)
             .FirstOrDefaultAsync(r => r.Id == id);
     }
+    public IEnumerable<Reserva> ObtenerReservasPorUsuarioYPropiedad(int? usuarioId, int propiedadId)
+    {
+       
+        return dbContext.Reservas
+                       .Include(r => r.Cliente)
+                       .Include(r => r.Propiedad)
+                       .Where(r => r.ClienteId == usuarioId && r.PropiedadId == propiedadId)
+                       .ToList(); // Materializa la consulta para devolver una lista
+    }
 
     public void ModificarReserva2(Reserva reserva)
     {
-        var existingReserva = dbContext.Reservas.Find(reserva.Id); // O alguna forma de obtener la reserva existente
+        var existingReserva = dbContext.Reservas.Find(reserva.Id);
 
         if (existingReserva != null)
         {
             // Actualizar las propiedades necesarias
-            existingReserva.PropiedadId = reserva.Propiedad.Id; // Asegúrate de asignar el ID
-            existingReserva.Propiedad = reserva.Propiedad;     // También podrías necesitar asignar la navegación
+            existingReserva.PropiedadId = reserva.Propiedad.Id; 
+            existingReserva.Propiedad = reserva.Propiedad;    
 
-            dbContext.Reservas.Update(existingReserva); // O _dbContext.Entry(existingReserva).State = EntityState.Modified;
+            dbContext.Reservas.Update(existingReserva); 
             dbContext.SaveChanges();
         }
         else

@@ -14,6 +14,8 @@ using AlquileresApp.Core.Entidades;
 using AlquileresApp.Core.CasosDeUso.Imagen;
 using AlquileresApp.Core.CasosDeUso.Reserva;
 using AlquileresApp.Core.CasosDeUso.Tarjeta;
+using AlquileresApp.Core.CasosDeUso.Comentario;
+using AlquileresApp.Core.CasosDeUso.Calificacion;
 using AlquileresApp.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 using AlquileresApp.Core.CasosDeUso.Promocion;
@@ -117,6 +119,16 @@ builder.Services.AddScoped<CasoDeUsoModificarTarjeta>();
 builder.Services.AddScoped<ICasoDeUsoVerReserva, CasoDeUsoVerReserva>();
 builder.Services.AddScoped<CasoDeUsoCerrarSesion>();
 builder.Services.AddScoped<CasoDeUsoListarReservasAdm>();
+builder.Services.AddScoped<IComentarioRepositorio, ComentarioRepositorio>();
+builder.Services.AddScoped<CasoDeUsoAgregarComentario>();
+builder.Services.AddScoped<CasoDeUsoListarComentarios>();
+builder.Services.AddScoped<CasoDeUsoOcultarComentario>();
+builder.Services.AddScoped<CasoDeUsoRegistrarCheckout>();
+builder.Services.AddScoped<ICalificacionRepositorio, CalificacionRepositorio>();
+builder.Services.AddScoped<CasoDeUsoAgregarCalificacion>();
+builder.Services.AddScoped<CasoDeUsoMostrarCalificacion>();
+builder.Services.AddScoped<CasoDeUsoMarcarPropiedadComoNoHabitable>();
+
 
 builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });
 builder.Services.AddScoped<CasoDeUsoEliminarPromocion>();
