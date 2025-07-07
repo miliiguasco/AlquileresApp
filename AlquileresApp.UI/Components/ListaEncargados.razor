@@ -85,6 +85,27 @@
     }
 </div>
 
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarEliminacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro que querés eliminar este encargado?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarEliminacion">No</button>
+                    <button class="btn btn-danger" @onclick="ConfirmarEliminacion">Sí</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private List<Encargado>? encargados;
     private RegistrarEncargado.InputModel Input = new();
@@ -92,6 +113,8 @@
     private bool registrar = false; 
     private string? errorMensaje = null; 
     public bool registroExitoso = false; 
+    private bool mostrarConfirmacion = false;
+    private int idEncargadoAEliminar;
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,9 +132,16 @@
     }
     private void EliminarEncargado(int id)
     {
+        mostrarConfirmacion = true;
+        idEncargadoAEliminar = id;
+    }
+
+    private void ConfirmarEliminacion()
+    {
         try
         {
-            CUEliminarEncargado.Ejecutar(id);
+            CUEliminarEncargado.Ejecutar(idEncargadoAEliminar);
+            mostrarConfirmacion = false;
             encargados = CUListarEncargados.Ejecutar();
             StateHasChanged(); 
         }
@@ -120,6 +150,11 @@
             errorMensaje = ex.Message; 
             StateHasChanged(); 
         }
+    }
+
+    private void CancelarEliminacion()
+    {
+        mostrarConfirmacion = false;
     }
 
     public void NuevoEncargado() {
