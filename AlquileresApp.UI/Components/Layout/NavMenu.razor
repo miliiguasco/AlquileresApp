@@ -15,7 +15,7 @@
 @using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes
 @rendermode InteractiveServer
 
-<link href="css/NavMenu.css" rel="stylesheet" />
+<link href="css/NavMenu.razor.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 @if (isDropdownOpen)
@@ -23,18 +23,21 @@
     <div class="dropdown-overlay" @onclick="CerrarDropdown"></div>
 }
 
-<nav class="navbar">
-    <div class="container">
-        <a class="navbar-brand" href="/">
-            <img src="/images/logo.png" alt="Logo" class="logo">
+<nav class="navbar custom-navbar">
+    <div class="container d-flex justify-content-between align-items-center">
+
+        <!-- IZQUIERDA -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="/images/logo.png" alt="Logo" class="logo me-2">
             <span class="brand-text">Alquilando</span>
         </a>
 
+        <!-- DERECHA -->
         <AuthorizeView>
             <Authorized>
                 <div class="auth-buttons">
                     <div class="dropdown">
-                        <button class="dropdown-toggle btn btn-dropdown" @onclick:stopPropagation @onclick="ToggleDropdown">
+                        <button class="dropdown-toggle btn btn-auth" @onclick:stopPropagation @onclick="ToggleDropdown">
                             ¡Hola, @context.User.Identity?.Name!
                         </button>
                         @if (isDropdownOpen)
@@ -61,15 +64,16 @@
             </Authorized>
             <NotAuthorized>
                 <div class="auth-buttons">
-        
-                    <a href="/Login" class="btn">Iniciar Sesión</a>
-                    <a href="/Registro" class="btn">Registrarse</a>
-                    <a href="/preguntas-frecuentes" class="btn btn-primary">Preguntas Frecuentes</a>
+                    <a href="/Login" class="btn btn-auth">Iniciar Sesión</a>
+                    <a href="/Registro" class="btn btn-auth">Registrarse</a>
+                    <a href="/preguntas-frecuentes" class="btn btn-auth">Preguntas Frecuentes</a>
                 </div>
             </NotAuthorized>
         </AuthorizeView>
+
     </div>
 </nav>
+
 
 @code {
     private bool isDropdownOpen = false;
