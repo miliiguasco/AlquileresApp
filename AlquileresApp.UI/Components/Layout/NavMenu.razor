@@ -1,0 +1,92 @@
+@namespace AlquileresApp.UI.Components.Layout
+@inherits ComponentBase
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Authorization
+@using AlquileresApp.Core.Servicios
+@using AlquileresApp.Core.CasosDeUso.Usuario
+@inject NavigationManager NavigationManager
+@inject ServicioAutenticacion ServicioAutenticacion
+@inject IUsuarioRepositorio UsuarioRepositorio
+@inject CasoDeUsoCerrarSesion CUCerrarSesion
+@using System.Security.Claims
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes
+@rendermode InteractiveServer
+
+<link href="css/NavMenu.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+@if (isDropdownOpen)
+{
+    <div class="dropdown-overlay" @onclick="CerrarDropdown"></div>
+}
+
+<nav class="navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="/images/logo.png" alt="Logo" class="logo">
+            <span class="brand-text">Alquilando</span>
+        </a>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="auth-buttons">
+                    <div class="dropdown">
+                        <button class="dropdown-toggle btn btn-dropdown" @onclick:stopPropagation @onclick="ToggleDropdown">
+                            ¡Hola, @context.User.Identity?.Name!
+                        </button>
+                        @if (isDropdownOpen)
+                        {
+                            <div class="dropdown-menu show" @onclick:stopPropagation>
+                                <a class="dropdown-item" href="/Perfil/@context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value">
+                                    <i class="bi bi-person"></i> Ver perfil
+                                </a>
+                                @if (context.User.IsInRole("Administrador"))
+                                {
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="/Administrar">
+                                        <i class="bi bi-gear"></i> Administrar
+                                    </a>
+                                }
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" @onclick="CerrarSesion">
+                                    <i class="bi bi-box-arrow-right"></i> Salir
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="auth-buttons">
+        
+                    <a href="/Login" class="btn">Iniciar Sesión</a>
+                    <a href="/Registro" class="btn">Registrarse</a>
+                    <a href="/preguntas-frecuentes" class="btn btn-primary">Preguntas Frecuentes</a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</nav>
+
+@code {
+    private bool isDropdownOpen = false;
+
+    private void ToggleDropdown()
+    {
+        isDropdownOpen = !isDropdownOpen;
+    }
+
+    private void CerrarDropdown()
+    {
+        isDropdownOpen = false;
+    }
+
+    private async Task CerrarSesion()
+    {
+        await CUCerrarSesion.Ejecutar();
+        NavigationManager.NavigateTo("/", true);
+    }
+}

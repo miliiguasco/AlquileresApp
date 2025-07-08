@@ -1,0 +1,116 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using AlquileresApp.Core.Entidades
+@using System.Collections.Generic
+
+<link href="css/RegistrarUsuario.css" rel="stylesheet" />
+<div class="registro-container mt-compacto">
+    <h6 class="registro-title">Alta Encargado</h6>
+    <div class="registro-form">
+        <EditForm Model="Input" OnValidSubmit="OnSubmit" OnInvalidSubmit="ManejarInvalidSubmit" FormName="@FormName">
+            <DataAnnotationsValidator />
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Nombre" class="form-control" aria-required="true" @oninput="@(() => { errorNombre = null; StateHasChanged(); })" />
+                <label for="nombre" class="form-label">Nombre</label>
+                <Error Mensaje="@errorNombre" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Apellido" class="form-control" aria-required="true" @oninput="@(() => { errorApellido = null; StateHasChanged(); })" />
+                <label for="apellido" class="form-label">Apellido</label>
+                <Error Mensaje="@errorApellido" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Email" 
+                        class="form-control" 
+                        aria-required="true" 
+                        @oninput="@(() => { 
+                            errorEmail = null; 
+                            OnEmailChange.InvokeAsync();
+                            StateHasChanged(); 
+                        })" />
+                <label for="email" class="form-label">Email</label>
+            </div>
+            <div class="button-container">
+                <button class="@ButtonClass" @onclick="@CancelarEdicion">
+                        Volver
+                </button>
+                <button type="submit" class="@ButtonClass">@SubmitButtonText</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public InputModel Input { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    [Parameter]
+    public EventCallback OnEmailChange { get; set; }
+
+    [Parameter]
+    public string FormName { get; set; } = "DatosForm";
+
+    [Parameter]
+    public string SubmitButtonText { get; set; } = "Guardar";
+
+    [Parameter]
+    public string ButtonClass { get; set; } = "";
+    [Parameter]
+    public EventCallback CancelarEdicion { get; set; }
+
+
+    private string? errorNombre;
+    private string? errorApellido;
+    private string? errorEmail;
+
+    public void LimpiarErrores()
+    {
+        errorNombre = null;
+        errorApellido = null;
+        errorEmail = null;
+        StateHasChanged();
+    }
+
+    private void ManejarInvalidSubmit()
+    {
+        ValidarCampos();
+        StateHasChanged();
+    }
+
+    private void ValidarCampos()
+    {
+        var context = new ValidationContext(Input);
+        var results = new List<ValidationResult>();
+        
+        if (!Validator.TryValidateObject(Input, context, results, true))
+        {
+            foreach (var result in results)
+            {
+                if (result.MemberNames.Contains(nameof(Input.Nombre)))
+                    errorNombre = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.Apellido)))
+                    errorApellido = result.ErrorMessage;
+                else if (result.MemberNames.Contains(nameof(Input.Email)))
+                    errorEmail = result.ErrorMessage;
+            }
+        }
+    }
+
+    public class InputModel
+    {
+        [Required(ErrorMessage = "El nombre es requerido")]
+        [DataType(DataType.Text)]
+        public string Nombre { get; set; } = "";
+
+        [Required(ErrorMessage = "El apellido es requerido")]
+        [DataType(DataType.Text)]
+        public string Apellido { get; set; } = "";
+
+        [Required(ErrorMessage = "El correo es requerido")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "El correo ingresado es inválido")]
+        [DataType(DataType.Text)]
+        public string Email { get; set; } = "";
+    }
+} 

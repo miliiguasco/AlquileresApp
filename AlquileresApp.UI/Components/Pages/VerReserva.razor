@@ -1,0 +1,203 @@
+@page "/reserva/{ReservaId:int}"
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.Interfaces
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject ICasoDeUsoVerReserva CUVerReserva
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILogger<VerReserva> Logger
+@inject IUsuarioRepositorio UsuarioRepositorio
+
+<PageTitle>Detalles de la Reserva</PageTitle>
+
+<div class="container mt-4">
+    @if (cargando)
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    }
+    else if (reserva == null)
+    {
+        <div class="alert alert-warning text-center">
+            <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+            <h4 class="alert-heading">Reserva no encontrada</h4>
+            <p>La reserva que estás buscando no existe o no tienes permisos para verla.</p>
+            <hr>
+            <button class="btn btn-primary" @onclick="VolverAtras">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-calendar-check"></i> Detalles de la Reserva
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Información de la Reserva</h4>
+                        <div class="mb-3">
+                            <label class="fw-bold">Estado:</label>
+                            <span class="badge @ObtenerClaseEstado(reserva.Estado.ToString())">
+                                @reserva.Estado
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Fecha de Inicio:</label>
+                            <p>@reserva.FechaInicio.ToShortDateString()</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Fecha de Fin:</label>
+                            <p>@reserva.FechaFin.ToShortDateString()</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Monto Total:</label>
+                            <p>$@reserva.PrecioTotal.ToString("N2")</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Información de la Propiedad</h4>
+                        <div class="mb-3">
+                            <label class="fw-bold">Título:</label>
+                            <p>@reserva.Propiedad?.Titulo</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Dirección:</label>
+                            <p>@reserva.Propiedad?.Direccion</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Localidad:</label>
+                            <p>@reserva.Propiedad?.Localidad</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Precio por Noche:</label>
+                            <p>$@reserva.Propiedad?.PrecioPorNoche.ToString("N2")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="btn btn-secondary" @onclick="VolverAtras">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int ReservaId { get; set; }
+
+    private Reserva? reserva;
+    private bool cargando = true;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (ReservaId <= 0)
+            {
+                cargando = false;
+                return;
+            }
+
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated != true)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            var userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            var usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(userEmail);
+            if (usuario == null)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            reserva = await Task.FromResult(await CUVerReserva.Ejecutar(ReservaId, usuario.Id));
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error al cargar la reserva {ReservaId}", ReservaId);
+            error = "Ocurrió un error al cargar los detalles de la reserva.";
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private void VolverAtras()
+    {
+        NavigationManager.NavigateTo("/reservas");
+    }
+
+    private string ObtenerClaseEstado(string estado)
+    {
+        return estado.ToLower() switch
+        {
+            "pendiente" => "bg-warning",
+            "confirmada" => "bg-success",
+            "cancelada" => "bg-danger",
+            "activa" => "bg-info",
+            "finalizada" => "bg-secondary",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+    .badge {
+        padding: 0.5em 1em;
+        font-size: 0.9em;
+    }
+
+    .alert {
+        border-radius: 10px;
+        padding: 2rem;
+    }
+
+    .alert i {
+        color: #856404;
+    }
+
+    .btn {
+        border-radius: 5px;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn i {
+        margin-right: 0.5rem;
+    }
+</style> 

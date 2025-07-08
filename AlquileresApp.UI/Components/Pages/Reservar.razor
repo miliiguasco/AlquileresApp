@@ -1,0 +1,335 @@
+@page "/Reservar/{PropiedadId:int}"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@inject CasoDeUsoObtenerPropiedad CUObtenerPropiedad
+@inject CasoDeUsoCalcularPrecioConPromocion CUCalcularPrecioConPromocion
+@inject CasoDeUsoCrearReserva CUCrearReserva
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider ServicioAutenticacion
+@inject IUsuarioRepositorio UsuarioRepositorio
+@inject IJSRuntime JS
+@inject ILogger<Reservar> Logger
+@attribute [Authorize]
+
+
+<link href="css/Reservar.css" rel="stylesheet" />
+
+<div class="modal-overlay">
+    <div class="reserva-container">
+        @if (isLoading)
+        {
+            <div class="loading">
+                <p>Cargando...</p>
+            </div>
+        }
+        else if (propiedad is null)
+        {
+            <div class="alert alert-danger">
+                <p>No se pudo cargar la información de la propiedad.</p>
+            </div>
+        }
+        else
+        {
+            <div class="reserva-card">
+                <div class="imagenes-section">
+                    @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
+                    {
+                        <div id="carousel-reserva" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                @{
+                                    var index = 0;
+                                    foreach (var imagen in propiedad.Imagenes)
+                                    {
+                                        <div class="carousel-item @(index == 0 ? "active" : "")">
+                                            <img src="@imagen.Url" class="d-block w-100" alt="Imagen de la propiedad" />
+                                        </div>
+                                        index++;
+                                    }
+                                }
+                            </div>
+                            @if (propiedad.Imagenes.Count > 1)
+                            {
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-reserva" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Anterior</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carousel-reserva" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Siguiente</span>
+                                </button>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-image">
+                            <i class="fas fa-image"></i>
+                            <p>No hay imágenes disponibles</p>
+                        </div>
+                    }
+                </div>
+
+                <div class="propiedad-info">
+                    <h3>@propiedad.Titulo</h3>
+                    <div class="info-details">
+                        <p><i class="fas fa-map-marker-alt"></i> @propiedad.Direccion, @propiedad.Localidad</p>
+                        <p><i class="fas fa-users"></i> Capacidad: @propiedad.Capacidad personas</p>
+                        <p><i class="fas fa-dollar-sign"></i> Precio por noche: $@propiedad.PrecioPorNoche</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reserva-form">
+                <h4>Reservar esta propiedad</h4>
+                <div class="fechas-section">
+                    <div class="fecha-input">
+                        <label><i class="fas fa-calendar-check"></i> Check-in:</label>
+                        <InputDate @bind-Value="fechaInicio" 
+                                 min="@DateTime.Today" 
+                                 format="yyyy-MM-dd"
+                                 @onchange="ActualizarFechas" />
+                    </div>
+
+                    <div class="fecha-input">
+                        <label><i class="fas fa-calendar-times"></i> Check-out:</label>
+                        <InputDate @bind-Value="fechaFin" 
+                                 min="@fechaInicio.AddDays(1)" 
+                                 format="yyyy-MM-dd"
+                                 @onchange="ActualizarFechas" />
+                    </div>
+                </div>
+
+                <div class="fecha-input">
+                    <label><i class="fas fa-users"></i> Cantidad de huéspedes:</label>
+                    <InputNumber @bind-Value="cantidadHuespedes" min="1" max="@propiedad.Capacidad" class="form-control" />
+                    <small class="text-muted">Máximo @propiedad.Capacidad personas</small>
+                </div>
+
+                <div class="resumen-section">
+                    <h4>Resumen de la reserva</h4>
+                    <div class="resumen-details">
+                        <p>Precio por noche: $@propiedad.PrecioPorNoche</p>
+                        <p>Noches: @CalcularNoches()</p>
+                        <p class="total">Total: $@CalcularTotal( )</p>
+                        @if (!string.IsNullOrEmpty(mensajePromocion))
+                        {
+                            <p class="text-success">@mensajePromocion</p>
+                        }
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMensaje))
+                {
+                    <div class="alert alert-danger">
+                        @errorMensaje
+                    </div>
+                }
+
+                <div class="botones-reserva">
+                    <button class="btn-cancelar" @onclick="CancelarReserva">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Cancelar</span>
+                    </button>
+
+                    <button class="btn-reservar" @onclick="ConfirmarReserva" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <span class="spinner"></span>
+                            <span>Procesando...</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-check-circle"></i>
+                            <span>Confirmar Reserva</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int PropiedadId { get; set; }
+
+    private Propiedad? propiedad;
+    private string? error;
+    private DateTime fechaInicio = DateTime.Today;
+    private DateTime fechaFin = DateTime.Today.AddDays(1);
+    private int cantidadHuespedes = 1;
+    private string? mensajeExito;
+    private int? usuarioId;
+    private string? errorMensaje;
+    private bool isLoading = true;
+    private bool isSubmitting = false;
+    private string? mensajePromocion;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            errorMensaje = null;
+            var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+            var email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
+            if (email != null)
+            {
+                var usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(email);
+                if (usuario != null)
+                {
+                    usuarioId = usuario.Id;
+                }
+            }
+
+            propiedad = CUObtenerPropiedad.Ejecutar(PropiedadId);
+            if (propiedad == null)
+            {
+                error = "Propiedad no encontrada";
+            }
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al cargar la propiedad: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private int CalcularNoches()
+    {
+        if (fechaInicio >= fechaFin) return 0;
+        return (int)(fechaFin - fechaInicio).TotalDays;
+    }
+
+    private decimal CalcularTotal()
+    {
+        if (propiedad == null) return 0;
+        var noches = CalcularNoches();
+        if (noches <= 0) return 0;
+        var total= CUCalcularPrecioConPromocion.Ejecutar(propiedad, DateTime.Now, fechaInicio, fechaFin ) * noches;
+        if (total!= propiedad.PrecioPorNoche * noches)
+        {
+            mensajePromocion = "Se aplicó una promoción";
+        }
+        return total;
+    }
+
+    private void ActualizarFechas()
+    {
+        // Asegurar que las fechas estén en el formato correcto
+        fechaInicio = fechaInicio.Date;
+        fechaFin = fechaFin.Date;
+        
+        // Si la fecha de fin es anterior o igual a la de inicio, ajustarla
+        if (fechaFin <= fechaInicio)
+        {
+            fechaFin = fechaInicio.AddDays(1);
+        }
+        
+        StateHasChanged();
+    }
+
+    private async Task ConfirmarReserva()
+    {
+        try
+        {
+            isSubmitting = true;
+            errorMensaje = null;
+
+            if (usuarioId == null)
+            {
+                errorMensaje = "No se pudo obtener el ID del usuario";
+                return;
+            }
+
+            // Asegurar que las fechas estén en el formato correcto
+            var fechaInicioFormateada = fechaInicio.Date;
+            var fechaFinFormateada = fechaFin.Date;
+
+            if (fechaInicioFormateada < DateTime.Today)
+            {
+                errorMensaje = "La fecha de check-in no puede ser anterior a hoy";
+                return;
+            }
+
+            if (fechaInicioFormateada >= fechaFinFormateada)
+            {
+                errorMensaje = "La fecha de check-out debe ser posterior a la fecha de check-in";
+                return;
+            }
+
+            if (cantidadHuespedes < 1 || cantidadHuespedes > propiedad.Capacidad)
+            {
+                errorMensaje = $"La cantidad de huéspedes debe estar entre 1 y {propiedad.Capacidad}";
+                return;
+            }
+
+            var noches = CalcularNoches();
+            if (noches <= 0)
+            {
+                errorMensaje = "Debe seleccionar al menos una noche de estadía";
+                return;
+            }
+
+            await CUCrearReserva.Ejecutar(usuarioId.Value, PropiedadId, fechaInicioFormateada, fechaFinFormateada, cantidadHuespedes);
+            mensajeExito = "Reserva creada exitosamente";
+            await Task.Delay(2000);
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = ex.Message;
+            StateHasChanged();
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void CancelarReserva()
+    {
+        NavigationManager.NavigateTo($"/propiedad/{PropiedadId}");
+    }
+}
+
+<style>
+    .botones-reserva {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn-cancelar {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-cancelar:hover {
+        background-color: #c82333;
+    }
+
+    .btn-cancelar i {
+        font-size: 1.1rem;
+    }
+</style>
+

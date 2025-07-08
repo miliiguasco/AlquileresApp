@@ -1,0 +1,330 @@
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@inject CasoDeUsoListarPropiedades CUListarPropiedades
+@inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
+@inject CasoDeUsoModificarPropiedad CUModificarPropiedad
+
+@inject CasoDeUsoCancelarReserva CUCancelarReserva
+@inject CasoDeUsoMarcarPropiedadComoNoHabitable CUMarcarPropiedadComoNoHabitable
+@inject ILogger<Propiedades> Logger
+@inject NavigationManager NavigationManager
+
+<link href="css/Tabla.css" rel="stylesheet" />
+
+<div class="admin-section">
+
+    @if (propiedades != null && propiedades.Any())
+    {
+    @if (!string.IsNullOrEmpty(mensajeExito))
+    {
+        <div class="alert alert-success">@mensajeExito</div>
+    }
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">@mensajeError</div>
+    }
+        <div class="table-container">
+            <table class="property-table">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Título</th>
+                        <th>Ubicación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var prop in propiedades)
+                    {
+                        <tr>
+                            <td class="image-cell">
+                                @{
+                                    var imagenUrl = "/Imagenes/Propiedades/iconoimagen.jpg";
+                                    if (prop.Imagenes != null && prop.Imagenes.Any())
+                                    {
+                                        var primeraImagen = prop.Imagenes.FirstOrDefault();
+                                        if (primeraImagen != null && !string.IsNullOrEmpty(primeraImagen.Url))
+                                        {
+                                            imagenUrl = primeraImagen.Url.StartsWith("/") ? 
+                                                primeraImagen.Url : 
+                                                $"/Imagenes/Propiedades/{primeraImagen.Url}";
+                                        }
+                                    }
+                                }
+                                <img src="@imagenUrl" alt="@prop.Titulo" />
+                            </td>
+                            <td>@prop.Titulo</td>
+                            <td>@prop.Localidad</td>
+                            <td class="actions-cell">
+                                <button class="btn btn-primary" @onclick="() => EditarPropiedad(prop)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" @onclick="() => EliminarPropiedad(prop)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button style="background-color: @(prop.Destacada ? "green" : "gray"); color: white"
+        class="@GetClaseBotonDestacar(prop)"
+        @onclick="() => DestacarPropiedad(prop)"
+        disabled="@prop.NoHabitable">
+    <i class="@GetIconoBotonDestacar(prop)"></i>
+</button>
+
+                                <button class="btn btn-warning" @onclick="() => IniciarCambioEstadoHabitabilidad(prop)">
+                                    @if (prop.NoHabitable)
+                                    {
+                                        <i class="fas fa-check-circle"></i> @* Icono para "Marcar como Habitable" *@
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-ban"></i> @* Icono para "Marcar como No Habitable" *@
+                                    }
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="btn" @onclick="() => NuevaPropiedad()">
+                Nueva propiedad
+            </button>
+        </div>
+    }
+    else
+    {
+        <p>No hay propiedades disponibles.</p>
+    }
+</div>
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Cancelación</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que querés eliminar esta propiedad?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-secondary" @onclick="@(async () => await ConfirmarCancelacion())">Sí, eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Aquí se renderiza el componente modal de Reubicación de Reserva *@
+@if (mostrarModalReubicacion)
+{
+    <ReubicacionReserva
+        IsVisible="mostrarModalReubicacion"
+        ReservaAfectada="reservaActualParaModal"
+        AlternativasDisponibles="alternativasActualesParaModal"
+        OnPropiedadSeleccionada="HandlePropiedadSeleccionada"
+        OnCerrarModal="HandleCerrarModal" 
+        OnConfirmarInhabilitacionSinReubicacion="HandleConfirmarInhabilitacionSinReubicacion" /> 
+}
+
+@code {
+    private List<Propiedad>? propiedades;
+    private bool cargando = true;
+
+
+
+    private Propiedad propiedadAEliminar;
+    private string mensajeError;
+    private string mensajeExito;
+    private bool mostrarConfirmacion = false;
+
+    private bool mostrarModalReubicacion = false;
+    private Reserva reservaActualParaModal;
+    private List<Propiedad> alternativasActualesParaModal;
+    private Propiedad propiedadQueSeEstaEvaluando; // Nueva variable para guardar la propiedad original temporalmente
+
+    protected override async Task OnInitializedAsync()
+
+    {
+        try
+        {
+            propiedades = CUListarPropiedades.Ejecutar();
+        }
+        finally
+        {
+            cargando = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task EditarPropiedad(Propiedad propiedad)
+    {
+        NavigationManager.NavigateTo($"/EditarPropiedad/{propiedad.Id}");
+    }
+
+    private void IniciarCambioEstadoHabitabilidad(Propiedad propiedad)
+    {
+        try
+        {
+            propiedadQueSeEstaEvaluando = propiedad;
+
+            Dictionary<Reserva, List<Propiedad>> opcionesDeReubicacion = CUMarcarPropiedadComoNoHabitable.IdentificarReservasYAlternativas(propiedadQueSeEstaEvaluando);
+
+            // Si hay reservas afectadas, preparamos y mostramos el modal para la primera.
+            // Para un manejo de múltiples reservas, considera una cola o un diseño de modal que las gestione todas.
+            if (opcionesDeReubicacion.Any())
+            {
+                var firstEntry = opcionesDeReubicacion.First();
+                reservaActualParaModal = firstEntry.Key;
+                alternativasActualesParaModal = firstEntry.Value;
+                mostrarModalReubicacion = true; // Hace visible el modal
+                mensajeError = string.Empty; // Limpiar mensajes de error previos
+                mensajeExito = string.Empty; // Limpiar mensajes de éxito previos
+                StateHasChanged(); // Forzar renderizado para mostrar el modal
+            }
+            else
+            {
+                 propiedadQueSeEstaEvaluando.NoHabitable = !propiedadQueSeEstaEvaluando.NoHabitable; // Volvemos a togglar para que coincida con el estado deseado
+                CUMarcarPropiedadComoNoHabitable.ActualizarEstadoNoHabitable(propiedadQueSeEstaEvaluando);
+                mensajeError = string.Empty;
+                mensajeExito = "El estado de la propiedad se ha actualizado correctamente (no había reservas que reubicar).";
+                // Recargar las propiedades para reflejar el cambio persistido en la DB
+                propiedades = CUListarPropiedades.Ejecutar();
+            }
+             if (propiedad.NoHabitable)
+    {
+        propiedad.Destacada = false; // Quitar el destacado si no es habitable
+    }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error al marcar la propiedad como no habitable o procesar sus reservas.");
+            mensajeError = $"Error al marcar la propiedad como no habitable: {ex.Message}";
+            mensajeExito = string.Empty;
+            mostrarModalReubicacion = false;
+
+            propiedades = CUListarPropiedades.Ejecutar();
+        }
+    }
+
+    private async Task HandlePropiedadSeleccionada(Propiedad propiedadSeleccionada)
+    {
+        try
+        {
+            CUMarcarPropiedadComoNoHabitable.ReasignarReserva(reservaActualParaModal, propiedadSeleccionada);
+
+            propiedadQueSeEstaEvaluando.NoHabitable = !propiedadQueSeEstaEvaluando.NoHabitable;
+            CUMarcarPropiedadComoNoHabitable.ActualizarEstadoNoHabitable(propiedadQueSeEstaEvaluando);
+
+            mensajeExito = $"Reubicación exitosa de '{propiedadSeleccionada.Titulo}'.";
+            mensajeError = string.Empty; // Limpiar cualquier error anterior
+            propiedades = CUListarPropiedades.Ejecutar();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error al reasignar la reserva.");
+            mensajeError = $"Error al reasignar la reserva: {ex.Message}";
+            mensajeExito = string.Empty;
+        }
+        mostrarModalReubicacion = false; // Ocultar el modal
+    }
+
+    private async Task HandleCerrarModal()
+    {
+        // El usuario cerró el modal o no seleccionó una alternativa.
+        // La reserva queda sin reubicar.
+        mensajeError = "La reubicación de la reserva fue cancelada o no se seleccionó una alternativa. La reserva original permanece sin reasignar y la propiedad mantiene su estado.";
+        mensajeExito = string.Empty;
+        mostrarModalReubicacion = false;
+        propiedades = CUListarPropiedades.Ejecutar();
+    }
+
+    private async Task HandleConfirmarInhabilitacionSinReubicacion()
+    {
+        propiedadQueSeEstaEvaluando.NoHabitable = !propiedadQueSeEstaEvaluando.NoHabitable; 
+        CUMarcarPropiedadComoNoHabitable.ActualizarEstadoNoHabitable(propiedadQueSeEstaEvaluando);
+        if (reservaActualParaModal != null)
+                {
+                    // Llamamos al nuevo método específico para cancelaciones por inhabitabilidad
+                    // Este método NO envía email y NO aplica reembolsos.
+                    var resultadoCancelacion = CUCancelarReserva.EjecutarParaInhabitabilidad(reservaActualParaModal.Id); 
+                    
+                    // Actualiza el mensaje de éxito para reflejar la cancelación sin reembolso
+                    mensajeExito = $"La propiedad '{propiedadQueSeEstaEvaluando.Titulo}' ha sido marcada como no habitable, y las reseras han sido canceladas.";
+                }
+                else 
+                {
+                    // Si no había una reserva actual en el modal, solo informa que la propiedad fue marcada como no habitable.
+                    mensajeExito = $"La propiedad '{propiedadQueSeEstaEvaluando.Titulo}' ha sido marcada como no habitable (no había reservas o la actual no existe).";
+                }
+        mostrarModalReubicacion = false;
+        propiedades = CUListarPropiedades.Ejecutar();
+    }
+
+
+    
+
+    private void EliminarPropiedad(Propiedad propiedad)
+    {
+        propiedadAEliminar = propiedad;
+        mostrarConfirmacion = true;
+        mensajeError = null;
+        mensajeExito = null;
+    }
+
+    private async Task ConfirmarCancelacion()
+    {
+        try
+        {   
+            if (CUEliminarPropiedad.Ejecutar(propiedadAEliminar)){
+                mensajeExito = $" Propiedad eliminada: ${propiedadAEliminar.Titulo}.";
+            }
+            else
+            {
+                mensajeError = $"Error al eliminar la propiedad: {propiedadAEliminar.Titulo}. Tiene reservas hechas";
+            }
+            propiedades = CUListarPropiedades.Ejecutar();
+            }
+            catch (Exception ex)
+            {
+            // Manejar el error silenciosamente o mostrar una notificación al usuario si es necesario
+        }
+        finally
+        {   
+            mostrarConfirmacion = false;
+        }
+    }
+   private string GetClaseBotonDestacar(Propiedad propiedad)
+{
+    return propiedad.Destacada ? "btn btn-success" : "btn btn-outline-secondary";
+}
+
+private string GetIconoBotonDestacar(Propiedad propiedad)
+{
+    return propiedad.Destacada ? "fas fa-star" : "far fa-star";
+}
+
+private async Task DestacarPropiedad(Propiedad propiedad)
+{
+    propiedad.Destacada = !propiedad.Destacada;
+
+    CUModificarPropiedad.Ejecutar(propiedad);
+
+    propiedades = CUListarPropiedades.Ejecutar();
+}
+    private void CancelarConfirmacion()
+    {
+        mostrarConfirmacion = false;
+    }
+
+    private void NuevaPropiedad() {
+
+        NavigationManager.NavigateTo("/PublicarPropiedad");
+    }
+
+} 
+        

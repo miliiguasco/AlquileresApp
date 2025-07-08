@@ -1,0 +1,82 @@
+.form-floating {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #596E69;
+    outline: none;
+    box-shadow: none;
+}
+
+.form-label {
+    color: #6c757d;
+}
+
+.text-muted {
+    font-size: 0.875rem;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    gap: 1rem;
+}
+
+::deep button.btn,
+::deep input[type="submit"].btn {
+    padding: 0.4rem 1.2rem;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    cursor: pointer;
+    background-color: #f1771f;
+    border: 1px solid #f1771f;
+    color: white;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    width: 130px;
+    text-align: center;
+    display: inline-block;
+}
+
+::deep button.btn:hover,
+::deep input[type="submit"].btn:hover {
+    background-color: #f37820;
+    border-color: #f37820;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    ::deep button.btn,
+    ::deep input[type="submit"].btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.9rem;
+        width: 110px;
+    }
+}
+
+::deep input:focus,
+::deep .form-control:focus {
+    border-color: #596E69;
+    outline: none;
+    box-shadow: none;
+}
+
+::deep .form-floating > .form-control:focus {
+    border-color: #596E69;
+    outline: none;
+    box-shadow: none;
+}
+
+::deep .form-floating > .form-control:focus ~ label {
+    color: #596E69;
+} 

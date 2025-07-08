@@ -1,0 +1,326 @@
+@page "/PublicarPropiedad"
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.Enumerativos
+@inject IPropiedadRepositorio PropiedadesRepositorio
+@inject CasoDeUsoAgregarPropiedad CUAgregarPropiedad
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Forms
+@using GoogleMaps.LocationServices
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@inject IJSRuntime JsRuntime
+
+
+<link href="css/VerPropiedad.css" rel="stylesheet" />
+
+<PageTitle>Publicar Propiedad - Alquilando</PageTitle>
+
+<div class="propiedad-container bg-light p-4 rounded shadow-sm my-5">
+    <h1 class="registro-title">Publicar Nueva Propiedad</h1>
+    <div class="registro-form">
+        <section>
+            <EditForm Model="@nuevaPropiedad" OnValidSubmit="HandleSubmitWithGeocoding">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label for="titulo">Título</label>
+                    <InputText id="titulo" class="form-control" @bind-Value="nuevaPropiedad.Titulo" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.Titulo)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <InputTextArea id="descripcion" class="form-control" @bind-Value="nuevaPropiedad.Descripcion" rows="3" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.Descripcion)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="precio">Precio por día</label>
+                    <InputNumber id="precio" class="form-control" @bind-Value="nuevaPropiedad.PrecioPorNoche" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.PrecioPorNoche)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="direccion">Dirección:</label>
+                    <div id="place-picker-container" style="width: 100%; height: 40px;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="capacidad">Capacidad de personas</label>
+                    <InputNumber id="capacidad" class="form-control" @bind-Value="nuevaPropiedad.Capacidad" />
+                    <ValidationMessage For="@(() => nuevaPropiedad.Capacidad)" />
+                </div>
+
+                <div class="form-group">
+                    <label>Servicios disponibles</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="wifi" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Wifi]" />
+                            <label class="form-check-label" for="wifi">WiFi</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="aire" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.AireAcondicionado]" />
+                            <label class="form-check-label" for="aire">Aire Acondicionado</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="calefaccion" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Calefaccion]" />
+                            <label class="form-check-label" for="calefaccion">Calefacción</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="cocina" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Cocina]" />
+                            <label class="form-check-label" for="cocina">Cocina</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="lavadora" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Lavadora]" />
+                            <label class="form-check-label" for="lavadora">Lavadora</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="estacionamiento" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Estacionamiento]" />
+                            <label class="form-check-label" for="estacionamiento">Estacionamiento</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="piscina" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Piscina]" />
+                            <label class="form-check-label" for="piscina">Piscina</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="television" @bind-Value="serviciosSeleccionados[ServiciosPropiedad.Television]" />
+                            <label class="form-check-label" for="television">Televisión</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pagoAnticipado">Porcentaje de pago anticipado</label>
+                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="nuevaPropiedad.TipoPago" @oninput="OnTipoPagoChanged">
+                        <option value="@TipoPago.SinAnticipo">0% - Sin pago anticipado</option>
+                        <option value="@TipoPago.Parcial">20% - Pago parcial anticipado</option>
+                        <option value="@TipoPago.Total">100% - Pago total anticipado</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => nuevaPropiedad.TipoPago)" />
+                </div>
+
+                
+                <div class="alert alert-info mt-2">
+                <strong>Política de cancelación:</strong> @ObtenerDescripcionPolitica(nuevaPropiedad.PoliticaCancelacion)
+                </div>
+                
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Publicar Propiedad</button>
+                    <button type="button" class="btn btn-primary" @onclick="NavigateToHome">Cancelar</button>
+                </div>
+            </EditForm>
+            @if (!string.IsNullOrEmpty(errorMensaje))
+            {
+                <div class="alert alert-danger mt-3">@errorMensaje</div>
+            }
+        </section>
+    </div>
+</div>
+
+@code {
+    private Propiedad nuevaPropiedad = new Propiedad {
+        TipoPago = TipoPago.SinAnticipo, // Valor por defecto
+        PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable // Opcional, para sincronizar la política
+     }; //PagoAnticipado = 0 }; // Valor por defecto
+    private string? errorMensaje;
+    private string? googleMapsApiKey;
+    private Dictionary<ServiciosPropiedad, bool> serviciosSeleccionados = new();
+    
+    protected override void OnInitialized()
+    {
+        googleMapsApiKey = Configuration["GoogleMaps:ApiKey"];
+        if (string.IsNullOrEmpty(googleMapsApiKey))
+        {
+            errorMensaje = "Error: La clave de API de Google Maps no está configurada.";
+            Console.WriteLine(errorMensaje);
+        }
+
+        // Inicializar el diccionario de servicios
+        foreach (ServiciosPropiedad servicio in Enum.GetValues(typeof(ServiciosPropiedad)))
+        {
+            serviciosSeleccionados[servicio] = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                Console.WriteLine("Iniciando place picker...");
+                await JsRuntime.InvokeVoidAsync("initPlacePicker", "place-picker-container", DotNetObjectReference.Create(this));
+                Console.WriteLine("Place picker inicializado correctamente");
+            }
+            catch (Exception ex)
+            {
+                errorMensaje = $"Error al inicializar el selector de dirección: {ex.Message}";
+                Console.WriteLine($"Error al inicializar place picker: {ex}");
+            }
+        }
+    }
+
+    [JSInvokable]
+    public async Task SetAddressAndLocalityFromPicker(string address, string locality)
+    {
+        try
+        {
+            Console.WriteLine($"Recibida dirección: {address},, Localidad: {locality}");
+            if (!string.IsNullOrEmpty(address))
+            {
+                nuevaPropiedad.Direccion = address;
+                nuevaPropiedad.Localidad = locality;
+                await InvokeAsync(StateHasChanged);
+                Console.WriteLine($"Dirección actualizada en el modelo: {nuevaPropiedad.Direccion}");
+                await GetCoordinatesForAddressAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al actualizar la dirección: {ex.Message}";
+            Console.WriteLine($"Error en SetAddressFromPicker: {ex}");
+        }
+    }
+
+    private async Task HandleSubmitWithGeocoding()
+    {
+        errorMensaje = null;
+
+        // Actualizar los servicios seleccionados
+        nuevaPropiedad.ServiciosDisponibles = serviciosSeleccionados
+            .Where(s => s.Value)
+            .Select(s => s.Key)
+            .ToList();
+
+        // Primero, intenta obtener las coordenadas de la dirección seleccionada
+        bool geocodingSuccessful = await GetCoordinatesForAddressAsync();
+
+        if (geocodingSuccessful)
+        {
+            await SavePropertyAsync();
+        }
+    }
+
+    private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
+    {
+        return politica switch
+        {
+            PoliticasDeCancelacion.Anticipo20_72hs => "Requiere 20% de anticipo y permite cancelación hasta 72hs antes.",
+            PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No requiere anticipo, pero no permite cancelaciones.",
+            PoliticasDeCancelacion.PagoTotal_48hs_50 => "Pago total por adelantado, permite cancelación hasta 48hs antes con 50% de reintegro.",
+            _ => "No especificada."
+        };
+    }
+
+    private void cargarPoliticaCancelacion(TipoPago tipoPago)
+    {
+        nuevaPropiedad.TipoPago = tipoPago;
+        // Asigna la política de cancelación según el tipo de pago
+        switch (tipoPago)
+        {
+            case TipoPago.SinAnticipo:
+                nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable;
+                break;
+            case TipoPago.Parcial:
+                nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs;
+                break;
+            case TipoPago.Total:
+                nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50;
+                break;
+            default:
+                nuevaPropiedad.TipoPago = TipoPago.SinAnticipo; // Valor por defecto
+                nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable;
+            break;
+        }
+    }
+
+    private async Task SavePropertyAsync()
+    {
+        try
+        {
+            cargarPoliticaCancelacion(nuevaPropiedad.TipoPago);
+            await Task.Run(() => CUAgregarPropiedad.Ejecutar(nuevaPropiedad));
+            NavigationManager.NavigateTo("/Administrar");
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al publicar la propiedad: {ex.Message}";
+            Console.WriteLine($"Error al guardar la propiedad: {ex}");
+        }
+    }
+
+    private void NavigateToHome()
+    {
+        NavigationManager.NavigateTo("/Administrar");
+    }
+
+    private void OnTipoPagoChanged(ChangeEventArgs e)
+        {
+            if (Enum.TryParse<TipoPago>(e.Value?.ToString(), out var tipoPago))
+            {
+                Console.Write($"Tipo de pago seleccionado: {tipoPago}");
+                nuevaPropiedad.TipoPago = tipoPago;
+                // Asigna la política de cancelación según el tipo de pago
+                switch (tipoPago)
+                {
+                    case TipoPago.SinAnticipo:
+                        nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable;
+                        break;
+                    case TipoPago.Parcial:
+                        nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs;
+                        break;
+                    case TipoPago.Total:
+                        nuevaPropiedad.PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50;
+                        break;
+                }
+            }
+            StateHasChanged();
+        }
+
+    private async Task<bool> GetCoordinatesForAddressAsync()
+    {
+        errorMensaje = string.Empty;
+        nuevaPropiedad.Latitud = 0;
+        nuevaPropiedad.Longitud = 0;
+
+        if (string.IsNullOrEmpty(googleMapsApiKey))
+        {
+            errorMensaje = "Error: La clave de API de Google Maps no está configurada.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(nuevaPropiedad.Direccion))
+        {
+            errorMensaje = "Por favor, ingresa una dirección.";
+            return false;
+        }
+
+        try
+        {
+            var locationService = new GoogleLocationService(googleMapsApiKey);
+            var coordenadas = locationService.GetLatLongFromAddress(nuevaPropiedad.Direccion);
+
+            if (coordenadas != null)
+            {
+                nuevaPropiedad.Latitud = coordenadas.Latitude;
+                nuevaPropiedad.Longitud = coordenadas.Longitude;
+                return true;
+            }
+            else
+            {
+                errorMensaje = "No se encontraron coordenadas para la dirección ingresada. Intenta ser más específico.";
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Ocurrió un error al buscar la dirección: {ex.Message}. Asegúrate de que tu clave de API sea válida.";
+            Console.WriteLine($"Error de geocodificación: {ex}");
+            return false;
+        }
+    }
+}

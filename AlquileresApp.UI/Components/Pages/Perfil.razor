@@ -1,0 +1,1329 @@
+@page "/Perfil/{userId:int}"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.Tarjeta
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.CasosDeUso.ContactarAdmin
+@using AlquileresApp.UI.Components
+@using AlquileresApp.Core.Enumerativos
+@using AlquileresApp.Data
+@inject CasoDeUsoListarMisReservas casoDeUsoListarMisReservas
+@inject CasoDeUsoCancelarReserva casoDeUsoCancelarReserva
+@inject AuthenticationStateProvider ServicioAutenticacion
+@inject IUsuarioRepositorio UsuarioRepositorio
+@inject ILogger<Perfil> Logger
+@inject NavigationManager NavigationManager
+@inject CasoDeUsoVisualizarTarjeta CUVisualizarTarjeta
+@inject CasoDeUsoEliminarTarjeta CUEliminarTarjeta
+@inject CasoDeUsoVisualizarReserva CUVisualizarReserva
+@inject IJSRuntime JS
+@inject CasoDeUsoContactarAdmin CasoDeUsoContactarAdmin
+@attribute [Authorize]
+
+<PageTitle>Mi Perfil</PageTitle>
+
+<div class="profile-container">
+    @if (usuario != null)
+    {
+        <div class="profile-header">
+            <h1>Mi Perfil</h1>
+        </div>
+
+        @if (esAdministrador)
+        {
+            <div class="profile-section">
+                @if (modoEdicion)
+                {
+                    <h2>Editar Información Personal</h2>
+                    <DatosFormEdicion Input="@datosForm" 
+                                  OnSubmit="GuardarCambios"
+                                  FormName="editarPerfil"
+                                  SubmitButtonText="Guardar"
+                                  ButtonClass="btn"
+                                  CancelarEdicion="CancelarEdicion" />          
+                }
+                else
+                {
+                    <h2>Información Personal</h2>
+                    <div class="info-group">
+                        <label>Nombre:</label>
+                        <span>@usuario.Nombre</span>
+                    </div>
+                    <div class="info-group">
+                        <label>Apellido:</label>
+                        <span>@usuario.Apellido</span>
+                    </div>
+                    <div class="info-group">
+                        <label>Email:</label>
+                        <span>@usuario.Email</span>
+                    </div>
+                    <div class="info-group">
+                        <label>Teléfono:</label>
+                        <span>@usuario.Telefono</span>
+                    </div>
+                    <div class="info-group">
+                        <label>Fecha de Nacimiento:</label>
+                        <span>@(usuario.FechaNacimiento?.ToShortDateString() ?? "No especificada")</span>
+                    </div>
+                    <div class="profile-actions">   
+                        @if (!string.IsNullOrEmpty(mensajeExito))
+                        {
+                            <div class="mensaje-exito">@mensajeExito</div>
+                        }   
+                        <button type="button" class="btn-otro" @onclick="IniciarEdicion">
+                            <i class="fas fa-edit"></i> Editar Perfil
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-button @(tabActiva == "datos" ? "active" : "")" 
+                            @onclick="@(() => CambiarTab("datos"))">
+                        <i class="fas fa-user"></i> Datos Personales
+                    </button>
+                    <button class="tab-button @(tabActiva == "pagos" ? "active" : "")" 
+                            @onclick="@(() => CambiarTab("pagos"))">
+                        <i class="fas fa-credit-card"></i> Método de Pago
+                    </button>
+                    <button class="tab-button @(tabActiva == "reservas" ? "active" : "")" 
+                            @onclick="@(() => CambiarTab("reservas"))">
+                        <i class="fas fa-calendar-alt"></i> Reservas
+                    </button>
+                </div>
+            </div>
+
+            <div class="tab-content">
+                    @if (tabActiva == "datos")
+                    {
+                        <div class="tab-pane active">
+                            <div class="profile-section">
+                                @if (modoEdicion)
+                                {
+                                    <h2>Editar Información Personal</h2>
+                                    <DatosFormEdicion Input="@datosForm" 
+                                                  OnSubmit="GuardarCambios"
+                                                  FormName="editarPerfil"
+                                                  SubmitButtonText="Guardar"
+                                                  ButtonClass="btn"
+                                                  CancelarEdicion="CancelarEdicion" />          
+                                }
+                                else
+                                {
+                                    <h3>Información Personal</h3>
+                                    <div class="info-group">
+                                        <label>Nombre</label>
+                                        <span>@usuario.Nombre</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Apellido</label>
+                                        <span>@usuario.Apellido</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Email</label>
+                                        <span>@usuario.Email</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Teléfono</label>
+                                        <span>@usuario.Telefono</span>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Fecha de Nacimiento</label>
+                                        <span>@(usuario.FechaNacimiento?.ToShortDateString() ?? "No especificada")</span>
+                                    </div>
+                                    <div class="profile-actions">
+                                        @if (!string.IsNullOrEmpty(mensajeExito))
+                                        {
+                                            <div class="mensaje-exito">@mensajeExito</div>
+                                        }   
+                                        <button type="button" class="btn-otro" @onclick="IniciarEdicion">
+                                            <i class="fas fa-edit"></i> Editar Perfil
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else if (tabActiva == "pagos")
+                    {
+                        <div class="tab-pane active" style="display: block;">
+                            <div class="profile-section">
+                                <h3>Métodos de Pago</h3>
+                                <VisualizarTarjeta/>
+                                <div class="">   
+                                    @if (!TieneTarjeta())
+                                    {
+                                    <button type="button" class="btn btn-primary" @onclick="IrARegistrarTarjeta">
+                                        <i class="fas fa-plus-circle"></i> Registrar Nueva Tarjeta
+                                    </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (tabActiva == "reservas")
+                    {
+                        <div class="tab-pane active" style="display: block;">
+                            <div class="profile-section">
+                                 <h2 class="h2 mb-4">Mis Reservas</h2>
+
+    @if (!string.IsNullOrEmpty(mensajeExito_misReservas))
+    {
+        <div class="alert alert-success">@mensajeExito_misReservas</div>
+    }
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">@mensajeError</div>
+    }
+
+    @if (!reservas.Any())
+    {
+        <div class="alert alert-info">No se encontraron reservas registradas.</div>
+    }
+    else
+    {
+        <table class="table_misreservas table-hover table-bordered shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Propiedad</th>
+                    <th>Politica De Cancelacion</th>
+                    <th>Fecha inicio</th>
+                    <th>Fecha fin</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var reserva in reservas)
+                {
+                    <tr>
+                        <td>@reserva.Propiedad?.Titulo</td>
+                       <td>@ObtenerDescripcionPolitica(reserva.Propiedad.PoliticaCancelacion)</td>
+                        <td>@reserva.FechaInicio.ToShortDateString()</td>
+                        <td>@reserva.FechaFin.ToShortDateString()</td>
+                        <td>
+                            <span class="badge bg-@GetBadgeColor(reserva.Estado)">
+                                @reserva.Estado
+                            </span>
+                        </td>
+                        <td>$@reserva.PrecioTotal.ToString("N2")</td>
+                        <td>
+                            @if (reserva.Estado == EstadoReserva.Pendiente)
+                            {
+                                <div class="btn-container">
+                                <button class=" btn btn-primary " @onclick="@(() => ModificarReserva(reserva.Id))">
+                                    <i class="bi bi-pencil  "></i> 
+                                </button>
+                                <button class="btn btn-danger" @onclick="@(() => CancelarReserva(reserva.Id))">
+                                    <i class="bi bi-x-circle "></i> 
+                                </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <button class="btn btn-otro" @onclick="() => AbrirFormularioMensaje(reserva)">
+    <i class="bi bi-envelope"></i> Enviar mensaje sobre esta reserva
+</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>  
+    }
+</div>
+
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Cancelación</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@(mensajeCancelacion ?? "¿No se encontró mensaje de cancelación?")</p>
+                    <p>¿Estás seguro de que deseas cancelar esta reserva?</p>
+                    <p>Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-danger" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+                                
+                            </div>
+                    }
+                </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info">
+            @if (_error != null)
+            {
+                <p>Error: @_error</p>
+            }
+            else
+            {
+                <p>Cargando información del perfil...</p>
+            }
+        </div>
+    }
+</div> <!-- cierre de .profile-container -->
+
+@if (reservaSeleccionada != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 2000;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Enviar mensaje sobre la reserva</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarFormularioMensaje"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Propiedad:</strong> @reservaSeleccionada.Propiedad.Titulo</p>
+                    <textarea class="form-control" @bind="mensajeAEnviar" rows="5" placeholder="Escriba su mensaje aquí..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CerrarFormularioMensaje">Cancelar</button>
+                    <button class="btn btn-primary" @onclick="EnviarMensajeEmail" disabled="@enviandoMensaje">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public int? userId { get; set; }
+
+    private Usuario? usuario;
+    private string? _error;
+    private bool modoEdicion = false;
+    private string? mensajeExito;
+    private bool esAdministrador = false;
+    private string tabActiva = "datos";
+    private bool mostrarEliminarTarjeta = false;
+    private Tarjeta tarjeta;
+    private int tarjetaSeleccionada = 0;
+    private DatosFormEdicion.InputModel datosForm = new();
+    private List<Reserva>? reservas=new();
+    private bool mostrarConfirmacion = false;
+    private int reservaAEliminarId;
+    private string mensajeError ;
+    private string mensajeExito_misReservas;
+     private string? mensajeCancelacion;
+    private bool enviandoMensaje = false;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await CargarmisReservas();
+            var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated != true)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            var userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(userEmail);
+            if (usuario == null)
+            {
+                _error = "No se pudo cargar la información del usuario.";
+                return;
+            }
+
+            // Si se proporcionó un userId en la URL, verificar que coincida con el usuario actual
+            if (userId.HasValue && userId.Value != usuario.Id)
+            {
+                NavigationManager.NavigateTo($"/Perfil/{usuario.Id}");
+                return;
+            }
+
+            esAdministrador = user.IsInRole("Administrador");
+            await CargarTarjeta();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error al cargar el perfil del usuario");
+            _error = "Ocurrió un error al cargar el perfil.";
+        }
+    }
+
+    private async Task CambiarTab(string tab)
+    {
+        tabActiva = tab;
+        if (modoEdicion)
+        {
+            CancelarEdicion();
+        }
+        
+        if (tab == "reservas")
+        {
+            await CargarmisReservas();
+        }
+    }
+
+    private void IniciarEdicion()
+    {
+        datosForm = new DatosFormEdicion.InputModel
+        {
+            Nombre = usuario!.Nombre,
+            Apellido = usuario.Apellido,
+            Email = usuario.Email,
+            Telefono = usuario.Telefono,
+            FechaDeNacimiento = usuario.FechaNacimiento
+        };
+        modoEdicion = true;
+    }
+
+    private void CancelarEdicion()
+    {
+        modoEdicion = false;
+        datosForm = new();
+    }
+
+    private async Task GuardarCambios()
+    {
+        try
+        {
+            usuario!.Nombre = datosForm.Nombre;
+            usuario.Apellido = datosForm.Apellido;
+            usuario.Email = datosForm.Email;
+            usuario.Telefono = datosForm.Telefono;
+            usuario.FechaNacimiento = datosForm.FechaDeNacimiento;
+
+            await Task.Run(() => UsuarioRepositorio.ModificarUsuario(usuario));
+            
+            modoEdicion = false;
+            mensajeExito = "Perfil actualizado exitosamente";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error al actualizar el perfil: {ex.Message}";
+        }
+    }
+    private  async Task CargarTarjeta(){
+        var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+    var user = authState.User;
+
+    if (user.Identity != null && user.Identity.IsAuthenticated)
+    {
+        var userId = user.FindFirst(c => c.Type == "sub")?.Value 
+                  ?? user.FindFirst(c => c.Type == "userid")?.Value 
+                  ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int id))
+        {
+            tarjeta = CUVisualizarTarjeta.Ejecutar(id);
+        }
+        else
+        {
+            mensajeError = "No se pudo obtener el ID del usuario.";
+        }
+    }
+    else
+    {
+        mensajeError = "Usuario no autenticado.";
+    }
+    
+    }
+    
+
+    private void CancelarEliminacion()
+    {
+        mostrarEliminarTarjeta = false;
+        tarjeta = null;
+        tarjetaSeleccionada = 0;
+    }
+
+    private bool TieneTarjeta()
+    {
+        return  UsuarioRepositorio.tieneTarjeta(usuario);
+    }
+
+    private async Task ConfirmarEliminacion()
+    {
+        if (tarjetaSeleccionada == 0)
+        {
+            await JS.InvokeVoidAsync("alert", "Por favor, seleccione una tarjeta para eliminar.");
+            return;
+        }
+
+        var confirmacion = await JS.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas eliminar esta tarjeta?");
+        if (confirmacion)
+        {
+            try
+            {
+                await CUEliminarTarjeta.Ejecutar(tarjetaSeleccionada);
+                await JS.InvokeVoidAsync("alert", "Tarjeta eliminada exitosamente");
+                CancelarEliminacion();
+            }
+            catch (Exception ex)
+            {
+                await JS.InvokeVoidAsync("alert", $"Error al eliminar la tarjeta: {ex.Message}");
+            }
+        }
+    }
+
+    private void IrARegistrarTarjeta()
+    {
+        NavigationManager.NavigateTo("/registrar-tarjeta");
+    }
+
+
+    private string ObtenerClaseEstado(string estado)
+    {
+        return estado.ToLower() switch
+        {
+            "pendiente" => "bg-warning",
+            "confirmada" => "bg-success",
+            "cancelada" => "bg-danger",
+            "activa" => "bg-info",
+            "finalizada" => "bg-secondary",
+            _ => "bg-secondary"
+        };
+    }
+    private  async Task CargarmisReservas()
+{
+    var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+    var user = authState.User;
+
+    if (user.Identity != null && user.Identity.IsAuthenticated)
+    {
+        var userId = user.FindFirst(c => c.Type == "sub")?.Value 
+                  ?? user.FindFirst(c => c.Type == "userid")?.Value 
+                  ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int id))
+        {
+            reservas = casoDeUsoListarMisReservas.Ejecutar(id);
+        }
+        else
+        {
+            mensajeError = "No se pudo obtener el ID del usuario.";
+        }
+    }
+    else
+    {
+        mensajeError = "Usuario no autenticado.";
+    }
+    
+}
+
+    private string GetBadgeColor(EstadoReserva estado)
+    {
+        return estado switch
+        {
+            EstadoReserva.Pendiente => "warning",
+            EstadoReserva.Confirmada => "success",
+            EstadoReserva.Cancelada => "secondary",
+            _ => "light"
+        };
+    }
+
+    private void ModificarReserva(int id)
+    {
+        NavigationManager.NavigateTo($"/modificarreserva/{id}");
+    }
+
+    private async Task CancelarReserva(int id)
+{
+    reservaAEliminarId = id;
+    var resultadoPreliminar = await casoDeUsoCancelarReserva.calcularCancelacion(id);
+    mensajeCancelacion = resultadoPreliminar.Mensaje;
+    mostrarConfirmacion = true;
+    mensajeError = null;
+    mensajeExito = null;
+    await InvokeAsync(StateHasChanged); 
+}
+
+    private async Task ConfirmarCancelacion()
+{
+    try
+    {
+        var resultado = await casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
+
+        if (resultado.EsExitosa)
+        {
+            mensajeExito_misReservas = resultado.Mensaje;
+
+
+            await CargarmisReservas();
+        }
+        else
+        {
+            mensajeError = resultado.Mensaje;
+        }
+    }
+    catch (Exception ex)
+    {
+        mensajeError = $"Ocurrió un error inesperado: {ex.Message}";
+    }
+    finally
+    {
+        mostrarConfirmacion = false;
+    }
+}
+
+
+    private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
+{
+    return politica switch
+    {
+        PoliticasDeCancelacion.Anticipo20_72hs => "Se puede cancelar con 72 horas de anticipación. Se reembolsa el 20%.",
+        PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No se puede cancelar.",
+        PoliticasDeCancelacion.PagoTotal_48hs_50 => "Se puede cancelar con 48 horas de anticipación. Se reembolsa el 50%.",
+        _ => "Política desconocida"
+    };
+}
+
+    private void CancelarConfirmacion()
+    {
+        mostrarConfirmacion = false;
+    }
+
+private void RedirigirAlChat(int reservaId)
+{
+    NavigationManager.NavigateTo($"/chat?reservaId={reservaId}");
+}
+
+
+
+
+
+
+
+private Reserva? reservaSeleccionada;
+private string mensajeAEnviar;
+
+private void AbrirFormularioMensaje(Reserva reserva)
+{
+    reservaSeleccionada = reserva;
+    mensajeAEnviar = "";
+}
+
+private void CerrarFormularioMensaje()
+{
+    reservaSeleccionada = null;
+    mensajeAEnviar = "";
+}
+
+private async Task EnviarMensajeEmail()
+{
+    if (reservaSeleccionada is null || string.IsNullOrWhiteSpace(mensajeAEnviar))
+        return;
+
+    enviandoMensaje = true;
+    try
+    {
+        string asunto = reservaSeleccionada.Propiedad.Titulo;
+        string emailCliente = reservaSeleccionada.Cliente.Email;
+        string cuerpo = mensajeAEnviar;
+
+        await Task.Run(() =>
+        {
+            CasoDeUsoContactarAdmin.Ejecutar(reservaSeleccionada, cuerpo);
+        });
+
+        mensajeExito_misReservas = "Mensaje enviado exitosamente al administrador.";
+        reservaSeleccionada = null;
+    }
+    catch (Exception ex)
+    {
+        mensajeError = $"Error al enviar mensaje: {ex.Message}";
+    }
+    finally
+    {
+        enviandoMensaje = false;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+<style>
+.profile-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    
+
+    .profile-actions button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        color: white;
+        border: none;
+    }
+    
+    
+
+    .profile-actions button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+   .btn-primary {
+        background-color: #4a9cb5;
+        border-color: #4a9cb5;
+    }
+
+
+     .btn-primary:hover {
+        background-color: #3d8ba0;
+    }
+
+    .profile-actions .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+        color: white;
+    }
+
+    .profile-actions .btn-info:hover {
+        background-color: #138496;
+    }
+
+    .profile-actions .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .profile-actions .btn-success:hover {
+        background-color: #218838;
+    }
+
+     .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+     .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .profile-actions .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: white;
+    }
+
+    .profile-actions .btn-warning:hover {
+        background-color: #e0a800;
+    }
+
+    .profile-actions button i {
+        font-size: 1.1rem;
+    }
+
+    .tarjetas-list {
+        margin-top: 1rem;
+    }
+
+    .tarjeta-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        background-color: #f8f9fa;
+    }
+
+    .tarjeta-item:hover {
+        background-color: #e9ecef;
+    }
+
+    .tarjeta-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .tarjeta-info small {
+        color: #6c757d;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0;
+    }
+
+    .form-check-label {
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .reservas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .reserva-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+
+    .reserva-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .reserva-header {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .reserva-header h4 {
+        margin: 0;
+        color: #495057;
+    }
+
+    .estado-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .estado-badge.pendiente {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .estado-badge.confirmada {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .estado-badge.cancelada {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .estado-badge.finalizada {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .reserva-body {
+        padding: 1rem;
+    }
+
+    .reserva-footer {
+        padding: 1rem;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .reserva-footer .btn {
+        padding: 0.5rem 1rem;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+    .badge {
+        padding: 0.5em 1em;
+        font-size: 0.9em;
+    }
+
+    .btn {
+        border-radius: 5px;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn i {
+        margin-right: 0.5rem;
+    }
+
+    .table {
+        margin-top: 1rem;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .payment-methods-actions {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .payment-methods-actions button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        color: white;
+        border: none;
+        min-width: 180px;
+    }
+
+    .payment-methods-actions button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .payment-methods-actions .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+
+    .payment-methods-actions .btn-info:hover {
+        background-color: #138496;
+    }
+
+    .payment-methods-actions .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .payment-methods-actions .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .payment-methods-actions .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .payment-methods-actions .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .payment-methods-actions .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+
+    .payment-methods-actions .btn-warning:hover {
+        background-color: #e0a800;
+    }
+    .profile-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    margin-top: 4rem;
+    min-height: calc(100vh - 4rem);
+    overflow-y: auto;
+}
+
+.profile-header {
+    margin-bottom: 2rem;
+}
+
+.profile-header h1 {
+    color: #1F3F48;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.tabs-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    min-width: 1000px;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #e9ecef;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.tab-button {
+    padding: 1rem 2rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #495057;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab-button:hover {
+    color: #1F3F48;
+}
+
+.tab-button.active {
+    color: #ff6b00;
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #ff6b00;
+}
+
+.tab-button i {
+    margin-right: 0.5rem;
+}
+
+.tab-content {
+    padding: 2rem;
+}
+
+.tab-pane {
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tab-pane h3 {
+    color: #1F3F48;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+@@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-section {
+    background: white;
+    padding: 2rem;
+}
+
+.profile-section h2 {
+    color: #1F3F48;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.info-group {
+    margin-bottom: 1.2rem;
+    padding: 0.8rem;
+    border-radius: var(--bs-border-radius);
+    background-color: var(--bs-tertiary-bg);
+    transition: background-color 0.2s ease;
+}
+
+.info-group:hover {
+    background-color: var(--bs-secondary-bg);
+}
+
+.info-group label {
+    display: block;
+    font-weight: 600;
+    color: #1F3F48;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.info-group span {
+    display: block;
+    color: var(--bs-body-color);
+    font-size: 1rem;
+    padding: 0.2rem 0;
+}
+
+.profile-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.btn-otro {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    width: 160px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #f1771f;
+    color: white;
+}
+
+.btn-otro:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.mensaje-exito {
+    width: 300px;
+    color: var(--bs-success);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    animation: fadeIn 0.3s ease-out;
+    text-align: center;
+}
+
+@@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+@@media (max-width: 1440px) {
+    .profile-container {
+        max-width: 95%;
+    }
+}
+
+@@media (max-width: 1024px) {
+    .tabs-container {
+        min-width: auto;
+        width: 100%;
+        overflow-x: auto;
+    }
+}
+
+@@media (max-width: 768px) {
+    .profile-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .profile-section {
+        padding: 1.5rem;
+    }
+
+    .info-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .info-group label {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+}
+.container_misreservas {
+        margin-top: 80px; /* margen grande arriba */
+        max-width: 900px; /* para no ocupar todo el ancho */
+        margin-left: auto;
+        margin-right: auto; /* centra horizontalmente */
+    }
+
+    .table_misreservas {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    background-color: #f9fafb;
+    border-radius: 12px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #3b3b3b;
+    overflow: hidden;
+}
+
+.table_misreservas thead tr {
+    background-color: #f3f9ff;
+    color: #565757;
+    font-weight: 700;
+    text-align: left;
+    border-bottom: 2px solid #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table_misreservas th, .table_misreservas td {
+    padding: 14px 20px;
+    border: none;
+    vertical-align: middle;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Tarjeta efecto */
+.table_misreservas tbody tr {
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 10px;
+}
+
+.table_misreservas tbody tr:hover {
+    background-color: #e8f1fd;
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Efecto sutil al pasar por celda */
+.table_misreservas td:hover {
+    background-color: #f0f8ff;
+    cursor: default;
+}
+.button_misreservas {
+  padding: 10px 20px!important;
+  font-weight: bold!important;
+  border: none!important;
+  border-radius: 8px!important;
+  color: white!important;
+  font-size: 1rem!important;
+  cursor: pointer!important;
+  transition: all 0.3s ease!important;
+  margin-bottom: 1rem!important;
+}
+
+.boton-cancelar {
+  background-color: #ab2e2e;
+}
+
+.boton-cancelar:hover {
+  background-color: #c0392b;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+}
+
+.boton-modificar {
+  background-color: #3498db;
+}
+
+.boton-modificar:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+</style>

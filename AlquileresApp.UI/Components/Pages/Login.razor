@@ -1,0 +1,72 @@
+@page "/Login"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.CasosDeUso.Usuario
+@using AlquileresApp.UI.Components
+@using System.ComponentModel.DataAnnotations
+@using AlquileresApp.Core.Entidades
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@inject NavigationManager NavigationManager
+@inject CasoDeUsoIniciarSesion CUIniciarSesion
+<link href="css/RegistrarUsuario.css" rel="stylesheet" />
+
+<div class="registro-container">
+    <h1 class="registro-title">Iniciar Sesión</h1>
+    <div class="registro-form">
+        <section>
+            <EditForm Model="@loginModel" OnValidSubmit="IniciarSesion">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <InputText id="email" class="form-control" @bind-Value="loginModel.Correo" />
+                    <ValidationMessage For="@(() => loginModel.Correo)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <InputText type="password" id="password" class="form-control" @bind-Value="loginModel.Contraseña" />
+                    <ValidationMessage For="@(() => loginModel.Contraseña)" />
+                </div>
+
+                <button type="submit" class="registro-button">Iniciar Sesión</button>
+            </EditForm>
+            <Error Mensaje="@errorMensaje"/>
+        </section>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new();
+    private string? errorMensaje;
+    private string nombreUsuario = "";
+
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
+    private class LoginModel
+    {
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "El formato del email no es válido")]
+        public string Correo { get; set; } = "";
+
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        public string Contraseña { get; set; } = "";
+    }
+
+    private async Task IniciarSesion()
+    {
+        try
+        {
+            errorMensaje = null;
+            Usuario usuario = await CUIniciarSesion.Ejecutar(loginModel.Correo, loginModel.Contraseña);
+            nombreUsuario = usuario.Nombre;
+            NavigationManager.NavigateTo(ReturnUrl ?? "/", true);
+        }
+        catch (Exception ex)
+        {   
+            errorMensaje = ex.Message;
+            StateHasChanged();
+        }
+    }
+}

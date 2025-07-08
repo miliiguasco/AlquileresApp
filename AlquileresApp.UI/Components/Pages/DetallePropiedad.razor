@@ -1,0 +1,557 @@
+@page "/EditarPropiedad/{Id:int}"
+@using AlquileresApp.Core.CasosDeUso.Imagen
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Enumerativos
+@using AlquileresApp.Core.Interfaces
+@using GoogleMaps.LocationServices
+@using Microsoft.JSInterop
+@inject IPropiedadRepositorio PropiedadesRepo
+@inject IImagenesRepositorio ImagenesRepo
+@inject NavigationManager NavigationManager
+@inject CasoDeUsoListarPropiedades CUListarPropiedades
+@inject CasoDeUsoCargarImagen CUAgregarImagen
+@inject CasoDeUsoModificarPropiedad CUModificarPropiedad
+@inject CasoDeUsoEliminarImagen CUEliminarImagen
+@inject CasoDeUsoMostrarImagenes CUMostrarImagenes
+@inject CasoDeUsoCrearReserva CUCrearReserva
+@inject CasoDeUsoObtenerPropiedad CUObtenerPropiedad
+@inject IWebHostEnvironment Environment
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@using System.ComponentModel.DataAnnotations
+@inject IJSRuntime Js
+
+<link href="css/VerPropiedad.css" rel="stylesheet" />
+
+<div class="propiedad-container bg-light p-4 rounded shadow-sm my-5">
+    @if (propiedad is null)
+    {
+        <p class="text-center">Cargando...</p>
+    }
+    else
+    {
+        @if (!modoEdicion)
+        {
+            <h2 class="tituloo">@propiedad.Titulo</h2>
+            @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
+            {
+                <div id="carouselPropiedad" class="carousel slide mb-4" data-bs-ride="carousel" style="max-width: 700px; margin:auto;">
+                    <div class="carousel-inner rounded shadow-sm">
+                        @for (int i = 0; i < propiedad.Imagenes.Count; i++)
+                        {
+                            var img = propiedad.Imagenes[i];
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@img.Url" alt="Imagen @i" class="d-block w-100" />
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselPropiedad" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselPropiedad" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Siguiente</span>
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div id="carouselPropiedad" class="carousel slide mb-4" data-bs-ride="carousel" style="max-width: 700px; margin:auto;">
+                    <div class="carousel-inner rounded shadow-sm">
+                        <div class="carousel-item active">
+                            <img src="Imagenes/Propiedades/iconoimagen.jpg" class="d-block w-100 propiedad-img" alt="Sin imagen disponible" />
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="detalle-propiedad px-3">
+                <p><strong>Dirección:</strong> @propiedad.Direccion</p>
+                <p><strong>Localidad:</strong> @propiedad.Localidad</p>
+                <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
+                <p><strong>Precio por noche:</strong> <span class="text-success fw-semibold">$@propiedad.PrecioPorNoche</span></p>
+                <p id="map" style="width: 100%; height: 300px; margin: 10px 0;"></p>
+
+                <h4 class="mt-4 mb-3">Servicios</h4>
+                @if (propiedad.ServiciosDisponibles is not null && propiedad.ServiciosDisponibles.Any())
+                {
+                    <ul class="servicios-list list-unstyled d-flex flex-wrap gap-2">
+                        @foreach (var servicio in propiedad.ServiciosDisponibles)
+                        {
+                            <li class="badge bg-primary text-white py-2 px-3">@servicio.ToString()</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="fst-italic text-muted">No se especificaron servicios.</p>
+                }
+
+                <h4 class="mt-4 mb-3">Descripción</h4>
+                <p class="text-secondary fs-5 lh-lg">@propiedad.Descripcion</p>
+
+                <h4 class="mt-5 mb-3">Política de cancelación</h4>
+                <p class="fst-italic">@ObtenerDescripcionPolitica(propiedad.PoliticaCancelacion)</p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" @onclick="IniciarEdicion">
+                    <i class="fas fa-edit"></i> Editar Propiedad
+                </button>
+
+                <button class="btn btn-primary" @onclick="OnClickUpload">
+                    <i class="fas fa-edit"></i> Cargar Imagen
+                </button>
+                <InputFile OnChange="CargarImagen" accept=".jpg,.jpeg,.png" style="display:none" />
+
+                <button class="btn btn-secondary" @onclick="VolverAInicio">Volver al Inicio</button>
+            </div>
+        }
+        else
+        {
+            <div id="carouselPropiedad" class="carousel slide mb-4 position-relative" data-bs-ride="carousel" style="max-width: 700px; margin:auto;">
+                @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
+                {
+                    <div class="carousel-inner rounded shadow-sm">
+                        @for (int i = 0; i < propiedad.Imagenes.Count; i++)
+                        {
+                            var img = propiedad.Imagenes[i];
+                            <div class="carousel-item @(i == 0 ? "active" : "") position-relative">
+                                <img src="@img.Url" alt="Imagen @i" class="d-block w-100" />
+
+                                <button class="btn btn-danger position-absolute" style="top: 10px; right: 10px; z-index: 10;"
+                                        @onclick="() => EliminarImagen(img.Id)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselPropiedad" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselPropiedad" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Siguiente</span>
+                    </button>
+                }
+                else
+                {
+                    <div class="carousel-inner rounded shadow-sm">
+                        <div class="carousel-item active">
+                            <img src="Imagenes/Propiedades/iconoimagen.jpg" class="d-block w-100 propiedad-img" alt="Sin imagen disponible" />
+                        </div>
+                    </div>
+                }
+            </div>
+            <EditForm Model="@propiedadEditada" class="form-horizontal">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label for="titulo">Título</label>
+                    <InputText id="titulo" class="form-control" @bind-Value="propiedadEditada.Titulo" />
+                    <ValidationMessage For="@(() => propiedadEditada.Titulo)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <InputTextArea id="descripcion" class="form-control" @bind-Value="propiedadEditada.Descripcion" rows="3" />
+                    <ValidationMessage For="@(() => propiedadEditada.Descripcion)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="precio">Precio por noche</label>
+                    <InputNumber id="precio" class="form-control" @bind-Value="propiedadEditada.PrecioPorNoche" />
+                    <ValidationMessage For="@(() => propiedadEditada.PrecioPorNoche)" />
+                </div>
+                
+                 <p id="map" style="width: 100%; height: 300px; margin: 10px 0;"></p>
+
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <div id="direccion-autocomplete-container"></div>
+                    <ValidationMessage For="@(() => propiedadEditada.Direccion)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="capacidad">Capacidad de personas</label>
+                    <InputNumber id="capacidad" class="form-control" @bind-Value="propiedadEditada.Capacidad" />
+                    <ValidationMessage For="@(() => propiedadEditada.Capacidad)" />
+                </div>
+
+                <div class="form-group">
+                    <label for="pagoAnticipado">Porcentaje de pago anticipado</label>
+                    <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="propiedadEditada.TipoPago" @oninput="OnTipoPagoChanged">
+                        <option value="SinAnticipo">0% - Sin pago anticipado</option>
+                        <option value="Parcial">20% - Pago parcial anticipado</option>
+                        <option value="Total">100% - Pago total anticipado</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => propiedadEditada.TipoPago)" />
+                </div>
+
+                <div class="form-group">
+                <label for="politicaCancelacion">Política de cancelación</label>
+                <p class="form-control-plaintext">@ObtenerDescripcionPolitica(propiedadEditada.PoliticaCancelacion)</p>
+                </div>
+
+                <div class="button-group">
+                    <!--<InputCheckbox class="form-check-input" id="NoHabitable"
+                                   @bind-Value="propiedadEditada.NoHabitable" />
+                    <label class="form-check-label" for="NoHabitable">No habitable</label> -->
+                    <button type="button" class="btn btn-primary" @onclick="HandleSubmitWithGeocoding">Guardar Cambios</button>
+                    <button type="button" class="btn btn-primary" @onclick="CancelarEdicion">Cancelar</button>
+                </div>
+
+            </EditForm>
+        }
+    }
+    @if (!string.IsNullOrEmpty(errorMensaje))
+    {
+        <div class="alert alert-danger mt-2">@errorMensaje</div>
+    }
+</div>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Propiedad? propiedad;
+    private Propiedad propiedadEditada = new();
+    private List<Imagen>? imagenes;
+    private string? errorMensaje;
+    private ElementReference fileInput;
+    
+    private string? googleMapsApiKey;
+    private bool modoEdicion = false;
+    private string carouselId => $"carousel-{Id}";
+
+    protected override void OnInitialized()
+    {
+        propiedad = CUObtenerPropiedad.Ejecutar(Id);
+        googleMapsApiKey = Configuration["GoogleMaps:ApiKey"];
+        if (string.IsNullOrEmpty(googleMapsApiKey))
+        {
+            errorMensaje = "Error: La clave de API de Google Maps no está configurada.";
+            Console.WriteLine(errorMensaje);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+{
+    if (modoEdicion && propiedadEditada != null)
+    {
+        try
+        {
+            await Js.InvokeVoidAsync(
+                "initPlacePicker",
+                "direccion-autocomplete-container",
+                DotNetObjectReference.Create(this),
+                propiedadEditada.Direccion
+            );
+            await Js.InvokeVoidAsync("mostrarMapa", "map", propiedadEditada.Latitud, propiedadEditada.Longitud);
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al inicializar el autocompletado: {ex.Message}";
+        }
+    }
+    // Mostrar el mapa siempre que NO estés en modo edición y la propiedad exista
+    if (!modoEdicion && propiedad != null)
+    {
+        try
+        {
+            await Js.InvokeVoidAsync("mostrarMapa", "map", propiedad.Latitud, propiedad.Longitud);
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al mostrar el mapa: {ex.Message}";
+        }
+    }
+}
+
+    private void CargarImagenes()
+    {
+        try
+        {
+            imagenes = CUMostrarImagenes.Ejecutar(Id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error en CargarImagenes: {ex.Message}");
+        }
+    }
+
+    private async Task IniciarEdicion()
+    {
+        try
+        {
+            if (propiedad != null)
+            {
+                propiedadEditada = new Propiedad
+                {
+                    Id = propiedad.Id,
+                    Titulo = propiedad.Titulo,
+                    Descripcion = propiedad.Descripcion,
+                    Direccion = propiedad.Direccion,
+                    Localidad = propiedad.Localidad,
+                    Latitud = propiedad.Latitud,
+                    Longitud = propiedad.Longitud,
+                    PoliticaCancelacion = propiedad.PoliticaCancelacion,
+                    PrecioPorNoche = propiedad.PrecioPorNoche,
+                    Capacidad = propiedad.Capacidad,
+                    EncargadoId = propiedad.EncargadoId,
+                    TipoPago = propiedad.TipoPago,
+                    ServiciosDisponibles = propiedad.ServiciosDisponibles,
+                    Imagenes = propiedad.Imagenes,
+                    NoHabitable = propiedad.NoHabitable
+                    
+                };
+                modoEdicion = true;
+                await InvokeAsync(StateHasChanged); // Forzar renderizado inmediato
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al iniciar la edición: {ex.Message}";
+            Console.WriteLine($"Error en IniciarEdicion: {ex}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task SetAddressAndLocalityFromPicker(string address, string locality)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(address))
+            {
+                propiedadEditada.Direccion = address;
+                propiedadEditada.Localidad = locality;
+                // No forzar StateHasChanged aquí, solo actualizar el modelo
+                await GetCoordinatesForAddressAsync(); // Actualizar coordenadas
+                await Js.InvokeVoidAsync("mostrarMapa", "map", propiedadEditada.Latitud, propiedadEditada.Longitud);
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Error al establecer la dirección desde el selector: {ex.Message}";
+            Console.WriteLine($"Error en SetAddressFromPicker: {ex}");
+        }
+    }
+
+    private async Task HandleSubmitWithGeocoding()
+    {
+        errorMensaje = null;
+        // Asegúrate de que la dirección esté actualizada
+        if (string.IsNullOrWhiteSpace(propiedadEditada.Direccion))
+        {
+            errorMensaje = "Por favor, ingresa una dirección.";
+            return;
+        }
+
+        // Primero, intenta obtener las coordenadas de la dirección seleccionada
+        bool geocodingSuccessful = await GetCoordinatesForAddressAsync();
+
+        if (geocodingSuccessful)
+        {
+            await GuardarCambios();
+        }
+    }
+
+   private async Task<bool> GetCoordinatesForAddressAsync()
+{
+    errorMensaje = string.Empty;
+    propiedadEditada.Latitud = 0;
+    propiedadEditada.Longitud = 0;
+
+    if (string.IsNullOrEmpty(googleMapsApiKey))
+    {
+        errorMensaje = "Error: La clave de API de Google Maps no está configurada.";
+        return false;
+    }
+
+    if (string.IsNullOrWhiteSpace(propiedadEditada.Direccion))
+    {
+        errorMensaje = "Por favor, ingresa una dirección.";
+        return false;
+    }
+
+    try
+    {
+        var locationService = new GoogleLocationService(googleMapsApiKey);
+        var coordenadas = locationService.GetLatLongFromAddress(propiedadEditada.Direccion);
+        Console.WriteLine($"Coordenadas obtenidas: Latitud={coordenadas.Latitude}, Longitud={coordenadas.Longitude}");
+        // Verificar si las coordenadas son válidas
+        if (coordenadas != null)
+        {
+            propiedadEditada.Latitud = coordenadas.Latitude;
+            propiedadEditada.Longitud = coordenadas.Longitude;
+            return true;
+        }
+        else
+        {
+            errorMensaje = "No se encontraron coordenadas para la dirección ingresada. Intenta ser más específico.";
+            return false;
+        }
+    }
+    catch (Exception ex)
+    {
+        errorMensaje = $"Ocurrió un error al buscar la dirección: {ex.Message}. Asegúrate de que tu clave de API sea válida.";
+        Console.WriteLine($"Error de geocificación: {ex}");
+        return false;
+    }
+}
+
+private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
+{
+    return politica switch
+    {
+        PoliticasDeCancelacion.Anticipo20_72hs => "Requiere 20% de anticipo y permite cancelación hasta 72hs antes.",
+        PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No requiere anticipo, pero no permite cancelaciones.",
+        PoliticasDeCancelacion.PagoTotal_48hs_50 => "Pago total por adelantado, permite cancelación hasta 48hs antes con 50% de reintegro.",
+        _ => "No especificada."
+    };
+}
+
+private async Task GuardarCambios()
+{
+    try
+    {
+        errorMensaje = null;
+
+        // Guardar cambios primero
+        await Task.Run(() => CUModificarPropiedad.Ejecutar(propiedadEditada));
+        Console.WriteLine("Cambios guardados exitosamente");
+        // Recargar la propiedad actualizada
+        propiedad = CUObtenerPropiedad.Ejecutar(propiedadEditada.Id);
+
+        modoEdicion = false;
+        await InvokeAsync(StateHasChanged);
+        //await Task.Delay(100);
+        await Js.InvokeVoidAsync("mostrarMapa", "map", propiedad.Latitud, propiedad.Longitud);
+    }
+    catch (Exception ex)
+    {
+        errorMensaje = $"Error al guardar los cambios: {ex.Message}";
+        Console.WriteLine($"Error en GuardarCambios: {ex.Message}");
+    }
+}
+
+        private async Task CancelarEdicion()
+        {
+            modoEdicion = false;
+            errorMensaje = null;
+            await InvokeAsync(StateHasChanged);
+        }
+
+       private async Task OnClickUpload()
+        {
+            await Js.InvokeVoidAsync("eval", "document.querySelector('[type=file]').click()");
+        }
+
+        private async Task CargarImagen(InputFileChangeEventArgs e)
+        {
+            try
+            {
+                errorMensaje = null;
+                var file = e.File;
+
+                if (file != null)
+                {
+                    // Validar formato de la imagen
+                    var extension = Path.GetExtension(file.Name).ToLowerInvariant();
+                    if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
+                    {
+                        errorMensaje = "Solo se permiten imágenes en formato JPG o PNG";
+                        return;
+                    }
+
+                    // Generar un nombre único para el archivo
+                    var fileName = $"{Guid.NewGuid()}{extension}";
+                    var path = Path.Combine(Environment.WebRootPath, "imagenes", "propiedades", fileName);
+
+                    // Asegurarse de que el directorio existe
+                    Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+
+                    // Guardar el archivo
+                    using (var stream = File.Create(path))
+                    {
+                        await file.OpenReadStream().CopyToAsync(stream);
+                    }
+
+                    // Crear un objeto Imagen con la URL del archivo
+                    var imagen = new Imagen
+                    {
+                        Url = $"/imagenes/propiedades/{fileName}"
+                    };
+
+                    var urlImagen = CUAgregarImagen.Ejecutar(imagen, Id);
+
+                    // Recargar las imágenes después de agregar una nueva
+                    CargarImagenes();
+
+                    errorMensaje = "Imagen cargada exitosamente";
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMensaje = $"Error al cargar la imagen: {ex.Message}";
+                Console.WriteLine($"Error en CargarImagen: {ex.Message}");
+            }
+        }
+
+        private void OnTipoPagoChanged(ChangeEventArgs e)
+        {
+            if (Enum.TryParse<TipoPago>(e.Value?.ToString(), out var tipoPago))
+            {
+                Console.Write($"Tipo de pago seleccionado: {tipoPago}");
+                propiedadEditada.TipoPago = tipoPago;
+                // Asigna la política de cancelación según el tipo de pago
+                switch (tipoPago)
+                {
+                    case TipoPago.SinAnticipo:
+                        propiedadEditada.PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable;
+                        break;
+                    case TipoPago.Parcial:
+                        propiedadEditada.PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs;
+                        break;
+                    case TipoPago.Total:
+                        propiedadEditada.PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50;
+                        break;
+                }
+            }
+            StateHasChanged();
+        }
+        private async Task EliminarImagen(int imagenId)
+        {
+            try
+            {
+                errorMensaje = null;
+                // 1. Ejecutar el caso de uso para eliminar la imagen del backend
+                await Task.Run(() => CUEliminarImagen.Ejecutar(imagenId));
+
+                propiedad = CUObtenerPropiedad.Ejecutar(Id); // Re-obtener la propiedad con sus imágenes actualizadas
+
+                // 3. Forzar la re-renderización del componente Blazor
+                await InvokeAsync(StateHasChanged);
+
+                errorMensaje = "Imagen eliminada exitosamente";
+            }
+            catch (Exception ex)
+            {
+                errorMensaje = $"Error al eliminar la imagen: {ex.Message}";
+                Console.WriteLine($"Error en EliminarImagen: {ex.Message}");
+            }
+        }
+        private void VolverAInicio()
+        {
+            NavigationManager.NavigateTo("/Administrar");
+        }
+
+        
+
+}

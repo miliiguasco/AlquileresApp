@@ -1,0 +1,47 @@
+﻿@inherits LayoutComponentBase
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using AlquileresApp.UI.Components.Layout
+
+<ErrorBoundary>
+    <ChildContent>
+        <div class="page">
+            <NavMenu />
+            <main class="main">
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
+        </div>
+    </ChildContent>
+    <ErrorContent>
+        <p class="error-message">Lo sentimos, ha ocurrido un error al cargar esta sección.</p>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+}
+
+<style>
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+
+    .main-content {
+        flex: 1;
+    }
+
+    .footer {
+        background-color: #fff;
+        border-top: 1px solid #dee2e6;
+    }
+</style>
+

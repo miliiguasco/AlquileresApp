@@ -1,0 +1,392 @@
+
+@page "/"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.CasosDeUso.Calificacion
+@using AlquileresApp.Core.Enumerativos
+@using AlquileresApp.Core.CasosDeUso.Promocion
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@inject IJSRuntime JS
+@inject IWebHostEnvironment Environment
+@inject CasoDeUsoListarPropiedadesFiltrado CUListarPropiedadesFiltrado
+@inject CasoDeUsoCrearReserva CUReservarPropiedad
+@inject CasoDeUsoListarPromocionesActivas CUListarPromocionesActivas
+@inject CasoDeUsoListarPropiedadesDestacadas CUListarPropiedadesDestacadas
+
+@inject CasoDeUsoMostrarCalificacion CUMostrarCalificacion
+
+<link href="css/Filtradas.css" rel="stylesheet" />
+@if (Promociones != null && Promociones.Any())
+{
+    <div id="carouselPromociones" class="carousel slide mb-5" data-bs-ride="carousel">
+        <div class="carousel-inner text-center text-white">
+
+            @for (int i = 0; i < Promociones.Count; i++)
+            {
+                var promo = Promociones[i];
+                var isActive = i == 0 ? "active" : "";
+
+                // Gradientes lindos y diferentes
+                string bgClass;
+               if (i % 3 == 0)
+                  bgClass = "bg-primary text-white";
+               else if (i % 3 == 1)
+                  bgClass = "bg-success text-white";
+               else
+                  bgClass = "promo-bg-warning";
+                <div class="carousel-item @isActive p-5 rounded shadow-lg @bgClass">
+                    <h3 class="mb-3 display-6 fw-bold">@promo.Titulo</h3>
+                    <p class="lead">@promo.Descripcion</p>
+                    <h4 class="display-6 fw-bold mb-4">@promo.PorcentajeDescuento% OFF</h4>
+
+                    @{
+                       var propiedadesMostrar = promo.Propiedades.Take(3).ToList();
+                       var tieneMas = promo.Propiedades.Count > 3;
+                    }
+                   <div class="row justify-content-center">
+                      @foreach (var prop in propiedadesMostrar)
+                    {
+                       <div class="col-md-3 mb-3">
+                          <div class="card text-dark bg-light h-100 shadow-sm">
+                             <div class="card-body">
+                               <h5 class="card-title">@prop.Titulo</h5>
+                               <p class="card-text">@prop.Localidad</p>
+                               @{
+                                 var precioOriginal = prop.PrecioPorNoche;
+                                 var descuento = promo.PorcentajeDescuento;
+                                 var precioConDescuento = precioOriginal * (1 - descuento / 100.0m);
+                                }
+                               <p class="card-text text-muted">
+                                 <del>@($"{precioOriginal:C}")</del>
+                                 <strong>@($"{precioConDescuento:C}")</strong> por noche con descuento
+                               </p>
+                               <a href="/propiedad/@prop.Id" class="btn btn-sm btn-primary">Ver más</a>
+                             </div>
+                           </div>
+                       </div>
+
+                    }
+                
+            
+                   @if (tieneMas)
+                   {
+                      <button class="btn btn-link text-white" data-bs-toggle="modal" data-bs-target="#modalPropiedadesPromo_@promo.Id">
+    Ver todas las propiedades (@promo.Propiedades.Count)
+</button>
+                      @if (tieneMas)
+{
+    <div class="modal fade" id="modalPropiedadesPromo_@promo.Id" tabindex="-1" aria-labelledby="modalLabel_@promo.Id" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel_@promo.Id">Propiedades de la promoción: @promo.Titulo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        @foreach (var prop in promo.Propiedades)
+                        {
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100 shadow-sm">
+                                    @if (prop.Imagenes != null && prop.Imagenes.Any())
+                                    {
+                                        <img src="@prop.Imagenes.First().Url" class="card-img-top" alt="Imagen propiedad" style="height: 180px; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <img src="Imagenes/Propiedades/iconoimagen.jpg" class="card-img-top" alt="Sin imagen" style="height: 180px; object-fit: cover;" />
+                                    }
+                                    <div class="card-body">
+                                        <h5 class="card-title">@prop.Titulo</h5>
+                                        <p class="card-text">@prop.Localidad</p>
+                                        @{
+                                            var precioOriginal = prop.PrecioPorNoche;
+                                            var descuento = promo.PorcentajeDescuento;
+                                            var precioConDescuento = precioOriginal * (1 - descuento / 100.0m);
+                                        }
+                                        <p class="card-text text-muted">
+                                            <del>@($"{precioOriginal:C}")</del>
+                                            <strong>@($"{precioConDescuento:C}")</strong> por noche con descuento
+                                        </p>
+                                        <a href="/propiedad/@prop.Id" class="btn btn-sm btn-primary">Ver más</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+                    }
+                   </div>
+
+                   <button class="carousel-control-prev" type="button" data-bs-target="#carouselPromociones" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon"></span>
+                      <span class="visually-hidden">Anterior</span>
+                   </button>
+                   <button class="carousel-control-next" type="button" data-bs-target="#carouselPromociones" data-bs-slide="next">
+                     <span class="carousel-control-next-icon"></span>
+                     <span class="visually-hidden">Siguiente</span>
+                   </button>
+                </div>
+            }
+        </div>
+    </div>
+ }   
+<div class="container_listar_propiedades mt-5">
+    <h2 class="tituloo">Busca tu lugar ideal</h2> 
+
+    <EditForm Model="Filtros" OnValidSubmit="Buscar">
+        <DataAnnotationsValidator />
+       <div class="validation-summary">
+           <ValidationSummary />
+       </div>
+
+        <div class="filtros">
+            <div>
+                <label>Ubicacion:</label>
+                <InputText @bind-Value="Filtros.Localidad" class="input" />
+            </div>
+
+            <div>
+                <label>Cantidad de personas:</label>
+                <InputNumber @bind-Value="Filtros.CantidadHuespedes" class="input" />
+            </div>
+
+            <div>
+                <label>Fecha de inicio:</label>
+                <InputDate @bind-Value="Filtros.FechaInicio" class="input" />
+            </div>
+
+            <div>
+                <label>Fecha de fin:</label>
+                <InputDate @bind-Value="Filtros.FechaFin" class="input" />
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-filtrar">Buscar</button>
+            </div>
+        </div>
+    </EditForm>
+@if (PropiedadesDestacadas != null && PropiedadesDestacadas.Any())
+{
+    <div class="container mt-5">
+        <h3 class="mb-3 text-center">Propiedades destacadas</h3>
+        <div id="carouselDestacadas" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                @{
+                    int total = PropiedadesDestacadas.Count;
+                    int itemsPorSlide = 3;
+                    int totalSlides = (int)Math.Ceiling((double)total / itemsPorSlide);
+
+                    for (int i = 0; i < totalSlides; i++)
+                    {
+                        var isActive = i == 0 ? "active" : "";
+                        var propiedadesSlide = PropiedadesDestacadas.Skip(i * itemsPorSlide).Take(itemsPorSlide).ToList();
+                    <div class="carousel-item @isActive">
+                        <div class="row justify-content-center">
+                            @foreach (var propiedad in propiedadesSlide)
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
+                                        {
+                                            <img src="@propiedad.Imagenes.First().Url" class="card-img-top" alt="Imagen destacada" style="height: 180px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <img src="Imagenes/Propiedades/iconoimagen.jpg" class="card-img-top" alt="Sin imagen" style="height: 180px; object-fit: cover;" />
+                                        }
+
+                                        <div class="card-body">
+                                            <h5 class="card-title">@propiedad.Titulo</h5>
+                                            <p class="card-text text-truncate">@propiedad.Descripcion</p>
+                                            <a href="/propiedad/@propiedad.Id" class="btn btn-sm btn-primary">Ver más</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                }
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselDestacadas" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselDestacadas" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+                <span class="visually-hidden">Siguiente</span>
+            </button>
+        </div>
+    </div>
+}
+
+    @if (Propiedades is null)
+    {
+        <div class="text-center">
+            <p></p>
+        </div>
+    }
+    else if (!Propiedades.Any())
+    {
+        <div class="text-center">
+            <p>No hay propiedades que cumplan con los requisitos disponibles.</p>
+        </div>
+    }
+    else
+    {
+        <ul class="lista-propiedades">
+            @foreach (var propiedad in Propiedades)
+            {
+                var carouselId = $"carousel-{propiedad.Id}";
+
+                <li class="propiedad-item">
+                    <h3>@propiedad.Titulo</h3>
+
+                    <div id="@carouselId" class="carousel slide propiedad-carousel" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            @if (propiedad.Imagenes != null && propiedad.Imagenes.Any())
+                            {
+                                var index = 0;
+                                foreach (var imagen in propiedad.Imagenes)
+                                {
+                                    <div class="carousel-item @(index == 0 ? "active" : "")">
+                                        <img src="@imagen.Url" class="d-block w-100 propiedad-img" alt="Imagen de @propiedad.Titulo" />
+                                    </div>
+                                    index++;
+                                }
+                            }
+                            else
+                            {
+                                <div class="carousel-item active">
+                                    <img src="Imagenes/Propiedades/iconoimagen.jpg" class="d-block w-100 propiedad-img" alt="Sin imagen" />
+                                </div>
+                            }
+                        </div>
+
+                        @if (propiedad.Imagenes != null && propiedad.Imagenes.Count > 1)
+                        {
+                            <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Anterior</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Siguiente</span>
+                            </button>
+                        }
+                    </div>
+
+                    <p>@propiedad.Descripcion</p>
+                    <p><strong>Dirección:</strong> @propiedad.Direccion</p>
+                    <p><strong>Localidad:</strong> @propiedad.Localidad</p>
+                    <p><strong>Capacidad:</strong> @propiedad.Capacidad personas</p>
+                    <p><strong>Precio por noche:</strong> $@propiedad.PrecioPorNoche</p>
+                    <p class="calificacion-promedio">
+                    <strong>Calificación Promedio:</strong>
+                    @if (propiedad.CalificacionPromedio > 0)  
+                    {
+                        <span style="color:#FFD700;">&#9733;</span> @* Una sola estrella dorada *@
+                        <span>@propiedad.CalificacionPromedio.ToString("F1")</span> @* El número al lado (ej. 4.5) *@
+                    }
+                    else
+                    {
+                        <span>Sin calificaciones aún</span>
+                    }
+                    </p>
+                    <a class="btn btn-secondary mt-2" href="/propiedad/@propiedad.Id">Ver más</a>
+
+
+
+                    @if (PropiedadesExpandida.Contains(propiedad.Id))
+                    {
+                        <div class="mt-3 btn-ver-mas" style="display:flex; flex-direction: column; gap: 0.5rem; max-width: 300px;">
+                            <h5>Servicios:</h5>
+                            @if (propiedad.ServiciosDisponibles != null && propiedad.ServiciosDisponibles.Any())
+                            {
+                                <ul>
+                                    @foreach (var servicio in propiedad.ServiciosDisponibles)
+                                    {
+                                        <li>@servicio.ToString()</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p>No se especificaron servicios.</p>
+                            }
+
+                            <h5>Política de cancelación:</h5>
+                            <p>@ObtenerDescripcionPolitica(propiedad.PoliticaCancelacion)</p>
+                        </div>
+                    }
+
+                    <div class="info-grupo">
+                            <button class="btn btn-primary" @onclick="() => IrAReservar(propiedad.Id)">
+                                <i class="fas fa-calendar-check"></i> Reservar esta propiedad
+                            </button>
+                        </div>
+
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+private List<Promocion> Promociones = new();
+    private List<Propiedad> PropiedadesDestacadas = new();
+    private SearchFilters Filtros = new()
+{
+    FechaInicio = DateTime.Today,
+    FechaFin = DateTime.Today.AddDays(1)
+};
+    private List<Propiedad>? Propiedades;
+    private Usuario UsuarioActual = new Cliente
+    {
+        Nombre = "María",
+        Apellido = "Gómez",
+        Email = "maria@demo.com",
+        Telefono = "1234567890",
+        Contraseña = "123456",
+        FechaNacimiento = new DateTime(1990, 1, 1)
+    };
+    private HashSet<int> PropiedadesExpandida = new();
+protected override void OnInitialized()
+    {
+        Promociones = CUListarPromocionesActivas.Ejecutar();
+        PropiedadesDestacadas = CUListarPropiedadesDestacadas.Ejecutar();
+    }
+    private void Buscar()
+    {
+        Propiedades = CUListarPropiedadesFiltrado.Ejecutar(Filtros);
+    }
+
+    private void IrAReservar( int Id)
+    {
+        NavigationManager.NavigateTo($"/reservar/{Id}");
+    }
+
+    private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
+    {
+        return politica switch
+        {
+            PoliticasDeCancelacion.Anticipo20_72hs => "Requiere 20% de anticipo y permite cancelación hasta 72hs antes.",
+            PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No requiere anticipo, pero no permite cancelaciones.",
+            PoliticasDeCancelacion.PagoTotal_48hs_50 => "Pago total por adelantado, permite cancelación hasta 48hs antes con 50% de reintegro.",
+            _ => "No especificada."
+        };
+    }
+}

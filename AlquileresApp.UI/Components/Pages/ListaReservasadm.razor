@@ -1,0 +1,223 @@
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.Enumerativos
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+
+@inject CasoDeUsoListarReservasAdm CUListarReservasAdm
+
+@inject CasoDeUsoRegistrarCheckout CURegistrarCheckout
+@inject ILogger<ListaReservasadm> Logger
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize(Roles = "Administrador")]
+
+<div class="admin-section">
+    @if (isLoading)
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-spinner fa-spin"></i> Cargando reservas...
+        </div>
+    }
+    else if (error != null)
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+    else if (reservas != null && reservas.Any())
+    {
+        @if (!string.IsNullOrEmpty(mensajeExito))
+        {
+            <div class="alert alert-success">@mensajeExito</div>
+        }
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <div class="alert alert-danger">@mensajeError</div>
+        }
+        <div class="table-container">
+            <table class="property-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Propiedad</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Estado</th>
+                        <th>Precio Total</th>
+                        <th>Monto Restante</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var reserva in reservas)
+                    {
+                        <tr>
+                            <td>@reserva.Id</td>
+                            <td>@($"{reserva.Cliente?.Nombre} {reserva.Cliente?.Apellido}")</td>
+                            <td>@reserva.Propiedad?.Titulo</td>
+                            <td>@reserva.FechaInicio.ToShortDateString()</td>
+                            <td>@reserva.FechaFin.ToShortDateString()</td>
+                            <td>
+                                <span class="badge @GetEstadoClass(reserva.Estado)">
+                                    @reserva.Estado
+                                </span>
+                            </td>
+                            <td>@reserva.PrecioTotal.ToString("C")</td>
+                            <td>@reserva.MontoRestante.ToString("C")</td>
+                            <td class="actions-cell">
+                                <button class="btn btn-primary" @onclick="() => VerDetallesReserva(reserva.Id)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                    <button class="btn btn-success" @onclick="() => RegistrarCheckout(reserva)">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                @if (reserva.Estado == EstadoReserva.Pendiente)
+                                {
+                                    <button class="btn btn-danger" @onclick="() => CancelarReserva(reserva)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>No hay reservas disponibles.</p>
+    }
+</div>
+
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Cancelación</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que querés cancelar esta reserva?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-danger" @onclick="@(async () => await ConfirmarCancelacion())">Sí, cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string? error;
+    private List<Reserva> reservas = new();
+    private bool isLoading = true;
+    private string mensajeError;
+    private string mensajeExito;
+    private bool mostrarConfirmacion = false;
+    private Reserva reservaACancelar;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("🚀 ListaReservasadm - OnInitializedAsync");
+        await CargarReservas();
+    }
+
+    private async Task CargarReservas()
+    {
+        try
+        {
+            Console.WriteLine("🔄 ListaReservasadm - CargarReservas iniciado");
+            isLoading = true;
+            error = null;
+            mensajeError = null;
+            mensajeExito = null;
+            StateHasChanged();
+
+            var reservasObtenidas = CUListarReservasAdm.Ejecutar();
+            Console.WriteLine($"📊 Reservas obtenidas: {reservasObtenidas?.Count ?? 0}");
+            
+            reservas = reservasObtenidas ?? new List<Reserva>();
+            Console.WriteLine($"✅ Reservas cargadas en el componente: {reservas.Count}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error al cargar reservas: {ex.Message}");
+            Console.WriteLine($"StackTrace: {ex.StackTrace}");
+            error = $"Error al cargar las reservas: {ex.Message}";
+            reservas = new List<Reserva>();
+        }
+        finally
+        {
+            isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private string GetEstadoClass(EstadoReserva estado)
+    {
+        return estado switch
+        {
+            EstadoReserva.Pendiente => "bg-warning",
+            EstadoReserva.Confirmada => "bg-success",
+            EstadoReserva.Cancelada => "bg-danger",
+            EstadoReserva.Activa => "bg-info",
+            EstadoReserva.Finalizada => "bg-secondary",
+            _ => "bg-secondary"
+        };
+    }
+
+    private void VerDetallesReserva(int reservaId)
+    {
+        NavigationManager.NavigateTo($"/DetallesReserva/{reservaId}");
+    }
+
+    private void CancelarReserva(Reserva reserva)
+    {
+        reservaACancelar = reserva;
+        mostrarConfirmacion = true;
+        mensajeError = null;
+        mensajeExito = null;
+    }
+
+    private async Task ConfirmarCancelacion()
+    {
+        try
+        {
+            // TODO: Implementar lógica de cancelación
+            mensajeExito = "Reserva cancelada exitosamente.";
+            await CargarReservas();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al cancelar la reserva: {ex.Message}";
+        }
+        finally
+        {
+            mostrarConfirmacion = false;
+        }
+    }
+
+    private void CancelarConfirmacion()
+    {
+        mostrarConfirmacion = false;
+    }
+
+    private async Task RegistrarCheckout(Reserva reserva)
+    {
+        try
+        {
+            CURegistrarCheckout.Ejecutar(reserva.Id);
+            mensajeExito = "Checkout registrado exitosamente.";
+            await CargarReservas();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al registrar el checkout: {ex.Message}";
+        }
+    }
+}

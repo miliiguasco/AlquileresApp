@@ -1,0 +1,96 @@
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Propiedad
+@using Microsoft.AspNetCore.Components
+¡
+@using System.Collections.Generic
+
+<div class="modal @(IsVisible ? "show d-block" : "")" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reubicar Reserva</h5>
+                <button type="button" class="btn-close" @onclick="CerrarModal"></button>
+            </div>
+            <div class="modal-body">
+                @if (ReservaAfectada != null)
+                {
+                    <p>La ReservaAfectada.Propiedad.Titulo se ha marcado como no habitable.</p>
+                    <p>La ReservaAfectada.Propiedad.Titulo (del @ReservaAfectada.FechaInicio.ToShortDateString() al @ReservaAfectada.FechaFin.ToShortDateString()) para el cliente **@ReservaAfectada.Cliente.Nombre @ReservaAfectada.Cliente.Apellido** necesita ser reubicada.</p>
+
+                    @if (AlternativasDisponibles != null && AlternativasDisponibles.Any())
+                    {
+                        <h6>Propiedades alternativas disponibles en @ReservaAfectada.Propiedad.Localidad:</h6>
+                        <ul class="list-group mb-3">
+                            @foreach (var prop in AlternativasDisponibles)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <strong>@prop.Titulo</strong> (@prop.Direccion) - Precio/noche: $@prop.PrecioPorNoche
+                                    </span>
+                                    <button class="btn btn-sm btn-primary" @onclick="() => SeleccionarPropiedad(prop)">Seleccionar</button>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="alert alert-warning">
+                            No se encontraron propiedades alternativas disponibles para esta reserva en la misma localidad y fechas.
+                            <br/>**Esta reserva no podrá ser reubicada.**
+                        </p>
+                    }
+                }
+            </div>
+            <div class="modal-footer">
+                @if (AlternativasDisponibles != null && AlternativasDisponibles.Any())
+                {
+                    <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cancelar Reubicación</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-warning" @onclick="ConfirmarInhabilitacionSinReubicacion">Confirmar Inhabilitación (sin reubicación)</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public Reserva ReservaAfectada { get; set; }
+
+    [Parameter]
+    public List<Propiedad> AlternativasDisponibles { get; set; }
+
+    [Parameter]
+    public EventCallback<Propiedad> OnPropiedadSeleccionada { get; set; }
+
+    [Parameter]
+    public EventCallback OnCerrarModal { get; set; } 
+
+    [Parameter]
+    public EventCallback OnConfirmarInhabilitacionSinReubicacion { get; set; } 
+    private void SeleccionarPropiedad(Propiedad propiedad)
+    {
+        OnPropiedadSeleccionada.InvokeAsync(propiedad);
+        IsVisible = false; // Ocultar el modal
+    }
+
+    private void CerrarModal()
+    {
+        OnCerrarModal.InvokeAsync(); 
+        IsVisible = false; // Ocultar el modal
+    }
+
+    private void ConfirmarInhabilitacionSinReubicacion()
+    {
+        // Esto se invoca cuando el usuario decide marcar la propiedad como no habitable
+        // A PESAR de que no se encontró una alternativa para la reserva.
+        OnConfirmarInhabilitacionSinReubicacion.InvokeAsync();
+        IsVisible = false; // Ocultar el modal
+    }
+}

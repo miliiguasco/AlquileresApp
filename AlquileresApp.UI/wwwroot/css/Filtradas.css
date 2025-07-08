@@ -1,17 +1,25 @@
-body {
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+
+.container_listar_propiedades {
+    max-width: 1200px;
+    padding: 2rem 1rem;
+    background: linear-gradient(
+        135deg,
+        rgba(206, 204, 244, 0.1) 0%,
+        rgba(122, 121, 129, 0.2) 100%
+    );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); /* Safari support */
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
 }
-.lista-propiedades {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-}
+
 .tituloo {
     text-align: center;
     font-size: 3rem;
     font-weight: bold;
-    color: #1F3F48;
+    color: #0A3D62;
     margin-top: 6rem;
     margin-bottom: 2.5rem;
     text-transform: uppercase;
@@ -29,30 +37,34 @@ body {
 
 .filtros {
     display: flex;
-    flex-wrap: wrap; /* para que en móvil bajen */
-    gap: 2rem;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+    margin: 2rem auto;
 }
 
+.filtros div {
+    display: flex;
+    flex-direction: column;
+}
 
 .filtros label {
     display: block;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: white;
+    color: #333;
 }
 
 .input {
-    width: 180px; /* en lugar de 100% */
+    width: 100%;
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 1rem;
 }
 
-
 .btn-filtrar {
+    margin-top: 1.5rem;
     background-color: #FF6B00;
     color: white;
     border: none;
@@ -65,7 +77,6 @@ body {
 
 .btn-filtrar:hover {
     background-color: #e65f00;
-    color:white;
 }
 
 .lista-propiedades {
@@ -83,7 +94,6 @@ body {
     padding: 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s;
-     background-color: #1F3F48;
 }
 
 .propiedad-item:hover {
@@ -92,11 +102,12 @@ body {
 
 .propiedad-item h3 {
     margin-bottom: 0.5rem;
-    color: white;
+    color: #1F3F48;
 }
 
 .propiedad-item p {
-    color: #fdfdfd;
+    margin: 0.2rem 0;
+    color: #444;
 }
 
 .text-center {
@@ -165,7 +176,7 @@ body {
 
 
 .btn-reservar {
-    background-color: #FF6B00;
+    background-color: #f1771faf;
     color: white;
     border: none;
     padding: 0.75rem 1rem;
@@ -198,37 +209,9 @@ body {
 
 }
 
-.container_listar_propiedades {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(
-        135deg,
-        rgba(206, 204, 244, 0.1) 0%,
-        rgba(122, 121, 129, 0.2) 100%
-    );
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 100px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    padding: 5rem;
-    width: fit-content;
-    max-width: 90%;
-    height: 400px; /* ✅ clave para centrar verticalmente */
-    background: #1F3F48;
-}
-.formulario-filtros {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center; /* centra el contenido verticalmente */
-    height: 100%;
-}
 .carousel-item h3, .carousel-item p, .carousel-item h4 {
     animation: fadeInUp 0.9s ease;
 }
-
 
 @keyframes fadeInUp {
     from {

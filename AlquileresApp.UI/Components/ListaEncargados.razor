@@ -1,0 +1,158 @@
+﻿@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Administrador
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@inject CasoDeUsoListarEncargados CUListarEncargados
+@inject CasoDeUsoRegistrarEncargado CURegistrarEncargado
+@inject CasoDeUsoEliminarEncargado CUEliminarEncargado
+@rendermode InteractiveServer
+
+<link href="css/Tabla.css" rel="stylesheet"/>
+
+<div class="admin-section">
+    @if (encargados != null && encargados.Any())
+    {
+        @if (registrar) 
+        {
+            <div class="registro-container">
+                <RegistrarEncargado Input="@Input" 
+                                    OnSubmit="NuevoEncargado"
+                                    FormName="RegistrarEncargado"
+                                    SubmitButtonText="Registrar"
+                                    ButtonClass="btn"
+                                    CancelarEdicion="CancelarRegistro"
+                                    OnEmailChange="LimpiarError"/>
+                <RegistroExitoso Visible='@registroExitoso' esCliente=false/>
+                <Error Mensaje="@errorMensaje"/>
+            </div>
+        }
+        else 
+        {
+            <div class="table-container">
+                <table class="property-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var encargado in encargados)
+                        {
+                            <tr>
+                                <td>@encargado.Nombre @encargado.Apellido</td>
+                                <td>@encargado.Email</td>
+                                <td class="actions-cell">
+                                    <button class="btn btn-danger" @onclick="() => EliminarEncargado(encargado.Id)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <button class="btn" @onclick="() => HabilitarRegistro()">
+                    Añadir encargado
+                </button>
+            </div>
+        }
+    }
+    else
+    {
+        @if (registrar) 
+        {
+            <div class="registro-container">
+                <RegistrarEncargado Input="@Input" 
+                                    OnSubmit="NuevoEncargado"
+                                    FormName="RegistrarEncargado"
+                                    SubmitButtonText="Registrar"
+                                    ButtonClass="btn"
+                                    CancelarEdicion="CancelarRegistro"
+                                    OnEmailChange="LimpiarError"/>
+                <RegistroExitoso Visible='@registroExitoso' esCliente=false/>
+                <Error Mensaje="@errorMensaje"/>
+            </div>
+        }
+        else 
+        {
+            <p>No hay encargados disponibles.</p> 
+            <button class="btn" @onclick="() => HabilitarRegistro()">
+                Añadir encargado
+            </button> 
+        } 
+    }
+</div>
+
+@code {
+    private List<Encargado>? encargados;
+    private RegistrarEncargado.InputModel Input = new();
+    private bool cargando = true;
+    private bool registrar = false; 
+    private string? errorMensaje = null; 
+    public bool registroExitoso = false; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Console.WriteLine("listando encargados");
+            encargados = CUListarEncargados.Ejecutar();
+            Console.WriteLine($"Se encontraron {encargados.Count} encargados");
+        }
+        finally
+        {
+            cargando = false;
+            StateHasChanged();
+        }
+    }
+    private void EliminarEncargado(int id)
+    {
+        try
+        {
+            CUEliminarEncargado.Ejecutar(id);
+            encargados = CUListarEncargados.Ejecutar();
+            StateHasChanged(); 
+        }
+        catch (Exception ex) 
+        {
+            errorMensaje = ex.Message; 
+            StateHasChanged(); 
+        }
+    }
+
+    public void NuevoEncargado() {
+        try 
+        {
+            var encargado = new Encargado(Input.Nombre, Input.Apellido, Input.Email, "Encargado");
+            CURegistrarEncargado.Ejecutar(encargado);
+            registroExitoso = true;  
+            StateHasChanged();   
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = ex.Message; 
+            StateHasChanged(); 
+        }
+    }
+
+    public void CancelarRegistro() 
+    {
+        registrar = false;
+        registroExitoso = false;
+        Input = new();  
+        encargados = CUListarEncargados.Ejecutar();
+    }
+
+    public void HabilitarRegistro() 
+    {
+        registrar = true; 
+    }
+
+    private void LimpiarError()
+    {
+        errorMensaje = null;
+        StateHasChanged();
+    }
+} 

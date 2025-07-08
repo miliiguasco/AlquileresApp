@@ -1,0 +1,170 @@
+@page "/modificarreserva/{ReservaId:int}"
+@rendermode InteractiveServer
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Enumerativos
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.Reserva
+@inject CasoDeUsoModificarReserva CasoDeUsoModificarReserva
+@inject CasoDeUsoObtenerReserva CasoDeUsoObtenerReserva
+@inject NavigationManager NavigationManager
+@using AlquileresApp.Core.Servicios
+@using Microsoft.AspNetCore.Authorization
+@inject AuthenticationStateProvider ServicioAutenticacion
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+<link href="css/ModificarReserva.css" rel="stylesheet" />
+
+<div class="container_modificar mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="h2_modificar mb-4 text-primary">Modificar Reserva</h2>
+
+        @if (mostrarMensaje)
+        {
+            <div class="alert @(mensajeResultado.Contains("exitosa") ? "alert-success" : "alert-danger") mt-3" role="alert">
+                @mensajeResultado
+            </div>
+        }
+
+        <EditForm Model="Filtros" OnValidSubmit="MostrarVistaPrevia">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger mb-3" />
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Fecha de Inicio:</label>
+                <InputDate @bind-Value="Filtros.FechaInicio" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Fecha de Fin:</label>
+                <InputDate @bind-Value="Filtros.FechaFin" class="form-control" />
+            </div>
+
+            <div class="d-flex gap-3 mt-4">
+                <button class="btn btn-primary" type="submit">Guardar</button>
+                <button class="btn btn-secondary" type="button" @onclick="Cancelar">Cancelar</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@if (mostrarModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5)">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar modificación</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@mensajeVistaPrevia</p>
+                    <p><strong>Monto anterior:</strong> @montoAnterior.ToString("C")</p>
+                    <p><strong>Monto nuevo:</strong> @montoNuevo.ToString("C")</p>
+                    <p><strong>Diferencia:</strong> @diferencia.ToString("C")</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" @onclick="ConfirmarModificacion">Confirmar</button>
+                    <button class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int ReservaId { get; set; }
+
+    private SearchFilters Filtros = new();
+    private Reserva reserva;
+    private string mensajeResultado;
+    private bool mostrarMensaje = false;
+
+    public int user { get; set; }
+
+
+    // Variables para el modal
+    private bool mostrarModal = false;
+    private string mensajeVistaPrevia;
+    private decimal montoAnterior;
+    private decimal montoNuevo;
+    private decimal diferencia;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+        var user = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        try
+        {
+            reserva = await CasoDeUsoObtenerReserva.Ejecutar(ReservaId);
+            if (reserva != null)
+            {
+                Filtros.FechaInicio = reserva.FechaInicio;
+                Filtros.FechaFin = reserva.FechaFin;
+            }
+            else
+            {
+                NavigationManager.NavigateTo($"/Perfil/{user}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener la reserva: {ex.Message}");
+            NavigationManager.NavigateTo($"/Perfil/{user}");
+        }
+    }
+
+    private async Task MostrarVistaPrevia()
+    {
+        var resultado = await CasoDeUsoModificarReserva.CalcularModificacion(ReservaId, Filtros.FechaInicio, Filtros.FechaFin);
+        if (!resultado.EsPosible)
+        {
+            mensajeResultado = resultado.Mensaje;
+            mostrarMensaje = true;
+            return;
+        }
+
+        // Mostrar el modal con la vista previa
+        mensajeVistaPrevia = resultado.Mensaje;
+        montoAnterior = resultado.MontoAnterior;
+        montoNuevo = resultado.MontoNuevo;
+        diferencia = resultado.Diferencia;
+        mostrarModal = true;
+    }
+
+    private async Task GuardarCambios()
+    {
+        if (reserva == null)
+        {
+            Console.WriteLine("Reserva no encontrada.");
+            NavigationManager.NavigateTo($"/Perfil/{user}");
+            return;
+        }
+
+        var resultado = await CasoDeUsoModificarReserva.Ejecutar(ReservaId, Filtros.FechaInicio, Filtros.FechaFin);
+        mensajeResultado = resultado.Mensaje;
+        mostrarMensaje = true;
+
+        if (resultado.EsExitosa)
+        {
+            await Task.Delay(3000); // Esperar unos segundos antes de redirigir
+            NavigationManager.NavigateTo($"/Perfil/{user}");
+        }
+    }
+
+    private async Task ConfirmarModificacion()
+    {
+        mostrarModal = false;
+        await GuardarCambios();
+    }
+
+    private void CerrarModal()
+    {
+        mostrarModal = false;
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo($"/Perfil/{user}");
+    }
+}

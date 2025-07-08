@@ -1,0 +1,133 @@
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes
+@inject CasoDeUsoMostrarPreguntasFrecuentes CUListarPreguntasFrecuentes
+@inject CasoDeUsoCrearPreguntaFrecuente CUCrearPreguntaFrecuente
+@inject CasoDeUsoModificarPreguntaFrecuente CUModificarPreguntaFrecuente
+@inject CasoDeUsoEliminarPreguntaFrecuente CUEliminarPreguntaFrecuente
+
+<link href="css/Tabla.css" rel="stylesheet"/>
+
+<div class="admin-section">
+    @if (preguntas != null && preguntas.Any())
+    {
+        <div class="table-container">
+            <table class="property-table">
+                <thead>
+                    <tr>
+                        <th>Pregunta</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pregunta in preguntas)
+                    {
+                        <tr>
+                            <td>@pregunta.Pregunta</td>
+                            <td class="actions-cell">
+                                <button class="btn btn-primary" @onclick="() => EditarPregunta(pregunta)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" @onclick="() => EliminarPregunta(pregunta)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="btn" @onclick="NuevaPregunta">
+                Nueva pregunta frecuente
+            </button>
+        </div>
+    }
+    else
+    {
+        <p>No hay preguntas frecuentes disponibles.</p>
+        <button class="btn" @onclick="NuevaPregunta">
+            Nueva pregunta frecuente
+        </button>
+    }
+</div>
+
+@if (mostrarModalEdicion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Pregunta Frecuente</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Pregunta</label>
+                        <input class="form-control" @bind="preguntaEditada.Pregunta" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Respuesta</label>
+                        <textarea class="form-control" @bind="preguntaEditada.Respuesta"></textarea>
+                    </div>
+                    @if (!string.IsNullOrEmpty(errorEdicion))
+                    {
+                        <div class="alert alert-danger">@errorEdicion</div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarEdicion">Cancelar</button>
+                    <button class="btn btn-primary" @onclick="GuardarCambiosEdicion">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<PreguntaFrecuente> preguntas;
+    private bool mostrarModalEdicion = false;
+    private PreguntaFrecuente preguntaEditada = new();
+    private string errorEdicion;
+
+    protected override void OnInitialized()
+    {
+        preguntas = CUListarPreguntasFrecuentes.Ejecutar();
+    }
+
+    private void EditarPregunta(PreguntaFrecuente pregunta)
+    {
+        preguntaEditada = new PreguntaFrecuente
+        {
+            Id = pregunta.Id,
+            Pregunta = pregunta.Pregunta,
+            Respuesta = pregunta.Respuesta
+        };
+        errorEdicion = string.Empty;
+        mostrarModalEdicion = true;
+    }
+
+    private void GuardarCambiosEdicion()
+    {
+        if (string.IsNullOrWhiteSpace(preguntaEditada.Pregunta) || string.IsNullOrWhiteSpace(preguntaEditada.Respuesta))
+        {
+            errorEdicion = "La pregunta y la respuesta no pueden estar vacías.";
+            return;
+        }
+        CUModificarPreguntaFrecuente.Ejecutar(preguntaEditada);
+        preguntas = CUListarPreguntasFrecuentes.Ejecutar();
+        mostrarModalEdicion = false;
+        StateHasChanged();
+    }
+
+    private void CancelarEdicion()
+    {
+        mostrarModalEdicion = false;
+    }
+
+    private void EliminarPregunta(PreguntaFrecuente pregunta)
+    {
+        // Lógica para eliminar
+    }
+
+    private void NuevaPregunta()
+    {
+        // Lógica para crear una nueva pregunta (abrir modal o navegar)
+    }
+} 
