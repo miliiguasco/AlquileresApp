@@ -1,0 +1,247 @@
+
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Promocion
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@inject CasoDeUsoListarPromociones CUListarPromociones
+@inject CasoDeUsoCrearPromocion CUCrearPromocion
+@inject CasoDeUsoEliminarPromocion CUEliminarPromocion
+@inject CasoDeUsoModificarPromocion CUModificarPromocion
+@inject ILogger<ListarPromociones> Logger
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize(Roles = "Administrador")]
+
+<link href="css/Tabla.css" rel="stylesheet" />
+
+<div class="admin-section">
+    @if (isLoading)
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-spinner fa-spin"></i> Cargando promociones...
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+    else if (promociones != null && promociones.Any())
+    {
+        @if (!string.IsNullOrEmpty(mensajeExito))
+        {
+            <div class="alert alert-success">@mensajeExito</div>
+        }
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <div class="alert alert-danger">@mensajeError</div>
+        }
+
+        <div class="table-container">
+            <table class="property-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Descuento (%)</th>
+                        <th>Estado</th>
+                        <th>Propiedades</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var promo in promociones)
+                    {
+                        <tr>
+                            <td>@promo.Titulo</td>
+                            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@promo.Descripcion</td>
+                            <td>@promo.FechaInicio.ToShortDateString()</td>
+                            <td>@promo.FechaFin.ToShortDateString()</td>
+                            <td>@promo.PorcentajeDescuento</td>
+                            <td>@CalcularEstado(promo)</td>
+                           <td>
+                    <button class="btn btn-info btn-sm" @onclick="() => AbrirModalPropiedades(promo)">
+                        Propiedades
+                    </button>
+                </td>
+                            <td class="actions-cell">
+    <button class="btn btn-primary"
+            @onclick="@(() => IrAEditar(promo.Id))"
+            disabled="@EsBorrada(promo)">
+        <i class="fas fa-edit"></i>
+    </button>
+    <button class="btn btn-danger"
+            @onclick="() => MostrarConfirmacion(promo.Id)"
+            disabled="@EsBorrada(promo)">
+        <i class="fas fa-trash"></i>
+    </button>
+</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p>No hay promociones disponibles.</p>
+    }
+    <button class="btn" @onclick="@(() => NavigationManager.NavigateTo("/PublicarPromocion"))">
+    Nueva promoción
+</button>
+</div>
+@if (mostrarModalPropiedades)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Propiedades de @promocionSeleccionada?.Titulo</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="CerrarModalPropiedades"></button>
+                </div>
+                <div class="modal-body">
+                    @if (promocionSeleccionada?.Propiedades != null && promocionSeleccionada.Propiedades.Any())
+                    {
+                        <ul>
+                            @foreach (var propiedad in promocionSeleccionada.Propiedades)
+                            {
+                                <li>@propiedad.Titulo - @propiedad.Direccion</li> <!-- adapta según propiedades -->
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No hay propiedades asociadas a esta promoción.</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CerrarModalPropiedades">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás segura de que querés eliminar esta promoción?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">Cancelar</button>
+                    <button class="btn btn-secondary" @onclick="ConfirmarEliminacion">Sí, eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private List<Promocion> promociones = new();
+
+    private bool mostrarConfirmacion = false;
+    private bool mostrarModalPropiedades = false;
+    private Promocion? promocionSeleccionada;
+    private int promocionAEliminar;
+    private string mensajeExito;
+    private string mensajeError;
+    private string error;
+    private bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPromociones();
+    }
+
+    private async Task CargarPromociones()
+    {
+        try
+        {
+            isLoading = true;
+            promociones = CUListarPromociones.Ejecutar();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error al cargar promociones");
+            error = $"Error al cargar promociones: {ex.Message}";
+            promociones = new List<Promocion>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+
+    private void MostrarConfirmacion(int id)
+    {
+        promocionAEliminar = id;
+        mostrarConfirmacion = true;
+        mensajeError = null;
+        mensajeExito = null;
+    }
+
+    private async Task ConfirmarEliminacion()
+    {
+        try
+        {
+            CUEliminarPromocion.Ejecutar(promocionAEliminar);
+            mensajeExito = "Promoción eliminada correctamente.";
+            await CargarPromociones();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al eliminar promoción: {ex.Message}";
+        }
+        finally
+        {
+            mostrarConfirmacion = false;
+        }
+    }
+
+    private void CancelarConfirmacion() => mostrarConfirmacion = false;
+
+
+
+    private void IrAEditar(int id)
+{
+    NavigationManager.NavigateTo($"/EditarPromocion/{id}");
+}
+private string CalcularEstado(Promocion promo)
+{
+    if (promo.borrada == true)
+        return "Borrada";
+
+    var hoy = DateTime.Today;
+
+    if (promo.FechaInicio <= hoy && promo.FechaFin >= hoy)
+        return "Activa";
+    else
+        return "No activa";
+}
+private bool EsBorrada(Promocion promo)
+{
+    return CalcularEstado(promo) == "Borrada";
+}
+
+private void AbrirModalPropiedades(Promocion promo)
+    {
+        promocionSeleccionada = promo;
+        mostrarModalPropiedades = true;
+    }
+
+    private void CerrarModalPropiedades()
+    {
+        mostrarModalPropiedades = false;
+        promocionSeleccionada = null;
+    }
+}

@@ -13,7 +13,7 @@ public class CasoDeUsoCrearReserva(
     IUsuarioRepositorio usuarioRepositorio,  
     ITarjetaRepositorio tarjetaRepositorio, 
     IFechaReservaValidador fechaReservaValidador,
-    INotificadorEmail notificadorEmail)
+    INotificadorEmail notificadorEmail, IPromocionRepositorio promocionRepositorio)
 {
     public async Task Ejecutar(int clienteId, int propiedadId, DateTime fechaInicio, DateTime fechaFin, int cantidadHuespedes)
     {
@@ -82,7 +82,7 @@ public class CasoDeUsoCrearReserva(
 
             // Calcular el monto total de la reserva
             var dias = (fechaFin - fechaInicio).Days;
-            var montoBase = propiedad.PrecioPorNoche * dias;
+            var montoBase = propiedadRepositorio.CalcularPrecioConPromocion(propiedad, DateTime.Now, fechaInicio, fechaFin ) * dias;
             var montoTotal = propiedad.TipoPago switch //actualizar tmb deuda 
             {
                 TipoPago.SinAnticipo => 0,
@@ -100,7 +100,7 @@ public class CasoDeUsoCrearReserva(
             }
 
             Console.WriteLine("Pago procesado correctamente");
-            Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes, montoTotal);
+            Reserva reserva = new Reserva(cliente, propiedad, fechaInicio, fechaFin, cantidadHuespedes,montoBase, montoTotal);
             if (reserva.FechaInicio == DateTime.Today) 
                 reserva.Estado = EstadoReserva.Activa;
             else    

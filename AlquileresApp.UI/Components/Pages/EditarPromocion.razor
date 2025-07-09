@@ -1,0 +1,168 @@
+@page "/EditarPromocion/{Id:int}"
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.CasosDeUso.Promocion
+@using AlquileresApp.Core.Interfaces
+@inject CasoDeUsoObtenerPromocion CUObtenerPromocion
+@inject CasoDeUsoModificarPromocion CUEditarPromocion
+@inject IPropiedadRepositorio PropiedadRepo
+@inject NavigationManager NavigationManager
+@inject ILogger<EditarPromocion> Logger
+
+<PageTitle>Editar Promoción</PageTitle>
+<link href="css/VerPropiedad.css" rel="stylesheet" />
+
+<div class="propiedad-container bg-light p-4 rounded shadow-sm my-5">
+    <h1 class="registro-title">Editar Promoción</h1>
+
+    @if (promocion == null)
+    {
+        <p>Cargando datos...</p>
+    }
+    else
+    {
+        <EditForm Model="@promocion" OnValidSubmit="GuardarEdicion">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label>Título</label>
+                <InputText class="form-control" @bind-Value="titulo" />
+            </div>
+
+            <div class="form-group">
+                <label>Descripción</label>
+                <InputTextArea class="form-control" @bind-Value="descripcion" rows="3" />
+            </div>
+
+            <div class="form-group">
+                <label>Fecha de Inicio</label>
+                <InputDate class="form-control" @bind-Value="fechaInicio" />
+            </div>
+
+            <div class="form-group">
+                <label>Fecha de Fin</label>
+                <InputDate class="form-control" @bind-Value="fechaFin" />
+            </div>
+            <div class="form-group">
+                <label>Fecha de Inicio de reserva </label>
+                <InputDate class="form-control" @bind-Value="fechaInicioReserva" />
+            </div>
+
+            <div class="form-group">
+                <label>Fecha de Fin de reserva</label>
+                <InputDate class="form-control" @bind-Value="fechaFinReserva" />
+            </div>
+
+            <div class="form-group">
+                <label>Porcentaje de Descuento</label>
+                <InputNumber class="form-control" @bind-Value="porcentajeDescuento" />
+            </div>
+            <div class="form-group mt-3">
+            <label>Propiedades asociadas a esta promoción:</label>
+               @if (propiedadesDisponibles?.Any() == true)
+               {
+                 foreach (var propiedad in propiedadesDisponibles)
+                 {
+                   <div class="form-check">
+                     <input 
+    type="checkbox" 
+    class="form-check-input"
+    id="@($"propiedad-{propiedad.Id}")"
+    checked="@BindPropiedad(propiedad.Id)"
+    @onchange="e => BindPropiedad(propiedad.Id, (bool)((ChangeEventArgs)e).Value!)" />
+
+<label class="form-check-label" for="@($"propiedad-{propiedad.Id}")">@propiedad.Titulo</label>
+                   </div>
+                  }
+               }
+                else
+               {
+                  <p class="text-muted">No hay propiedades disponibles.</p>
+               }
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <button type="button" class="btn btn-secondary" @onclick="Volver">Cancelar</button>
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMensaje))
+            {
+                <div class="alert alert-danger mt-2">@errorMensaje</div>
+            }
+        </EditForm>
+    }
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private string? titulo;
+    private string? descripcion;
+    private DateTime fechaInicio;       
+    private DateTime fechaFin;
+    private DateTime fechaInicioReserva;
+    private DateTime fechaFinReserva;
+    private decimal porcentajeDescuento;
+    private Promocion? promocion;
+    private string? errorMensaje;
+    private List<Propiedad> propiedadesDisponibles = new();
+private List<int> propiedadesSeleccionadas = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            promocion = await Task.Run(() => CUObtenerPromocion.Ejecutar(Id));
+            fechaFin = promocion.FechaFin;
+            fechaInicio = promocion.FechaInicio;  
+            fechaInicioReserva = promocion.FechaInicioReserva;
+            fechaFinReserva = promocion.FechaFinReserva;  
+            titulo = promocion.Titulo;
+            descripcion = promocion.Descripcion;    
+            porcentajeDescuento = promocion.PorcentajeDescuento;
+             propiedadesDisponibles = PropiedadRepo.obtenerPropiedades();
+
+        // Obtener IDs de propiedades ya asociadas
+        propiedadesSeleccionadas = promocion.Propiedades?.Select(p => p.Id).ToList() ?? new();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error al cargar la promoción.");
+            errorMensaje = "No se pudo cargar la promoción. Intentalo nuevamente.";
+        }
+    }
+
+    private void  GuardarEdicion()
+    {
+        try
+        {
+            CUEditarPromocion.Ejecutar(Id,titulo, descripcion, fechaInicio, fechaFin, fechaInicioReserva, fechaFinReserva, porcentajeDescuento, propiedadesSeleccionadas);
+            NavigationManager.NavigateTo("/Administrar");
+        }
+        catch (Exception ex)
+        {
+           errorMensaje = $"Error al modificar la promoción: {ex.Message}";
+        }
+    }
+
+    private void Volver(){
+        NavigationManager.NavigateTo("/Administrar");
+    }
+    private bool BindPropiedad(int id)
+{
+    return propiedadesSeleccionadas.Contains(id);
+}
+
+private void BindPropiedad(int id, bool seleccionado)
+{
+    if (seleccionado)
+    {
+        if (!propiedadesSeleccionadas.Contains(id))
+            propiedadesSeleccionadas.Add(id);
+    }
+    else
+    {
+        propiedadesSeleccionadas.Remove(id);
+    }
+}
+}

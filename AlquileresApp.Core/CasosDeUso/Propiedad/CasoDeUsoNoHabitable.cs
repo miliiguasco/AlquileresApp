@@ -2,62 +2,54 @@ namespace AlquileresApp.Core.CasosDeUso.Propiedad;
 
 using AlquileresApp.Core.Entidades;
 using AlquileresApp.Core.Interfaces;
-public class CasoDeUsoMarcarPropiedadComoNoHabitable(IPropiedadRepositorio propiedadesRepositorio, ITarjetaRepositorio tarjetaRepositorio, IReservaRepositorio reservasRepositorio)
+using System.Collections.Generic;
+using System.Linq;
+
+public class CasoDeUsoMarcarPropiedadComoNoHabitable(IPropiedadRepositorio propiedadesRepositorio, IReservaRepositorio reservasRepositorio)
 {
-    public void Ejecutar(Propiedad propiedadOriginal)
+    public Dictionary<Reserva, List<Propiedad>> IdentificarReservasYAlternativas(Propiedad propiedad)
     {
-        // Obtener todas las reservas activas de la propiedad original
-        List<Reserva> reservas = reservasRepositorio.ListarReservas()
-            .Where(r => r.PropiedadId == propiedadOriginal.Id)
+        List<Reserva> reservasAfectadas = reservasRepositorio.ListarReservas()
+            .Where(r => r.PropiedadId == propiedad.Id)
             .ToList();
 
-        foreach (var reserva in reservas)
+        var opcionesDeReubicacion = new Dictionary<Reserva, List<Propiedad>>();
+
+        foreach (var reserva in reservasAfectadas)
         {
-            bool propiedadAlternativaEncontrada = false;
             List<Propiedad> propiedadesEnLocalidad = propiedadesRepositorio.ListarPropiedades()
-                .Where(p => p.Localidad == propiedadOriginal.Localidad && p.Id != propiedadOriginal.Id && !p.NoHabitable)
+                .Where(p => p.Localidad == propiedad.Localidad && p.Id != propiedad.Id && !p.NoHabitable)
                 .ToList();
+
+            List<Propiedad> alternativasDisponiblesParaReserva = new List<Propiedad>();
 
             foreach (Propiedad propiedadAlternativa in propiedadesEnLocalidad)
             {
                 try
                 {
                     propiedadesRepositorio.ComprobarDisponibilidad(propiedadAlternativa, reserva.FechaInicio, reserva.FechaFin);
-                    // Si no lanza excepción, la propiedad alternativa está disponible
-                    Console.WriteLine($"Propiedad disponible encontrada: {propiedadAlternativa.Titulo} (ID: {propiedadAlternativa.Id}) para la reserva {reserva.Id}");
-                    reserva.Propiedad = propiedadAlternativa;
-                    reserva.PropiedadId = propiedadAlternativa.Id;
-                    reservasRepositorio.ModificarReserva2(reserva);
-                    propiedadAlternativaEncontrada = true;
-                    break; // Salir del bucle al encontrar una propiedad disponible
+                    alternativasDisponiblesParaReserva.Add(propiedadAlternativa);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Console.WriteLine($"Propiedad {propiedadAlternativa.Titulo} no disponible: {ex.Message}");
-                    // Continuar buscando otras propiedades
+                    // Propiedad no disponible, no la agregamos
                 }
             }
-
-            // Si no se encontró ninguna propiedad alternativa disponible, reembolsar al cliente
-            if (!propiedadAlternativaEncontrada)
-            {
-                Console.WriteLine($"No se encontraron propiedades alternativas disponibles en la localidad: {propiedadOriginal.Localidad} para la reserva {reserva.Id}. Procediendo al reembolso.");
-                Tarjeta? tarjeta = tarjetaRepositorio.ObtenerTarjetaPorId(reserva.Cliente.Id);
-                if (tarjeta != null)
-                {
-                    tarjeta.Saldo += propiedadOriginal.MontoPagoAnticipado;
-                    tarjetaRepositorio.ModificarTarjeta(tarjeta);
-                    Console.WriteLine($"Reembolso de {propiedadOriginal.MontoPagoAnticipado} realizado a la tarjeta del cliente {reserva.Cliente.Id}.");
-                }
-                else
-                {
-                    Console.WriteLine($"No se encontró la tarjeta para el cliente {reserva.Cliente.Id}. No se pudo realizar el reembolso.");
-                }
-            }
+            opcionesDeReubicacion.Add(reserva, alternativasDisponiblesParaReserva);
         }
 
-        // Marcar la propiedad original como no habitable (esto debería hacerse siempre después de intentar la recolocación o el reembolso)
-        propiedadesRepositorio.MarcarPropiedadComoNoHabitable(propiedadOriginal);
-        Console.WriteLine($"Propiedad original (ID: {propiedadOriginal.Id}, Título: {propiedadOriginal.Titulo}) marcada como no habitable.");
+        return opcionesDeReubicacion;
+    }
+
+    public void ActualizarEstadoNoHabitable(Propiedad propiedad)
+    {
+        propiedadesRepositorio.MarcarPropiedadComoNoHabitable(propiedad); // Este método ahora se llama aquí
+    }
+    
+    public void ReasignarReserva(Reserva reserva, Propiedad nuevaPropiedad)
+    {
+        reserva.Propiedad = nuevaPropiedad;
+        reserva.PropiedadId = nuevaPropiedad.Id;
+        reservasRepositorio.ModificarReserva2(reserva);
     }
 }
