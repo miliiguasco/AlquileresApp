@@ -225,7 +225,7 @@ namespace AlquileresApp.Data
                     Titular = "Maria Garcia", 
                     FechaVencimiento = "12/25",
                     CVV = "123",
-                    Saldo = 0m,
+                    Saldo = 99999999999999m,
                     ClienteId = usuarios[0].Id
                 }
                 ,

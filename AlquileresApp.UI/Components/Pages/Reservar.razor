@@ -22,6 +22,7 @@
 
 <div class="modal-overlay">
     <div class="reserva-container">
+        <button class="btn-close close-reserva" type="button" title="Cerrar" @onclick="VolverAtras"></button>
         @if (isLoading)
         {
             <div class="loading">
@@ -131,25 +132,33 @@
                     </div>
                 }
 
-                <div class="botones-reserva">
-                    <button class="btn-cancelar" @onclick="CancelarReserva">
-                        <i class="fas fa-times-circle"></i>
-                        <span>Cancelar</span>
-                    </button>
-
-                    <button class="btn-reservar" @onclick="ConfirmarReserva" disabled="@isSubmitting">
-                        @if (isSubmitting)
-                        {
-                            <span class="spinner"></span>
-                            <span>Procesando...</span>
-                        }
-                        else
-                        {
-                            <i class="fas fa-check-circle"></i>
-                            <span>Confirmar Reserva</span>
-                        }
-                    </button>
-                </div>
+                @if (esCliente)
+                {
+                    <div class="botones-reserva">
+                        <button class="btn-cancelar" type="button" @onclick="VolverAtras">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Cancelar</span>
+                        </button>
+                        <button class="btn-reservar" @onclick="ConfirmarReserva" disabled="@isSubmitting">
+                            @if (isSubmitting)
+                            {
+                                <span class="spinner"></span>
+                                <span>Procesando...</span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-check-circle"></i>
+                                <span>Confirmar Reserva</span>
+                            }
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning mt-2">
+                        Solo los usuarios con rol <strong>Cliente</strong> pueden realizar reservas.
+                    </div>
+                }
             </div>
         }
     </div>
@@ -158,7 +167,7 @@
 @code {
     [Parameter]
     public int PropiedadId { get; set; }
-
+    private bool esCliente = false;
     private Propiedad? propiedad;
     private string? error;
     private DateTime fechaInicio = DateTime.Today;
@@ -171,38 +180,44 @@
     private bool isSubmitting = false;
     private string? mensajePromocion;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            isLoading = true;
-            errorMensaje = null;
-            var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
-            var email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
-            if (email != null)
-            {
-                var usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(email);
-                if (usuario != null)
-                {
-                    usuarioId = usuario.Id;
-                }
-            }
 
-            propiedad = CUObtenerPropiedad.Ejecutar(PropiedadId);
-            if (propiedad == null)
+protected override async Task OnInitializedAsync()
+{
+    try
+    {
+        isLoading = true;
+        errorMensaje = null;
+
+        var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+        var user = authState.User; // <-- esta línea faltaba
+        var email = user.FindFirst(ClaimTypes.Email)?.Value;
+
+        if (email != null)
+        {
+            var usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(email);
+            if (usuario != null)
             {
-                error = "Propiedad no encontrada";
+                usuarioId = usuario.Id;
             }
         }
-        catch (Exception ex)
+
+        esCliente = user.IsInRole("Cliente"); // ahora sí existe "user"
+
+        propiedad = CUObtenerPropiedad.Ejecutar(PropiedadId);
+        if (propiedad == null)
         {
-            error = $"Error al cargar la propiedad: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
+            error = "Propiedad no encontrada";
         }
     }
+    catch (Exception ex)
+    {
+        error = $"Error al cargar la propiedad: {ex.Message}";
+    }
+    finally
+    {
+        isLoading = false;
+    }
+}
 
     private int CalcularNoches()
     {
@@ -300,36 +315,9 @@
     {
         NavigationManager.NavigateTo($"/propiedad/{PropiedadId}");
     }
+
+    private void VolverAtras()
+    {
+        JS.InvokeVoidAsync("history.back");
+    }
 }
-
-<style>
-    .botones-reserva {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        margin-top: 2rem;
-    }
-
-    .btn-cancelar {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-cancelar:hover {
-        background-color: #c82333;
-    }
-
-    .btn-cancelar i {
-        font-size: 1.1rem;
-    }
-</style>
-

@@ -105,6 +105,7 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
             .Where(r => r.Cliente.Id == usuario)
+            .OrderBy(r => r.FechaInicio)
             .ToList();
         return reservas;
     }
