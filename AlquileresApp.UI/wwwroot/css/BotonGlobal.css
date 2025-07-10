@@ -1,0 +1,13 @@
+.btn-naranja {
+    padding: 0.5rem 1.25rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    background-color: #eb7119;
+    color: white;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+.btn-naranja:hover {
+    background-color: #e78f50e1;
+}

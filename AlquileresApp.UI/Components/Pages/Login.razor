@@ -8,7 +8,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @inject NavigationManager NavigationManager
 @inject CasoDeUsoIniciarSesion CUIniciarSesion
-<link href="css/RegistrarUsuario.css" rel="stylesheet" />
+
 
 <div class="registro-container">
     <h1 class="registro-title">Iniciar Sesión</h1>
@@ -17,15 +17,15 @@
             <EditForm Model="@loginModel" OnValidSubmit="IniciarSesion">
                 <DataAnnotationsValidator />
 
-                <div class="form-group">
+                <div class="input-container">
                     <label for="email">Email</label>
-                    <InputText id="email" class="form-control" @bind-Value="loginModel.Correo" />
+                    <InputText id="email" class="mi-input" @bind-Value="loginModel.Correo" />
                     <ValidationMessage For="@(() => loginModel.Correo)" />
                 </div>
 
-                <div class="form-group">
+                <div class="input-container">
                     <label for="password">Contraseña</label>
-                    <InputText type="password" id="password" class="form-control" @bind-Value="loginModel.Contraseña" />
+                    <InputText type="password" id="password" class="mi-input" @bind-Value="loginModel.Contraseña" />
                     <ValidationMessage For="@(() => loginModel.Contraseña)" />
                 </div>
 

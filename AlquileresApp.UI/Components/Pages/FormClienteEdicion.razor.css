@@ -1,0 +1,55 @@
+.form-floating {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    outline: none;
+    box-shadow: none;
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.form-control:focus {
+    border-color: #596E69;
+    outline: none;
+    box-shadow: none;
+}
+
+.form-label {
+    color: #6c757d;
+}
+
+.text-muted {
+    font-size: 0.875rem;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    gap: 1rem;
+}
+
+::deep button.btn {
+    padding: 0.4rem 1.2rem;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    cursor: pointer;
+    background-color: #f1771f;
+    border: 1px solid #f1771f;
+    color: white;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    width: 130px;
+    text-align: center;
+    display: inline-block;
+}
+
+
+

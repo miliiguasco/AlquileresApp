@@ -1,0 +1,68 @@
+.propiedad-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+}
+
+.registro-title {
+    font-size: 1.5rem;
+    color: #1F3F48;
+    text-align: center;
+    font-weight: 500;
+    margin-bottom: 2rem;
+}
+
+.subtitulo {
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+.form-check {
+    margin-bottom: 0.5rem;
+}
+
+.form-check-label {
+    font-weight: 400;
+    color: #333;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-naranja {
+    background-color: #1F3F48 !important;
+    border-color: #1F3F48 !important;
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 500;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-naranja:hover {
+    background-color: #244e5a !important;
+    border-color: #1F3F48 !important;
+    color: white;
+}
+
+.alert {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+}
+
+.text-muted {
+    font-size: 0.9rem;
+    color: #6c757d;
+}

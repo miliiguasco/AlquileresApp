@@ -13,8 +13,6 @@
 @inject ILogger<Propiedades> Logger
 @inject NavigationManager NavigationManager
 
-<link href="css/Tabla.css" rel="stylesheet" />
-
 <div class="admin-section">
 
     @if (propiedades != null && propiedades.Any())
@@ -60,35 +58,37 @@
                             <td>@prop.Titulo</td>
                             <td>@prop.Localidad</td>
                             <td class="actions-cell">
-                                <button class="btn btn-primary" @onclick="() => EditarPropiedad(prop)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-danger" @onclick="() => EliminarPropiedad(prop)">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <button style="background-color: @(prop.Destacada ? "green" : "gray"); color: white"
-        class="@GetClaseBotonDestacar(prop)"
-        @onclick="() => DestacarPropiedad(prop)"
-        disabled="@prop.NoHabitable">
-    <i class="@GetIconoBotonDestacar(prop)"></i>
-</button>
+                                <div class="actions-wrapper">
+                                    <button class="btn btn-primary" title="Editar" @onclick="() => EditarPropiedad(prop)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger" title="Eliminar" @onclick="() => EliminarPropiedad(prop)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button title="Destacar" style="background-color: @(prop.Destacada ? "#ffc107" : "gray"); color: white"
+            class="@GetClaseBotonDestacar(prop)"
+            @onclick="() => DestacarPropiedad(prop)"
+            disabled="@prop.NoHabitable">
+        <i class="@GetIconoBotonDestacar(prop)"></i>
+    </button>
 
-                                <button class="btn btn-warning" @onclick="() => IniciarCambioEstadoHabitabilidad(prop)">
-                                    @if (prop.NoHabitable)
-                                    {
-                                        <i class="fas fa-check-circle"></i> @* Icono para "Marcar como Habitable" *@
-                                    }
-                                    else
-                                    {
-                                        <i class="fas fa-ban"></i> @* Icono para "Marcar como No Habitable" *@
-                                    }
-                                </button>
+                                    <button title="@(prop.NoHabitable ? "Habilitar" : "Inhabilitar")" style="background-color: @(prop.NoHabitable ? "green" : "#dc3545"); color: white" class="btn btn-warning" @onclick="() => IniciarCambioEstadoHabitabilidad(prop)">
+                                        @if (prop.NoHabitable)
+                                        {
+                                            <i class="fas fa-check-circle"></i> @* Icono para "Marcar como Habitable" *@
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-ban"></i> @* Icono para "Marcar como No Habitable" *@
+                                        }
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-            <button class="btn" @onclick="() => NuevaPropiedad()">
+            <button class="btn-naranja btn-agregar" @onclick="() => NuevaPropiedad()">
                 Nueva propiedad
             </button>
         </div>
@@ -111,8 +111,8 @@
                     <p>¿Estás seguro de que querés eliminar esta propiedad?</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
-                    <button class="btn btn-secondary" @onclick="@(async () => await ConfirmarCancelacion())">Sí, eliminar</button>
+                    <button class="btn-naranja" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn-naranja" @onclick="@(async () => await ConfirmarCancelacion())">Sí, eliminar</button>
                 </div>
             </div>
         </div>

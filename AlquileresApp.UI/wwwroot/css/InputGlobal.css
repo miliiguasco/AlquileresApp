@@ -1,0 +1,27 @@
+input.mi-input,
+textarea.mi-input.mi-text-input {
+    display: block;
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0.5rem 0.75rem !important;
+    width: 100%;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+input.mi-input:focus,
+textarea.mi-input.mi-text-input:focus {
+    border-color: #596E69 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+}
+
+.input-container label {
+    margin-bottom: 0.1rem;
+}

@@ -33,49 +33,40 @@
             <h1>Mi Perfil</h1>
         </div>
 
-        @if (esAdministrador)
+        @if (esEmpleado)
         {
             <div class="profile-section">
                 @if (modoEdicion)
                 {
                     <h2>Editar Información Personal</h2>
-                    <DatosFormEdicion Input="@datosForm" 
+                    <FormEmpleadoEdicion Input="@datosFormEmpleado" 
                                   OnSubmit="GuardarCambios"
                                   FormName="editarPerfil"
                                   SubmitButtonText="Guardar"
-                                  ButtonClass="btn"
                                   CancelarEdicion="CancelarEdicion" />          
                 }
                 else
                 {
                     <h2>Información Personal</h2>
                     <div class="info-group">
-                        <label>Nombre:</label>
+                        <label>Nombre</label>
                         <span>@usuario.Nombre</span>
                     </div>
                     <div class="info-group">
-                        <label>Apellido:</label>
+                        <label>Apellido</label>
                         <span>@usuario.Apellido</span>
                     </div>
                     <div class="info-group">
-                        <label>Email:</label>
+                        <label>Email</label>
                         <span>@usuario.Email</span>
-                    </div>
-                    <div class="info-group">
-                        <label>Teléfono:</label>
-                        <span>@usuario.Telefono</span>
-                    </div>
-                    <div class="info-group">
-                        <label>Fecha de Nacimiento:</label>
-                        <span>@(usuario.FechaNacimiento?.ToShortDateString() ?? "No especificada")</span>
                     </div>
                     <div class="profile-actions">   
                         @if (!string.IsNullOrEmpty(mensajeExito))
                         {
                             <div class="mensaje-exito">@mensajeExito</div>
                         }   
-                        <button type="button" class="btn-otro" @onclick="IniciarEdicion">
-                            <i class="fas fa-edit"></i> Editar Perfil
+                        <button type="button" class="btn-naranja" @onclick="IniciarEdicion">
+                            Editar Perfil
                         </button>
                     </div>
                 }
@@ -108,11 +99,10 @@
                                 @if (modoEdicion)
                                 {
                                     <h2>Editar Información Personal</h2>
-                                    <DatosFormEdicion Input="@datosForm" 
+                                    <FormClienteEdicion Input="@datosFormCliente" 
                                                   OnSubmit="GuardarCambios"
                                                   FormName="editarPerfil"
                                                   SubmitButtonText="Guardar"
-                                                  ButtonClass="btn"
                                                   CancelarEdicion="CancelarEdicion" />          
                                 }
                                 else
@@ -143,8 +133,8 @@
                                         {
                                             <div class="mensaje-exito">@mensajeExito</div>
                                         }   
-                                        <button type="button" class="btn-otro" @onclick="IniciarEdicion">
-                                            <i class="fas fa-edit"></i> Editar Perfil
+                                        <button type="button" class="btn-naranja" @onclick="IniciarEdicion">
+                                            Editar Perfil
                                         </button>
                                     </div>
                                 }
@@ -189,7 +179,7 @@
     }
     else
     {
-        <table class="table_misreservas table-hover table-bordered shadow-sm">
+        <table class="table_misreservas table-hover shadow-sm">
             <thead class="table-dark">
                 <tr>
                     <th>Propiedad</th>
@@ -229,9 +219,7 @@
                             }
                             else
                             {
-                                <button class="btn btn-otro" @onclick="() => AbrirFormularioMensaje(reserva)">
-    <i class="bi bi-envelope"></i> Enviar mensaje sobre esta reserva
-</button>
+                                <span class="text-muted">Sin acciones</span>
                             }
                         </td>
                     </tr>
@@ -251,13 +239,11 @@
                     <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
                 </div>
                 <div class="modal-body">
-                    <p>@(mensajeCancelacion ?? "¿No se encontró mensaje de cancelación?")</p>
-                    <p>¿Estás seguro de que deseas cancelar esta reserva?</p>
-                    <p>Esta acción no se puede deshacer.</p>
+                    <p>¿Estás seguro de que querés cancelar esta reserva?</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
-                    <button class="btn btn-danger" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
+                    <button class="btn-naranja" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn-naranja" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
                 </div>
             </div>
         </div>
@@ -282,29 +268,8 @@
             }
         </div>
     }
-</div> <!-- cierre de .profile-container -->
+</div>
 
-@if (reservaSeleccionada != null)
-{
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 2000;">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Enviar mensaje sobre la reserva</h5>
-                    <button type="button" class="btn-close" @onclick="CerrarFormularioMensaje"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Propiedad:</strong> @reservaSeleccionada.Propiedad.Titulo</p>
-                    <textarea class="form-control" @bind="mensajeAEnviar" rows="5" placeholder="Escriba su mensaje aquí..."></textarea>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CerrarFormularioMensaje">Cancelar</button>
-                    <button class="btn btn-primary" @onclick="EnviarMensajeEmail" disabled="@enviandoMensaje">Enviar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
 
 @code {
 
@@ -315,12 +280,13 @@
     private string? _error;
     private bool modoEdicion = false;
     private string? mensajeExito;
-    private bool esAdministrador = false;
+    private bool esEmpleado = false;
     private string tabActiva = "datos";
     private bool mostrarEliminarTarjeta = false;
     private Tarjeta tarjeta;
     private int tarjetaSeleccionada = 0;
-    private DatosFormEdicion.InputModel datosForm = new();
+    private FormClienteEdicion.InputModel datosFormCliente = new();
+    private FormEmpleadoEdicion.InputModel datosFormEmpleado = new(); 
     private List<Reserva>? reservas=new();
     private bool mostrarConfirmacion = false;
     private int reservaAEliminarId;
@@ -341,14 +307,14 @@
 
             if (user.Identity?.IsAuthenticated != true)
             {
-                NavigationManager.NavigateTo("/login");
+                NavigationManager.NavigateTo("/Login");
                 return;
             }
 
             var userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(userEmail))
             {
-                NavigationManager.NavigateTo("/login");
+                NavigationManager.NavigateTo("/Login");
                 return;
             }
 
@@ -366,7 +332,7 @@
                 return;
             }
 
-            esAdministrador = user.IsInRole("Administrador");
+            esEmpleado = user.IsInRole("Administrador") || user.IsInRole("Encargado");
             await CargarTarjeta();
         }
         catch (Exception ex)
@@ -391,36 +357,52 @@
     }
 
     private void IniciarEdicion()
-    {
-        datosForm = new DatosFormEdicion.InputModel
-        {
-            Nombre = usuario!.Nombre,
-            Apellido = usuario.Apellido,
-            Email = usuario.Email,
-            Telefono = usuario.Telefono,
-            FechaDeNacimiento = usuario.FechaNacimiento
-        };
+    {   
+        if (!esEmpleado)
+            datosFormCliente = new FormClienteEdicion.InputModel
+            {
+                Nombre = usuario!.Nombre,
+                Apellido = usuario.Apellido,
+                Email = usuario.Email,
+                Telefono = usuario.Telefono,
+                FechaDeNacimiento = usuario.FechaNacimiento
+            };
+        else 
+           datosFormEmpleado = new FormEmpleadoEdicion.InputModel
+            {
+                Nombre = usuario!.Nombre,
+                Apellido = usuario.Apellido,
+                Email = usuario.Email,
+            };
         modoEdicion = true;
     }
 
     private void CancelarEdicion()
     {
         modoEdicion = false;
-        datosForm = new();
+        datosFormCliente = new();
+        datosFormEmpleado = new(); 
     }
 
     private async Task GuardarCambios()
     {
         try
         {
-            usuario!.Nombre = datosForm.Nombre;
-            usuario.Apellido = datosForm.Apellido;
-            usuario.Email = datosForm.Email;
-            usuario.Telefono = datosForm.Telefono;
-            usuario.FechaNacimiento = datosForm.FechaDeNacimiento;
-
-            await Task.Run(() => UsuarioRepositorio.ModificarUsuario(usuario));
-            
+            if (!esEmpleado) 
+            {
+                usuario!.Nombre = datosFormCliente.Nombre;
+                usuario.Apellido = datosFormCliente.Apellido;
+                usuario.Email = datosFormCliente.Email;
+                usuario.Telefono = datosFormCliente.Telefono;
+                usuario.FechaNacimiento = datosFormCliente.FechaDeNacimiento;  
+            }
+            else 
+            {
+                usuario!.Nombre = datosFormEmpleado.Nombre;
+                usuario.Apellido = datosFormEmpleado.Apellido;
+                usuario.Email = datosFormEmpleado.Email; 
+            }
+            await Task.Run(() => UsuarioRepositorio.ModificarUsuario(usuario));    
             modoEdicion = false;
             mensajeExito = "Perfil actualizado exitosamente";
             StateHasChanged();
@@ -432,7 +414,7 @@
     }
     private  async Task CargarTarjeta(){
         var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
-    var user = authState.User;
+        var user = authState.User;
 
     if (user.Identity != null && user.Identity.IsAuthenticated)
     {
@@ -554,16 +536,13 @@
         NavigationManager.NavigateTo($"/modificarreserva/{id}");
     }
 
-    private async Task CancelarReserva(int id)
-{
-    reservaAEliminarId = id;
-    var resultadoPreliminar = await casoDeUsoCancelarReserva.calcularCancelacion(id);
-    mensajeCancelacion = resultadoPreliminar.Mensaje;
-    mostrarConfirmacion = true;
-    mensajeError = null;
-    mensajeExito = null;
-    await InvokeAsync(StateHasChanged); 
-}
+    private void CancelarReserva(int id)
+    {
+        reservaAEliminarId = id;
+        mostrarConfirmacion = true; 
+        mensajeError = null;
+        mensajeExito = null;
+    }
 
     private async Task ConfirmarCancelacion()
 {
@@ -575,6 +554,10 @@
         {
             mensajeExito_misReservas = resultado.Mensaje;
 
+            if (resultado.MontoReembolsado.HasValue)
+            {
+                mensajeExito_misReservas += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
+            }
 
             await CargarmisReservas();
         }
@@ -614,12 +597,6 @@ private void RedirigirAlChat(int reservaId)
 {
     NavigationManager.NavigateTo($"/chat?reservaId={reservaId}");
 }
-
-
-
-
-
-
 
 private Reserva? reservaSeleccionada;
 private string mensajeAEnviar;
@@ -831,7 +808,6 @@ private async Task EnviarMensajeEmail()
 
     .reserva-card {
         background: white;
-        border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         overflow: hidden;
         transition: transform 0.2s ease;
@@ -900,12 +876,6 @@ private async Task EnviarMensajeEmail()
 
     .card {
         border: none;
-        border-radius: 10px;
-        transition: transform 0.2s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-2px);
     }
 
     .card-header {
@@ -1238,21 +1208,12 @@ private async Task EnviarMensajeEmail()
         text-align: center;
     }
 }
-.container_misreservas {
-        margin-top: 80px; /* margen grande arriba */
-        max-width: 900px; /* para no ocupar todo el ancho */
-        margin-left: auto;
-        margin-right: auto; /* centra horizontalmente */
-    }
-
     .table_misreservas {
-    margin: 0 auto;
     width: 100%;
-    max-width: 900px;
+    max-width: 1080px;
     border-collapse: separate;
     border-spacing: 0 12px;
     background-color: #f9fafb;
-    border-radius: 12px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #3b3b3b;
     overflow: hidden;
@@ -1263,7 +1224,7 @@ private async Task EnviarMensajeEmail()
     color: #565757;
     font-weight: 700;
     text-align: left;
-    border-bottom: 2px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
     position: sticky;
     top: 0;
     z-index: 1;
@@ -1279,22 +1240,14 @@ private async Task EnviarMensajeEmail()
 /* Tarjeta efecto */
 .table_misreservas tbody tr {
     background-color: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border-radius: 10px;
 }
 
 .table_misreservas tbody tr:hover {
-    background-color: #e8f1fd;
-    transform: scale(1.01);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+   background-color: var(--bs-secondary-bg);
+    transform: scale(1.001);
 }
 
-/* Efecto sutil al pasar por celda */
-.table_misreservas td:hover {
-    background-color: #f0f8ff;
-    cursor: default;
-}
 .button_misreservas {
   padding: 10px 20px!important;
   font-weight: bold!important;

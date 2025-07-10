@@ -1,0 +1,95 @@
+.table-container {
+    overflow-x: auto;
+    background: white;
+    padding: 1.5rem;
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.property-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.property-table thead {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.property-table tr {
+    height: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.property-table th,
+.property-table td {
+    padding: 1rem 0.5rem;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 0.95rem;
+}
+
+.property-table th {
+    color: #343a40;
+    font-weight: 600;
+}
+
+.property-table td {
+    color: #495057;
+}
+
+.image-cell {
+    padding: 0.6rem;
+}
+
+.image-cell img {
+    width: 100px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.actions-cell {
+    padding: 0.5rem;
+}
+
+.actions-wrapper {
+    display: flex;
+    justify-content: space-evenly; /* CENTRADO VERTICAL */
+    height: 100%; /* ← ESTA LÍNEA ES CLAVE */
+}
+
+.actions-cell button {
+    padding: 0.75rem 0.75rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    border: none;
+    transition: background-color 0.2s ease;
+}
+
+/* Iconos centrados */
+.actions-cell i {
+    font-size: 1.2rem;
+    padding: 0.2rem;
+}
+
+/* Asegura que los botones personalizados (destacar/habitable) mantengan el estilo */
+.actions-cell .btn {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.btn-agregar {
+    align-self: center;
+    vertical-align: center;
+    padding: 0.5rem;
+    margin: 0.5rem;
+    margin-top: 1.8rem;
+}

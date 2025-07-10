@@ -1,0 +1,219 @@
+.propiedad-container {
+    max-width: 900px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.titulo-propiedad {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1F3F48;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    animation: fadeInDown 0.8s ease-in-out;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.detalle-propiedad p {
+    margin: 0.3rem 0;
+}
+
+.servicios-list li {
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    background-color: #f37820;
+}
+
+.carousel-inner img {
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+@media (max-width: 576px) {
+    .carousel-inner img {
+        max-height: 200px;
+    }
+}
+.tituloo {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #0A3D62;
+    margin-bottom: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(to right, #1F3F48, #4a9cb5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeIn 1s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos para la sección de comentarios */
+.comments-section {
+    padding: 2rem 0; /* Espaciado interno */
+    background-color: #f8f9fa; /* Un fondo suave para la sección */
+    border-top: 1px solid #e9ecef; /* Separador sutil */
+    margin-top: 3rem; /* Espacio superior */
+    border-radius: 8px; /* Bordes ligeramente redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Sombra sutil */
+}
+
+.comments-section h2 {
+    text-align: center;
+    font-size: 2.2rem; /* Un poco más pequeño que el título principal */
+    font-weight: bold;
+    color: #0A3D62; /* Color similar al título principal */
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    background: linear-gradient(to right, #1F3F48, #4a9cb5); /* Gradiente similar */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeIn 1s ease-in-out; /* Animación de aparición */
+}
+
+/* Estilos para el formulario de comentarios */
+.comment-form {
+    background-color: #ffffff; /* Fondo blanco para el formulario */
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Sombra para resaltar */
+    margin-bottom: 2rem;
+}
+
+.comment-form h3 {
+    font-size: 1.8rem;
+    color: #1F3F48;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #f37820; /* Línea naranja de acento */
+    padding-bottom: 0.5rem;
+}
+
+.comment-form label {
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.5rem;
+    display: block; /* Asegura que ocupe toda la línea */
+}
+
+.comment-form textarea {
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    width: 100%; /* Ocupa todo el ancho disponible */
+    resize: vertical; /* Permite redimensionar verticalmente */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.comment-form textarea:focus {
+    border-color: #4a9cb5; /* Color de borde al enfocar */
+    box-shadow: 0 0 0 0.25rem rgba(74, 156, 181, 0.25); /* Sombra al enfocar */
+    outline: 0;
+}
+
+.comment-form .btn-success {
+    background-color: #f37820; /* Naranja de los servicios */
+    border-color: #f37820;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+
+.comment-form .btn-success:hover {
+    background-color: #e06c1f; /* Naranja un poco más oscuro al hover */
+    border-color: #e06c1f;
+    transform: translateY(-2px); /* Pequeño efecto de elevación */
+}
+
+.comment-form .alert-danger {
+    margin-top: 1rem;
+    font-size: 0.9em;
+    padding: 0.75rem 1.25rem;
+    border-radius: 5px;
+    background-color: #f8d7da; /* Fondo suave para el error */
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Estilos para los elementos de comentario individuales */
+.comment-list {
+    margin-top: 2rem;
+}
+
+.comment-item {
+    background-color: #ffffff; /* Fondo blanco para cada comentario */
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem; /* Espacio entre comentarios */
+    border: 1px solid #e9ecef; /* Borde sutil */
+    animation: fadeInUp 0.5s ease-out forwards; /* Animación de aparición */
+    opacity: 0; /* Empezar invisible para la animación */
+}
+
+/* Animación para que los comentarios aparezcan suavemente */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.comment-item:nth-child(odd) {
+    animation-delay: 0.1s; /* Retraso para un efecto escalonado */
+}
+.comment-item:nth-child(even) {
+    animation-delay: 0.2s; /* Retraso para un efecto escalonado */
+}
+
+.comment-item .fw-bold {
+    color: #0A3D62; /* Color del nombre de usuario */
+    font-size: 1.1em;
+}
+
+.comment-item .text-muted.small {
+    font-size: 0.85em;
+    color: #6c757d;
+}
+
+.comment-item p.text-secondary {
+    color: #495057;
+    line-height: 1.6;
+    margin-top: 10px;
+}
+
+.comment-list .fst-italic {
+    text-align: center;
+    color: #6c757d;
+    padding: 1rem;
+    border: 1px dashed #ced4da;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+.estrella:hover,
+.estrella:focus {
+    color: #FFA500 !important;
+}

@@ -1,0 +1,111 @@
+/* Contenedor principal */
+.admin-section {
+    padding: 1.5rem;
+}
+
+/* Tabla con espacio entre filas */
+.property-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px; /* espacio entre filas */
+    background-color: transparent;
+}
+
+/* Encabezados */
+.property-table thead th {
+    background-color: #f8f9fa;
+    color: #343a40;
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 0.95rem;
+    vertical-align: middle;
+
+}
+
+/* Celdas del cuerpo */
+.property-table tbody td {
+    height: 100%;
+    background-color: #ffffff;
+    padding: 1rem;
+    border: none;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Estilo para la fila completa */
+.property-table tbody tr {
+    height: 100%;
+    margin-bottom: 0.5rem;
+}
+
+/* Columna de acciones */
+.actions-cell {
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Botones */
+.property-table button.btn {
+    padding: 0.5rem 0.75rem;
+    height: 37.6px; 
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    border: none;
+    transition: background-color 0.2s ease;
+}
+
+/* Íconos */
+.property-table i {
+    margin: 0;
+}
+
+/* Badges de estado */
+.badge {
+    padding: 0.4em 0.7em;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: white;
+    white-space: nowrap;
+}
+
+.bg-warning { background-color: #ffc107; }
+.bg-success { background-color: #28a745; }
+.bg-danger { background-color: #dc3545; }
+.bg-info { background-color: #17a2b8; }
+.bg-secondary { background-color: #6c757d; }
+
+/* Modal */
+.modal-content {
+    border-radius: 12px;
+}
+
+.modal-footer .btn-naranja {
+    background-color: #f57c00;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+}
+
+.modal-footer .btn-naranja:hover {
+    background-color: #ef6c00;
+}
+
+/* Responsive tabla */
+@media (max-width: 768px) {
+    .property-table {
+        font-size: 0.875rem;
+    }
+
+    .actions-cell {
+        flex-direction: column;
+    }
+}

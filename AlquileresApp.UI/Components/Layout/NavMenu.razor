@@ -15,7 +15,6 @@
 @using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes
 @rendermode InteractiveServer
 
-<link href="css/NavMenu.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 @if (isDropdownOpen)
@@ -34,7 +33,7 @@
             <Authorized>
                 <div class="auth-buttons">
                     <div class="dropdown">
-                        <button class="dropdown-toggle btn btn-dropdown" @onclick:stopPropagation @onclick="ToggleDropdown">
+                        <button class="dropdown-toggle btn-dropdown btn-naranja" @onclick:stopPropagation @onclick="ToggleDropdown">
                             ¡Hola, @context.User.Identity?.Name!
                         </button>
                         @if (isDropdownOpen)
@@ -43,7 +42,7 @@
                                 <a class="dropdown-item" href="/Perfil/@context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value">
                                     <i class="bi bi-person"></i> Ver perfil
                                 </a>
-                                @if (context.User.IsInRole("Administrador"))
+                                @if (context.User.IsInRole("Administrador") || context.User.IsInRole("Encargado"))
                                 {
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="/Administrar">
@@ -62,9 +61,9 @@
             <NotAuthorized>
                 <div class="auth-buttons">
         
-                    <a href="/Login" class="btn">Iniciar Sesión</a>
-                    <a href="/Registro" class="btn">Registrarse</a>
-                    <a href="/preguntas-frecuentes" class="btn btn-primary">Preguntas Frecuentes</a>
+                    <a href="/Login" class="btn-naranja">Iniciar Sesión</a>
+                    <a href="/Registro" class="btn-naranja">Registrarse</a>
+                    <a href="/preguntas-frecuentes" class="btn-naranja">Preguntas Frecuentes</a>
                 </div>
             </NotAuthorized>
         </AuthorizeView>

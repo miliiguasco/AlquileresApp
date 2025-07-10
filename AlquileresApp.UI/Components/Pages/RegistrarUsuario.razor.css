@@ -6,10 +6,6 @@
     padding: 2rem;
     width: 100%;
 }
-  
-.mt-normal {
-    margin-top: 4.5rem;
-}
 
 .button-container {
     display: flex;
@@ -37,21 +33,23 @@
     width: 100%;
 }
 
-.registro-form .form-control:focus {
-    border-color: #596E69;
-    outline: none;
+:deep(input.form-control),
+:deep(select.form-control),
+:deep(textarea.form-control) {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
     box-shadow: none;
+    outline: none;
 }
 
-.registro-form .form-control {
-    outline: none;
+:deep(input.form-control:focus),
+:deep(select.form-control:focus),
+:deep(textarea.form-control:focus) {
+    border-color: #596E69;
     box-shadow: none;
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
+    outline: none;
 }
+
 
 .registro-button {
     background-color: #1F3F48 !important;

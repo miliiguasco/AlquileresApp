@@ -26,10 +26,6 @@
 
 <PageTitle>Administración</PageTitle>
 
-<HeadContent>
-    <link href="css/Administracion.css" rel="stylesheet" />
-</HeadContent>
-
 <div class="admin-container">
     <h1 class="admin-title">Panel de Administración</h1>
 
@@ -85,7 +81,7 @@
             else if (tabActiva == "preguntas-frecuentes")
             {
                 <div class="tab-pane active">
-                        <button class="btn btn-primary" @onclick="NuevaPregunta">
+                        <button class="btn-naranja" @onclick="NuevaPregunta">
                             <i class="fas fa-plus"></i> Nueva pregunta frecuente
                         </button>
                     <div class="preg-frec-table-container">
@@ -141,8 +137,8 @@
                                         }
                                     </div>
                                     <div class="modal-footer">
-                                        <button class="btn btn-secondary" @onclick="CancelarEdicion">Cancelar</button>
-                                        <button class="btn btn-primary" @onclick="GuardarCambiosEdicion">Guardar</button>
+                                        <button class="btn-naranja" @onclick="CancelarEdicion">Cancelar</button>
+                                        <button class="btn-naranja" @onclick="GuardarCambiosEdicion">Guardar</button>
                                     </div>
                                 </div>
                             </div>
@@ -161,8 +157,8 @@
                                         <p><strong>@preguntaAEliminar?.Pregunta</strong></p>
                                     </div>
                                     <div class="modal-footer">
-                                        <button class="btn btn-secondary" @onclick="CancelarEliminar">Cancelar</button>
-                                        <button class="btn btn-primary" @onclick="EliminarPreguntaConfirmada">Eliminar</button>
+                                        <button class="btn-naranja" @onclick="CancelarEliminar">Cancelar</button>
+                                        <button class="btn-naranja" @onclick="EliminarPreguntaConfirmada">Eliminar</button>
                                     </div>
                                 </div>
                             </div>
@@ -191,8 +187,8 @@
                                         }
                                     </div>
                                     <div class="modal-footer">
-                                        <button class="btn btn-secondary" @onclick="CancelarCreacion">Cancelar</button>
-                                        <button class="btn btn-primary" @onclick="GuardarNuevaPregunta">Guardar</button>
+                                        <button class="btn-naranja" @onclick="CancelarCreacion">Cancelar</button>
+                                        <button class="btn-naranja" @onclick="GuardarNuevaPregunta">Guardar</button>
                                     </div>
                                 </div>
                             </div>

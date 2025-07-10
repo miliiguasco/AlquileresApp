@@ -12,8 +12,6 @@
 
 @attribute [Authorize(Roles = "Administrador")]
 
-<link href="css/Tabla.css" rel="stylesheet" />
-
 <div class="admin-section">
     @if (isLoading)
     {
@@ -60,18 +58,18 @@
                             <td>@promo.FechaFin.ToShortDateString()</td>
                             <td>@promo.PorcentajeDescuento</td>
                             <td>@CalcularEstado(promo)</td>
-                           <td>
-                    <button class="btn btn-info btn-sm" @onclick="() => AbrirModalPropiedades(promo)">
+                           <td class="lista-propiedades">
+                    <button class="btn-naranja" title="Listar propiedades" @onclick="() => AbrirModalPropiedades(promo)">
                         Propiedades
                     </button>
                 </td>
                             <td class="actions-cell">
-    <button class="btn btn-primary"
+    <button class="btn btn-primary" title="Editar"
             @onclick="@(() => IrAEditar(promo.Id))"
             disabled="@EsBorrada(promo)">
         <i class="fas fa-edit"></i>
     </button>
-    <button class="btn btn-danger"
+    <button class="btn btn-danger" title="Eliminar"
             @onclick="() => MostrarConfirmacion(promo.Id)"
             disabled="@EsBorrada(promo)">
         <i class="fas fa-trash"></i>
@@ -87,7 +85,7 @@
     {
         <p>No hay promociones disponibles.</p>
     }
-    <button class="btn" @onclick="@(() => NavigationManager.NavigateTo("/PublicarPromocion"))">
+    <button class="btn-naranja btn-agregar" @onclick="@(() => NavigationManager.NavigateTo("/PublicarPromocion"))">
     Nueva promoción
 </button>
 </div>
@@ -136,8 +134,8 @@
                     <p>¿Estás segura de que querés eliminar esta promoción?</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">Cancelar</button>
-                    <button class="btn btn-secondary" @onclick="ConfirmarEliminacion">Sí, eliminar</button>
+                    <button class="btn-naranja" @onclick="CancelarConfirmacion">Cancelar</button>
+                    <button class="btn-naranja" @onclick="ConfirmarEliminacion">Sí, eliminar</button>
                 </div>
             </div>
         </div>

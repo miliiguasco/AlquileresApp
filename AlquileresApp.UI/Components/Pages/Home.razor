@@ -19,7 +19,6 @@
 
 @inject CasoDeUsoMostrarCalificacion CUMostrarCalificacion
 
-<link href="css/Filtradas.css" rel="stylesheet" />
 @if (Promociones != null && Promociones.Any())
 {
     <div id="carouselPromociones" class="carousel slide mb-5" data-bs-ride="carousel">
@@ -154,22 +153,22 @@
         <div class="filtros">
             <div>
                 <label>Ubicacion:</label>
-                <InputText @bind-Value="Filtros.Localidad" class="input" />
+                <InputText @bind-Value="Filtros.Localidad" class="mi-input input-custom" />
             </div>
 
             <div>
                 <label>Cantidad de personas:</label>
-                <InputNumber @bind-Value="Filtros.CantidadHuespedes" class="input" />
+                <InputNumber @bind-Value="Filtros.CantidadHuespedes" class="mi-input input-custom" />
             </div>
 
             <div>
                 <label>Fecha de inicio:</label>
-                <InputDate @bind-Value="Filtros.FechaInicio" class="input" />
+                <InputDate @bind-Value="Filtros.FechaInicio" class="mi-input input-custom" />
             </div>
 
             <div>
                 <label>Fecha de fin:</label>
-                <InputDate @bind-Value="Filtros.FechaFin" class="input" />
+                <InputDate @bind-Value="Filtros.FechaFin" class="mi-input input-custom" />
             </div>
 
             <div>

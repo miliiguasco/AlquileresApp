@@ -107,7 +107,7 @@
             <p class="fst-italic">@ObtenerDescripcionPolitica(propiedad.PoliticaCancelacion)</p>
         </div>
        <div class="info-grupo">
-                            <button class="btn btn-primary" @onclick="IrAReservar">
+                            <button class="btn-naranja" @onclick="IrAReservar">
                                 <i class="fas fa-calendar-check"></i> Reservar esta propiedad
                             </button>
         </div>
@@ -127,7 +127,7 @@
         {
             <div class="alert alert-danger">@mensajeErrorComentario</div>
         }
-        <button class="btn btn-success" @onclick="EnviarComentario">
+        <button class="btn-naranja" @onclick="EnviarComentario">
             <i class="fas fa-comment-dots"></i> Comentar
         </button>
     </div>
@@ -172,7 +172,7 @@
                     <div class="alert alert-danger mt-2">@mensajeErrorCalificacion</div>
                 }
             </div>
-            <button class="btn btn-warning" @onclick="EnviarCalificacion">
+            <button class="btn-naranja" @onclick="EnviarCalificacion">
                 <i class="fas fa-star"></i> Calificar
             </button>
         </div>
@@ -234,8 +234,8 @@
                     <p>¿Estás seguro de que querés eliminar este comentario?</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
-                    <button class="btn btn-secondary" @onclick="ConfirmarOcultarComentario">Sí, eliminar</button>
+                    <button class="btn-naranja" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn-naranja" @onclick="ConfirmarOcultarComentario">Sí, eliminar</button>
                 </div>
             </div>
         </div>

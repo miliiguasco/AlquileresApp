@@ -7,6 +7,13 @@
     width: 100%;
 }
 
+.button-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
 .registro-title {
     font-size: 1.5rem;
     color: #1F3F48;
@@ -26,14 +33,22 @@
 
 .registro-form section {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
-.input-container label, .input-container input {
-    width: 350px;
+.registro-form .form-control:focus {
+    border-color: #596E69;
+    outline: none;
+    box-shadow: none;
+}
+
+.registro-form .form-control {
+    outline: none;
+    box-shadow: none;
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
 }
 
 .registro-button {
@@ -50,3 +65,7 @@
     border-color: #1F3F48 !important;
     color: white;
 } 
+
+.btn-volver {
+    width: 102px; 
+}

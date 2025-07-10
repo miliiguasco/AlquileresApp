@@ -16,6 +16,10 @@
     gap: 1rem;
 }
 
+.btn-naranja:hover {
+    background-color: #eb7119;
+}
+
 .logo {
     height: 35px;
     width: auto;
@@ -33,20 +37,7 @@
     gap: 1rem;
 }
 
-.auth-buttons .btn {
-    padding: 0.5rem 1.25rem;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: 500;
-    background-color: #FF6B00;
-    color: white;
-    border: none;
-    transition: background-color 0.3s ease;
-}
-
-.auth-buttons .btn:hover {
-    background-color: #e65f00;
-}
+.auth-buttons 
 
 @media (max-width: 640px) {
     .brand-text {

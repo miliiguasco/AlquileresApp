@@ -44,11 +44,11 @@
             <div class="modal-footer">
                 @if (AlternativasDisponibles != null && AlternativasDisponibles.Any())
                 {
-                    <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cancelar Reubicación</button>
+                    <button type="button" class="btn-naranja" @onclick="CerrarModal">Cancelar Reubicación</button>
                 }
                 else
                 {
-                    <button type="button" class="btn btn-warning" @onclick="ConfirmarInhabilitacionSinReubicacion">Confirmar Inhabilitación (sin reubicación)</button>
+                    <button type="button" class="btn-naranja" @onclick="ConfirmarInhabilitacionSinReubicacion">Confirmar Inhabilitación (sin reubicación)</button>
                     <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
                 }
             </div>

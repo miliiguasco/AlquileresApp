@@ -1,4 +1,4 @@
-@using System.ComponentModel.DataAnnotations
+﻿@using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 @using AlquileresApp.Core.Entidades
 @using System.Collections.Generic
@@ -6,18 +6,18 @@
 <EditForm Model="Input" OnValidSubmit="OnSubmit" OnInvalidSubmit="ManejarInvalidSubmit" FormName="@FormName">
     <DataAnnotationsValidator />
     <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.Nombre" class="form-control" aria-required="true" @oninput="@(() => { errorNombre = null; StateHasChanged(); })" />
+        <InputText @bind-Value="Input.Nombre" class="form-control mi-input" aria-required="true" @oninput="@(() => { errorNombre = null; StateHasChanged(); })" />
         <label for="nombre" class="form-label">Nombre</label>
         <Error Mensaje="@errorNombre" />
     </div>
     <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.Apellido" class="form-control" aria-required="true" @oninput="@(() => { errorApellido = null; StateHasChanged(); })" />
+        <InputText @bind-Value="Input.Apellido" class="form-control mi-input" aria-required="true" @oninput="@(() => { errorApellido = null; StateHasChanged(); })" />
         <label for="apellido" class="form-label">Apellido</label>
         <Error Mensaje="@errorApellido" />
     </div>
     <div class="form-floating mb-3">
         <InputText @bind-Value="Input.Email" 
-                  class="form-control" 
+                  class="form-control mi-input" 
                   aria-required="true" 
                   @oninput="@(() => { 
                       errorEmail = null; 
@@ -29,7 +29,7 @@
     </div>
     <div class="form-floating mb-3">
         <InputText @bind-Value="Input.Telefono" 
-                  class="form-control" 
+                  class="form-control mi-input" 
                   aria-required="true" 
                   @oninput="@(() => { errorTelefono = null; StateHasChanged(); })"
                   type="tel"
@@ -40,26 +40,27 @@
         <small class="text-muted d-block pt-2 ps-2">Solo números, sin espacios ni guiones</small>
         <Error Mensaje="@errorTelefono" />
     </div>
-    <div class="form-floating mb-3">
-        <InputDate TValue="DateTime?" 
-                  @bind-Value="Input.FechaDeNacimiento" 
-                  class="form-control" 
-                  aria-required="true" 
-                  @oninput="@(() => { errorFechaNacimiento = null; StateHasChanged(); })"
-                  min="1920-01-01"
-                  max="@DateTime.Today.AddYears(-18).ToString("yyyy-MM-dd")" />
-        <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
-        <small class="text-muted d-block pt-2 ps-2">Debes tener al menos 18 años</small>
-        <Error Mensaje="@errorFechaNacimiento" />
+    <div class="mb-3">
+    <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+    <InputDate TValue="DateTime?" 
+               @bind-Value="Input.FechaDeNacimiento" 
+               class="form-control mi-input"
+               aria-required="true" 
+               @oninput="@(() => { errorFechaNacimiento = null; StateHasChanged(); })"
+               min="1920-01-01"
+               max="@DateTime.Today.AddYears(-18).ToString("yyyy-MM-dd")" />
+    <small class="text-muted d-block pt-2 ps-2">Debes tener al menos 18 años</small>
+    <Error Mensaje="@errorFechaNacimiento" />
     </div>
+
     <div class="form-floating mb-3">
-        <InputText type="password" @bind-Value="Input.Password" class="form-control" aria-required="true" @oninput="@(() => { errorPassword = null; StateHasChanged(); })" />
+        <InputText type="password" @bind-Value="Input.Password" class="form-control mi-input" aria-required="true" @oninput="@(() => { errorPassword = null; StateHasChanged(); })" />
         <label for="password" class="form-label">Contraseña</label>
         <Error Mensaje="@errorPassword" />
     </div>
     
-    <div>
-        <button type="submit" class="w-100 btn btn-lg @ButtonClass">@SubmitButtonText</button>
+    <div class="btn-container">
+        <button type="submit" class="btn-naranja">@SubmitButtonText</button>
     </div>
 </EditForm>
 

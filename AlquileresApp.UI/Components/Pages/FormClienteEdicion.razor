@@ -1,4 +1,4 @@
-@using System.ComponentModel.DataAnnotations
+﻿@using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 @using AlquileresApp.Core.Entidades
 @using System.Collections.Generic
@@ -8,18 +8,18 @@
 <EditForm Model="Input" OnValidSubmit="OnSubmit" OnInvalidSubmit="ManejarInvalidSubmit" FormName="@FormName">
     <DataAnnotationsValidator />
     <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.Nombre" class="form-control" aria-required="true" @oninput="@(() => { errorNombre = null; StateHasChanged(); })" />
+        <InputText @bind-Value="Input.Nombre" class="mi-input" aria-required="true" @oninput="@(() => { errorNombre = null; StateHasChanged(); })" />
         <label for="nombre" class="form-label">Nombre</label>
         <Error Mensaje="@errorNombre" />
     </div>
     <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.Apellido" class="form-control" aria-required="true" @oninput="@(() => { errorApellido = null; StateHasChanged(); })" />
+        <InputText @bind-Value="Input.Apellido" class="mi-input" aria-required="true" @oninput="@(() => { errorApellido = null; StateHasChanged(); })" />
         <label for="apellido" class="form-label">Apellido</label>
         <Error Mensaje="@errorApellido" />
     </div>
     <div class="form-floating mb-3">
         <InputText @bind-Value="Input.Email" 
-                  class="form-control" 
+                  class="mi-input" 
                   aria-required="true" 
                   @oninput="@(() => { 
                       errorEmail = null; 
@@ -31,7 +31,7 @@
     </div>
     <div class="form-floating mb-3">
         <InputText @bind-Value="Input.Telefono" 
-                  class="form-control" 
+                  class="mi-input" 
                   aria-required="true" 
                   @oninput="@(() => { errorTelefono = null; StateHasChanged(); })"
                   type="tel"
@@ -45,7 +45,7 @@
     <div class="form-floating mb-3">
         <InputDate TValue="DateTime?" 
                   @bind-Value="Input.FechaDeNacimiento" 
-                  class="form-control" 
+                  class="mi-input" 
                   aria-required="true" 
                   @oninput="@(() => { errorFechaNacimiento = null; StateHasChanged(); })"
                   min="1920-01-01"
@@ -55,10 +55,10 @@
         <Error Mensaje="@errorFechaNacimiento" />
     </div>
     <div class="btn-container">
-        <button class="btn" @onclick="@CancelarEdicion">
+        <button class="btn-naranja" @onclick="@CancelarEdicion">
             Volver
         </button>
-        <button type="submit" class="@ButtonClass">@SubmitButtonText</button>
+        <button type="submit" class="btn-naranja">@SubmitButtonText</button>
     </div>
 </EditForm>
 
@@ -78,8 +78,6 @@
     [Parameter]
     public string SubmitButtonText { get; set; } = "Guardar";
 
-    [Parameter]
-    public string ButtonClass { get; set; } = "";
     [Parameter]
     public EventCallback CancelarEdicion { get; set; }
 

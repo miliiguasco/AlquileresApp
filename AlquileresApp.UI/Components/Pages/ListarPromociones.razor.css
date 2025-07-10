@@ -1,0 +1,127 @@
+.table-container {
+    overflow-x: auto;
+    background: white;
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.property-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.property-table thead {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.property-table tr {
+    height: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.property-table th,
+.property-table td {
+    height: 100%;
+    padding: 1rem 0.5rem;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 0.95rem;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.property-table th {
+    color: #343a40;
+    font-weight: 600;
+}
+
+.property-table td {
+    color: #495057;
+}
+
+.property-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.lista-propiedades button{
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    border: none;
+}
+
+.actions-cell {
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.actions-cell button {
+    padding: 0.5rem 0.75rem;
+    height: 37.6px; 
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    border: none;
+    transition: background-color 0.2s ease;
+}
+
+.actions-cell i {
+    font-size: 1.1rem;
+    padding: 0.2rem;
+}
+
+.actions-cell .btn {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.alert {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.btn-agregar {
+    align-self: flex-end;
+    padding: 0.5rem 1rem;
+    margin: 1.5rem 0 0.5rem 0;
+}
+
+/* Modal personalizado */
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header,
+.modal-footer {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-title {
+    font-weight: 500;
+    color: #1F3F48;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    color: #333;
+}
+
+.modal-body ul {
+    padding-left: 1.2rem;
+}
+
+.modal-body li {
+    margin-bottom: 0.5rem;
+}

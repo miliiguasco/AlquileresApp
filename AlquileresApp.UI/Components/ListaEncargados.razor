@@ -8,8 +8,6 @@
 @inject CasoDeUsoEliminarEncargado CUEliminarEncargado
 @rendermode InteractiveServer
 
-<link href="css/Tabla.css" rel="stylesheet"/>
-
 <div class="admin-section">
     @if (encargados != null && encargados.Any())
     {
@@ -53,7 +51,7 @@
                         }
                     </tbody>
                 </table>
-                <button class="btn" @onclick="() => HabilitarRegistro()">
+                <button class="btn-naranja" @onclick="() => HabilitarRegistro()">
                     Añadir encargado
                 </button>
             </div>
@@ -68,7 +66,6 @@
                                     OnSubmit="NuevoEncargado"
                                     FormName="RegistrarEncargado"
                                     SubmitButtonText="Registrar"
-                                    ButtonClass="btn"
                                     CancelarEdicion="CancelarRegistro"
                                     OnEmailChange="LimpiarError"/>
                 <RegistroExitoso Visible='@registroExitoso' esCliente=false/>
@@ -78,12 +75,33 @@
         else 
         {
             <p>No hay encargados disponibles.</p> 
-            <button class="btn" @onclick="() => HabilitarRegistro()">
+            <button class="btn-naranja" @onclick="() => HabilitarRegistro()">
                 Añadir encargado
             </button> 
         } 
     }
 </div>
+
+@if (mostrarConfirmacion)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarEliminacion"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro que querés eliminar este encargado?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-naranja" @onclick="CancelarEliminacion">No</button>
+                    <button class="btn-naranja" @onclick="ConfirmarEliminacion">Sí</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     private List<Encargado>? encargados;
@@ -92,6 +110,8 @@
     private bool registrar = false; 
     private string? errorMensaje = null; 
     public bool registroExitoso = false; 
+    private bool mostrarConfirmacion = false;
+    private int idEncargadoAEliminar;
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,9 +129,16 @@
     }
     private void EliminarEncargado(int id)
     {
+        mostrarConfirmacion = true;
+        idEncargadoAEliminar = id;
+    }
+
+    private void ConfirmarEliminacion()
+    {
         try
         {
-            CUEliminarEncargado.Ejecutar(id);
+            CUEliminarEncargado.Ejecutar(idEncargadoAEliminar);
+            mostrarConfirmacion = false;
             encargados = CUListarEncargados.Ejecutar();
             StateHasChanged(); 
         }
@@ -120,6 +147,11 @@
             errorMensaje = ex.Message; 
             StateHasChanged(); 
         }
+    }
+
+    private void CancelarEliminacion()
+    {
+        mostrarConfirmacion = false;
     }
 
     public void NuevoEncargado() {

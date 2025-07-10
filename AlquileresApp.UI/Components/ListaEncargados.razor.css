@@ -1,0 +1,79 @@
+.table-container {
+    overflow-x: auto;
+    background-color: #fff;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem; 
+}
+
+.property-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0 0.75rem; /* Espacio entre filas */
+}
+
+.property-table thead tr {
+    background-color: #f4f6f8;
+}
+
+.property-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #444;
+    border-bottom: 2px solid #e1e1e1;
+}
+
+.property-table td {
+    background-color: #fafafa;
+    padding: 1rem;
+    font-size: 0.9rem;
+    vertical-align: middle;
+    color: #333;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.property-table tr {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.property-table tr:hover {
+    background-color: #f0f0f0;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.actions-cell button {
+    align-self: center;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.actions-cell button i {
+    pointer-events: none;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+button[title] {
+    position: relative;
+}

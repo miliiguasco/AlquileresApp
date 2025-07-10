@@ -13,8 +13,6 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
 
-<link href="css/ModificarReserva.css" rel="stylesheet" />
-
 <div class="container_modificar mt-5">
     <div class="card shadow-lg p-4">
         <h2 class="h2_modificar mb-4 text-primary">Modificar Reserva</h2>
@@ -41,8 +39,8 @@
             </div>
 
             <div class="d-flex gap-3 mt-4">
-                <button class="btn btn-primary" type="submit">Guardar</button>
-                <button class="btn btn-secondary" type="button" @onclick="Cancelar">Cancelar</button>
+                <button class="btn-naranja" type="submit">Guardar</button>
+                <button class="btn-naranja" type="button" @onclick="Cancelar">Cancelar</button>
             </div>
         </EditForm>
     </div>
@@ -64,8 +62,8 @@
                     <p><strong>Diferencia:</strong> @diferencia.ToString("C")</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-success" @onclick="ConfirmarModificacion">Confirmar</button>
-                    <button class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
+                    <button class="btn-naranja" @onclick="ConfirmarModificacion">Confirmar</button>
+                    <button class="btn-naranja" @onclick="CerrarModal">Cancelar</button>
                 </div>
             </div>
         </div>
