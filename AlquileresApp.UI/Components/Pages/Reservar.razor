@@ -131,8 +131,14 @@
                         @errorMensaje
                     </div>
                 }
+                @if (!string.IsNullOrEmpty(mensajeExito))
+                {
+                    <div class="alert alert-success">
+                        @mensajeExito
+                    </div>
+                }
 
-                @if (esCliente)
+                @if (esCliente || !estaAutenticado)
                 {
                     <div class="botones-reserva">
                         <button class="btn-cancelar" type="button" @onclick="VolverAtras">
@@ -153,7 +159,7 @@
                         </button>
                     </div>
                 }
-                else
+                else if (esAdministrador)
                 {
                     <div class="alert alert-warning mt-2">
                         Solo los usuarios con rol <strong>Cliente</strong> pueden realizar reservas.
@@ -168,6 +174,8 @@
     [Parameter]
     public int PropiedadId { get; set; }
     private bool esCliente = false;
+    private bool esAdministrador = false;
+    private bool estaAutenticado = false;
     private Propiedad? propiedad;
     private string? error;
     private DateTime fechaInicio = DateTime.Today;
@@ -179,6 +187,7 @@
     private bool isLoading = true;
     private bool isSubmitting = false;
     private string? mensajePromocion;
+    private bool confirmandoReserva = false;
 
 
 protected override async Task OnInitializedAsync()
@@ -189,7 +198,8 @@ protected override async Task OnInitializedAsync()
         errorMensaje = null;
 
         var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
-        var user = authState.User; // <-- esta línea faltaba
+        var user = authState.User;
+        estaAutenticado = user.Identity != null && user.Identity.IsAuthenticated;
         var email = user.FindFirst(ClaimTypes.Email)?.Value;
 
         if (email != null)
@@ -201,7 +211,8 @@ protected override async Task OnInitializedAsync()
             }
         }
 
-        esCliente = user.IsInRole("Cliente"); // ahora sí existe "user"
+        esCliente = user.IsInRole("Cliente");
+        esAdministrador = user.IsInRole("Administrador");
 
         propiedad = CUObtenerPropiedad.Ejecutar(PropiedadId);
         if (propiedad == null)
@@ -255,14 +266,28 @@ protected override async Task OnInitializedAsync()
 
     private async Task ConfirmarReserva()
     {
+        if (confirmandoReserva) return;
+        confirmandoReserva = true;
+        isSubmitting = true; // Se deshabilita el botón instantáneamente
+        StateHasChanged(); // Fuerza renderizado inmediato
+        await Task.Yield(); // Cede el control al renderizador
         try
         {
-            isSubmitting = true;
             errorMensaje = null;
+
+            if (!estaAutenticado)
+            {
+                NavigationManager.NavigateTo("/Login");
+                isSubmitting = false;
+                confirmandoReserva = false;
+                return;
+            }
 
             if (usuarioId == null)
             {
                 errorMensaje = "No se pudo obtener el ID del usuario";
+                isSubmitting = false;
+                confirmandoReserva = false;
                 return;
             }
 
@@ -273,18 +298,24 @@ protected override async Task OnInitializedAsync()
             if (fechaInicioFormateada < DateTime.Today)
             {
                 errorMensaje = "La fecha de check-in no puede ser anterior a hoy";
+                isSubmitting = false;
+                confirmandoReserva = false;
                 return;
             }
 
             if (fechaInicioFormateada >= fechaFinFormateada)
             {
                 errorMensaje = "La fecha de check-out debe ser posterior a la fecha de check-in";
+                isSubmitting = false;
+                confirmandoReserva = false;
                 return;
             }
 
             if (cantidadHuespedes < 1 || cantidadHuespedes > propiedad.Capacidad)
             {
                 errorMensaje = $"La cantidad de huéspedes debe estar entre 1 y {propiedad.Capacidad}";
+                isSubmitting = false;
+                confirmandoReserva = false;
                 return;
             }
 
@@ -292,13 +323,19 @@ protected override async Task OnInitializedAsync()
             if (noches <= 0)
             {
                 errorMensaje = "Debe seleccionar al menos una noche de estadía";
+                isSubmitting = false;
+                confirmandoReserva = false;
                 return;
             }
 
             await CUCrearReserva.Ejecutar(usuarioId.Value, PropiedadId, fechaInicioFormateada, fechaFinFormateada, cantidadHuespedes);
-            mensajeExito = "Reserva creada exitosamente";
-            await Task.Delay(2000);
-            NavigationManager.NavigateTo("/");
+            mensajeExito = "Reserva realizada correctamente";
+            isSubmitting = false;
+            confirmandoReserva = false;
+            StateHasChanged();
+            await Task.Delay(2000); // Espera 2 segundos mostrando el mensaje
+            mensajeExito = null;
+            return;
         }
         catch (Exception ex)
         {
@@ -308,6 +345,7 @@ protected override async Task OnInitializedAsync()
         finally
         {
             isSubmitting = false;
+            confirmandoReserva = false;
         }
     }
 
