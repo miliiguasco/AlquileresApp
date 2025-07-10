@@ -8,6 +8,8 @@
 @using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.Interfaces
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 
 @inject CasoDeUsoListarPropiedades CUListarPropiedades
 @inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
@@ -21,183 +23,217 @@
 @inject CasoDeUsoModificarPreguntaFrecuente CUModificarPreguntaFrecuente
 @inject CasoDeUsoEliminarPreguntaFrecuente CUEliminarPreguntaFrecuente
 @inject CasoDeUsoMostrarPreguntasFrecuentes CUListarPreguntasFrecuentes
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
-@attribute [Authorize(Roles = "Administrador")] 
+@attribute [Authorize(Roles = "Administrador,Encargado")] 
 
 <PageTitle>Administración</PageTitle>
 
 <div class="admin-container">
     <h1 class="admin-title">Panel de Administración</h1>
 
-    <div class="tabs-container">
-        <div class="tabs">
-            <button class="tab-button @(tabActiva == "reservas" ? "active" : "")" 
-                    @onclick='@(() => CambiarTab("reservas"))'>
-                Reservas
-            </button>
-            <button class="tab-button @(tabActiva == "encargados" ? "active" : "")" 
-                    @onclick='@(() => CambiarTab("encargados"))'>
-                Encargados
-            </button>
-            <button class="tab-button @(tabActiva == "propiedades" ? "active" : "")" 
-                    @onclick='@(() => CambiarTab("propiedades"))'>
-                Propiedades
-            </button>
-            <button class="tab-button @(tabActiva == "promociones" ? "active" : "")" 
-                    @onclick='@(() => CambiarTab("promociones"))'>
-                Promociones
-            </button>
-            <button class="tab-button @(tabActiva == "preguntas-frecuentes" ? "active" : "")" 
-                    @onclick='@(() => CambiarTab("preguntas-frecuentes"))'>
-                Preguntas Frecuentes
-            </button>
+    
+    <AuthorizeView Roles="Administrador">
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab-button @(tabActiva == "reservas" ? "active" : "")" 
+                        @onclick='@(() => CambiarTab("reservas"))'>
+                    Reservas
+                </button>
+                <button class="tab-button @(tabActiva == "encargados" ? "active" : "")" 
+                        @onclick='@(() => CambiarTab("encargados"))'>
+                    Encargados
+                </button>
+                <button class="tab-button @(tabActiva == "propiedades" ? "active" : "")" 
+                        @onclick='@(() => CambiarTab("propiedades"))'>
+                    Propiedades
+                </button>
+                <button class="tab-button @(tabActiva == "promociones" ? "active" : "")" 
+                        @onclick='@(() => CambiarTab("promociones"))'>
+                    Promociones
+                </button>
+                <button class="tab-button @(tabActiva == "preguntas-frecuentes" ? "active" : "")" 
+                        @onclick='@(() => CambiarTab("preguntas-frecuentes"))'>
+                    Preguntas Frecuentes
+                </button>
+            </div>
+
+            <div class="tab-content">
+                @if (tabActiva == "reservas")
+                {
+                    <div class="tab-pane active">
+                        <ListaReservasadm />
+                    </div>
+                }
+                else if (tabActiva == "encargados")
+                {
+                    <div class="tab-pane active">
+                        <ListaEncargados/>
+                    </div>
+                }
+                else if (tabActiva == "propiedades")
+                {
+                    <div class="tab-pane active">
+                        <Propiedades />
+                    </div>
+                }
+                else if (tabActiva == "promociones")
+                {
+                    <div class="tab-pane active">
+                        <ListarPromociones />
+                    </div>
+                }
+                else if (tabActiva == "preguntas-frecuentes")
+                {
+                    <div class="tab-pane active">
+                            <button class="btn-naranja" @onclick="NuevaPregunta">
+                                <i class="fas fa-plus"></i> Nueva pregunta frecuente
+                            </button>
+                        <div class="preg-frec-table-container">
+                            @if (!string.IsNullOrEmpty(mensajeExito))
+                            {
+                                <div class="preg-frec-success">@mensajeExito</div>
+                            }
+                            <table class="property-table">
+                                <thead>
+                                    <tr>
+                                        <th>Pregunta</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var pregunta in preguntas)
+                                    {
+                                        <tr>
+                                            <td>@pregunta.Pregunta</td>
+                                            <td class="actions-cell">
+                                                <button class="btn btn-primary" @onclick="() => EditarPregunta(pregunta)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger" @onclick="() => ConfirmarEliminarPregunta(pregunta)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (mostrarModalEdicion)
+                        {
+                            <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Editar Pregunta Frecuente</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Pregunta</label>
+                                                <input class="form-control" @bind="preguntaEditada.Pregunta" />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Respuesta</label>
+                                                <textarea class="form-control" @bind="preguntaEditada.Respuesta"></textarea>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(errorEdicion))
+                                            {
+                                                <div class="alert alert-danger">@errorEdicion</div>
+                                            }
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn-naranja" @onclick="CancelarEdicion">Cancelar</button>
+                                            <button class="btn-naranja" @onclick="GuardarCambiosEdicion">Guardar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (mostrarModalEliminar)
+                        {
+                            <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirmar Eliminación</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>¿Estás seguro de que deseas eliminar la pregunta frecuente?</p>
+                                            <p><strong>@preguntaAEliminar?.Pregunta</strong></p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn-naranja" @onclick="CancelarEliminar">Cancelar</button>
+                                            <button class="btn-naranja" @onclick="EliminarPreguntaConfirmada">Eliminar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (mostrarModalCreacion)
+                        {
+                            <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Nueva Pregunta Frecuente</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Pregunta</label>
+                                                <input class="form-control" @bind="nuevaPregunta.Pregunta" />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Respuesta</label>
+                                                <textarea class="form-control" @bind="nuevaPregunta.Respuesta"></textarea>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(errorCreacion))
+                                            {
+                                                <div class="alert alert-danger">@errorCreacion</div>
+                                            }
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn-naranja" @onclick="CancelarCreacion">Cancelar</button>
+                                            <button class="btn-naranja" @onclick="GuardarNuevaPregunta">Guardar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </AuthorizeView>
+    
+    <AuthorizeView Roles="Encargado">
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab-button @(tabActiva == "reservas" ? "active" : "")" 
+                        @onclick='@(() => CambiarTab("reservas"))'>
+                    Reservas
+                </button>
+                <button class="tab-button @(tabActiva == "propiedades" ? "active" : "")" 
+                        @onclick='@(() => CambiarTab("propiedades"))'>
+                    Propiedades
+                </button>
+            </div>
         </div>
 
         <div class="tab-content">
-            @if (tabActiva == "reservas")
-            {
-                <div class="tab-pane active">
-                    <ListaReservasadm />
-                </div>
-            }
-            else if (tabActiva == "encargados")
-            {
-                <div class="tab-pane active">
-                    <ListaEncargados/>
-                </div>
-            }
-            else if (tabActiva == "propiedades")
-            {
-                <div class="tab-pane active">
-                    <Propiedades />
-                </div>
-            }
-            else if (tabActiva == "promociones")
-            {
-                <div class="tab-pane active">
-                    <ListarPromociones />
-                </div>
-            }
-            else if (tabActiva == "preguntas-frecuentes")
-            {
-                <div class="tab-pane active">
-                        <button class="btn-naranja" @onclick="NuevaPregunta">
-                            <i class="fas fa-plus"></i> Nueva pregunta frecuente
-                        </button>
-                    <div class="preg-frec-table-container">
-                        @if (!string.IsNullOrEmpty(mensajeExito))
-                        {
-                            <div class="preg-frec-success">@mensajeExito</div>
-                        }
-                        <table class="property-table">
-                            <thead>
-                                <tr>
-                                    <th>Pregunta</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var pregunta in preguntas)
-                                {
-                                    <tr>
-                                        <td>@pregunta.Pregunta</td>
-                                        <td class="actions-cell">
-                                            <button class="btn btn-primary" @onclick="() => EditarPregunta(pregunta)">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-danger" @onclick="() => ConfirmarEliminarPregunta(pregunta)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                @if (tabActiva == "reservas")
+                {
+                    <div class="tab-pane active">
+                        <ListaReservasadm />
                     </div>
-                    @if (mostrarModalEdicion)
-                    {
-                        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Editar Pregunta Frecuente</h5>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Pregunta</label>
-                                            <input class="form-control" @bind="preguntaEditada.Pregunta" />
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Respuesta</label>
-                                            <textarea class="form-control" @bind="preguntaEditada.Respuesta"></textarea>
-                                        </div>
-                                        @if (!string.IsNullOrEmpty(errorEdicion))
-                                        {
-                                            <div class="alert alert-danger">@errorEdicion</div>
-                                        }
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn-naranja" @onclick="CancelarEdicion">Cancelar</button>
-                                        <button class="btn-naranja" @onclick="GuardarCambiosEdicion">Guardar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    @if (mostrarModalEliminar)
-                    {
-                        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Confirmar Eliminación</h5>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>¿Estás seguro de que deseas eliminar la pregunta frecuente?</p>
-                                        <p><strong>@preguntaAEliminar?.Pregunta</strong></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn-naranja" @onclick="CancelarEliminar">Cancelar</button>
-                                        <button class="btn-naranja" @onclick="EliminarPreguntaConfirmada">Eliminar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    @if (mostrarModalCreacion)
-                    {
-                        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Nueva Pregunta Frecuente</h5>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Pregunta</label>
-                                            <input class="form-control" @bind="nuevaPregunta.Pregunta" />
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Respuesta</label>
-                                            <textarea class="form-control" @bind="nuevaPregunta.Respuesta"></textarea>
-                                        </div>
-                                        @if (!string.IsNullOrEmpty(errorCreacion))
-                                        {
-                                            <div class="alert alert-danger">@errorCreacion</div>
-                                        }
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn-naranja" @onclick="CancelarCreacion">Cancelar</button>
-                                        <button class="btn-naranja" @onclick="GuardarNuevaPregunta">Guardar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
+                }
+                else if (tabActiva == "propiedades")
+                {
+                    <div class="tab-pane active">
+                        <Propiedades />
+                    </div>
+                }
         </div>
-    </div>
+    </AuthorizeView>
 </div>
 
 @code {
