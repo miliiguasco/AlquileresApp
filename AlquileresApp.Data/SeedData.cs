@@ -175,7 +175,7 @@ namespace AlquileresApp.Data
                     MontoAPagar = 3750,
                     MontoRestante = 0,
                     TipoPago = TipoPago.Total,
-                    CantidadHuespedes = 4
+                    CantidadHuespedes = 4,
                 },
                 new Reserva
                 {

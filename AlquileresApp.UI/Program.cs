@@ -21,7 +21,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using AlquileresApp.Core.CasosDeUso.Promocion;
 
 using AlquileresApp.Core.CasosDeUso.PreguntasFrecuentes;
-using AlquileresApp.Core.CasosDeUso.ContactarAdmin;
+using AlquileresApp.Core.CasosDeUso.ContactarEncargado;
+using AlquileresApp.Core.CasosDeUso.ContactarCliente;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -145,7 +146,8 @@ builder.Services.AddScoped<CasoDeUsoMostrarPreguntasFrecuentes>();
 builder.Services.AddScoped<CasoDeUsoCrearPreguntaFrecuente>();
 builder.Services.AddScoped<CasoDeUsoModificarPreguntaFrecuente>();
 builder.Services.AddScoped<CasoDeUsoEliminarPreguntaFrecuente>();
-builder.Services.AddScoped<CasoDeUsoContactarAdmin>();
+builder.Services.AddScoped<CasoDeUsoContactarEncargado>();
+builder.Services.AddScoped<CasoDeUsoContactarCliente>();
 builder.Services.AddResponseCompression();
 
 var app = builder.Build();

@@ -9,16 +9,27 @@ public class CasoDeUsoContactarCliente(INotificadorEmail notificadorEmail)
     {
         try
         {
+            /*string replyTo;
+
+            if (reserva.FechaInicio < DateTime.Now)
+            {
+                replyTo = "manupedrob@gmail.com"; // mail del administrador
+            }
+            else
+            {
+                replyTo = reserva.Encargado.Email ?? "Sin encargado";
+            }*/
             notificadorEmail.EnviarEmail(
-                reserva.Cliente.Email,
+                reserva.Cliente?.Email ?? "",
                 reserva.Propiedad?.Titulo ?? "Sin título",
                 mensaje,
-                reserva.Cliente?.Email ?? ""
+                "email replyto"
+                //replyTo
             );
         }
         catch (Exception ex)
         {
-            throw new Exception("No se pudo enviar el mensaje al administrador", ex);
+            throw new Exception("No se pudo enviar el mensaje al encargado", ex);
         }
     }
 }

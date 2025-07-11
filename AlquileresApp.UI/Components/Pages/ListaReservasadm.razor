@@ -1,13 +1,13 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.CasosDeUso.Reserva
-@using AlquileresApp.Core.CasosDeUso.ContactarAdmin
+@using AlquileresApp.Core.CasosDeUso.ContactarCliente
 @using AlquileresApp.Core.Enumerativos
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
 @using Microsoft.JSInterop
 
 @inject CasoDeUsoListarReservasAdm CUListarReservasAdm
-@inject CasoDeUsoContactarAdmin CasoDeUsoContactarAdmin
+@inject CasoDeUsoContactarCliente CasoDeUsoContactarCliente
 @inject CasoDeUsoRegistrarCheckout CURegistrarCheckout
 @inject ILogger<ListaReservasadm> Logger
 @inject NavigationManager NavigationManager
@@ -29,7 +29,9 @@
     {
         @if (!string.IsNullOrEmpty(mensajeExito))
         {
-            <div class="alert alert-success">@mensajeExito</div>
+            <div class="alert alert-success mensaje-exito-admin" role="alert">
+                @mensajeExito
+            </div>
         }
         @if (!string.IsNullOrEmpty(mensajeError))
         {
@@ -255,6 +257,7 @@ private string mensajeAEnviar;
     private string mensajeExito_misReservas;
      private string? mensajeCancelacion;
     private bool enviandoMensaje = false;
+private System.Threading.Timer? timerMensajeExito;
 
 private void AbrirFormularioMensaje(Reserva reserva)
 {
@@ -282,11 +285,19 @@ private async Task EnviarMensajeEmail()
 
         await Task.Run(() =>
         {
-            CasoDeUsoContactarAdmin.Ejecutar(reservaSeleccionada, cuerpo);
+            CasoDeUsoContactarCliente.Ejecutar(reservaSeleccionada, cuerpo);
         });
 
-        mensajeExito_misReservas = "Mensaje enviado exitosamente al administrador.";
-        reservaSeleccionada = null;
+        reservaSeleccionada = null; // Cierra el modal
+        mensajeExito = "Mensaje enviado exitosamente al cliente.";
+        StateHasChanged(); // Fuerza refresco de la UI para mostrar el mensaje
+        // Inicia temporizador para ocultar el mensaje de éxito
+        timerMensajeExito?.Dispose();
+        timerMensajeExito = new System.Threading.Timer(_ =>
+        {
+            mensajeExito = null;
+            InvokeAsync(StateHasChanged);
+        }, null, 4000, System.Threading.Timeout.Infinite);
     }
     catch (Exception ex)
     {
@@ -299,3 +310,14 @@ private async Task EnviarMensajeEmail()
 }
 
 }
+<style>
+.mensaje-exito-admin {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto 1.5rem auto;
+    font-size: 1.1rem;
+    text-align: center;
+    animation: fadeIn 0.3s ease-out;
+    z-index: 3000;
+}
+</style>

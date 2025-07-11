@@ -7,7 +7,7 @@
 @using AlquileresApp.Core.Interfaces
 @using AlquileresApp.Core.CasosDeUso.Tarjeta
 @using AlquileresApp.Core.CasosDeUso.Reserva
-@using AlquileresApp.Core.CasosDeUso.ContactarAdmin
+@using AlquileresApp.Core.CasosDeUso.ContactarEncargado
 @using AlquileresApp.UI.Components
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Data
@@ -21,7 +21,7 @@
 @inject CasoDeUsoEliminarTarjeta CUEliminarTarjeta
 @inject CasoDeUsoVisualizarReserva CUVisualizarReserva
 @inject IJSRuntime JS
-@inject CasoDeUsoContactarAdmin CasoDeUsoContactarAdmin
+@inject CasoDeUsoContactarEncargado CasoDeUsoContactarEncargado
 @attribute [Authorize]
 
 <PageTitle>Mi Perfil</PageTitle>
@@ -653,10 +653,10 @@ private async Task EnviarMensajeEmail()
 
         await Task.Run(() =>
         {
-            CasoDeUsoContactarAdmin.Ejecutar(reservaSeleccionada, cuerpo);
+            CasoDeUsoContactarEncargado.Ejecutar(reservaSeleccionada, cuerpo);
         });
 
-        mensajeExito_misReservas = "Mensaje enviado exitosamente al administrador.";
+        mensajeExito_misReservas = "El mensaje fue enviado exitosamente al Encargado. Recibirá una respuesta en su correo electrónico." ;
         reservaSeleccionada = null;
     }
     catch (Exception ex)
