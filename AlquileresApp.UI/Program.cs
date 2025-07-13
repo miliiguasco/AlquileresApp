@@ -115,6 +115,7 @@ builder.Services.AddScoped<ICalificacionRepositorio, CalificacionRepositorio>();
 builder.Services.AddScoped<CasoDeUsoAgregarCalificacion>();
 builder.Services.AddScoped<CasoDeUsoMostrarCalificacion>();
 builder.Services.AddScoped<CasoDeUsoMarcarPropiedadComoNoHabitable>();
+builder.Services.AddScoped<CasoDeUsoModificarContraseña>();
 
 
 builder.Services.AddAuthentication().AddScheme<CustomOptions, ServicioAutorizacion>("CustomAuth", options => { });

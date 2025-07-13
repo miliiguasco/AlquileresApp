@@ -13,5 +13,7 @@ public interface IUsuarioRepositorio
     List<Encargado> ListarEncargados();
     public Usuario? AutenticarUsuario(string correo, String hashedContraseña);
     public bool tieneTarjeta(Usuario usuario);
+
+    public void modificarContraseña(int usuarioId, string nuevaContraseña);
 }
 

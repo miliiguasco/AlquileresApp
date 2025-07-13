@@ -1,0 +1,161 @@
+@using Microsoft.AspNetCore.Components
+@using AlquileresApp.Core.Entidades
+@using AlquileresApp.Core.Interfaces
+@using AlquileresApp.Core.CasosDeUso.Usuario
+@using Microsoft.Extensions.Logging
+
+@inject IServicioHashPassword ServicioHashPassword
+@inject CasoDeUsoModificarContraseña CUModificarContraseña
+
+@if (Mostrar)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modificar Contraseña</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(MensajeError))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @MensajeError
+                        </div>
+                    }
+
+                    <div class="form-group mb-3">
+                        <label for="currentPassword">Contraseña Actual:</label>
+                        <input type="password" class="form-control" id="currentPassword" @bind="ContraseñaActualInput" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="newPassword">Nueva Contraseña:</label>
+                        <input type="password" class="form-control" id="newPassword" @bind="NuevaContraseñaInput" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="confirmNewPassword">Confirmar Nueva Contraseña:</label>
+                        <input type="password" class="form-control" id="confirmNewPassword" @bind="ConfirmarNuevaContraseñaInput" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" @onclick="GuardarContraseña">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool Mostrar { get; set; }
+    
+    [Parameter]
+    public EventCallback<bool> MostrarChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnPasswordChanged { get; set; } 
+
+    [Parameter]
+    public Usuario UsuarioActual { get; set; }
+
+    [Inject]
+    private ILogger<ModalModificarContraseña> Logger { get; set; } 
+
+    private string ContraseñaActualInput { get; set; } = string.Empty;
+    private string NuevaContraseñaInput { get; set; } = string.Empty;
+    private string ConfirmarNuevaContraseñaInput { get; set; } = string.Empty;
+
+    private string MensajeError { get; set; } = string.Empty;
+
+    private async Task CerrarModal()
+    {
+        ContraseñaActualInput = string.Empty;
+        NuevaContraseñaInput = string.Empty;
+        ConfirmarNuevaContraseñaInput = string.Empty;
+        MensajeError = string.Empty;
+
+        // 1. Notifica al componente padre que 'Mostrar' ha cambiado a false.
+        Mostrar = false; // Opcional, pero buena práctica para mantener el estado interno coherente
+        await MostrarChanged.InvokeAsync(Mostrar); 
+
+        // 2. Invoca el evento OnClose que puede tener lógica adicional en el padre (como limpiar el mensaje de éxito).
+        await OnClose.InvokeAsync(); 
+    }
+
+
+    private async Task GuardarContraseña()
+    {
+        MensajeError = string.Empty; // Limpiamos cualquier mensaje de error anterior.
+
+
+        if (UsuarioActual == null)
+        {
+            MensajeError = "Error interno: No se pudo cargar la información del usuario.";
+            Logger.LogError("ModalModificarContraseña: UsuarioActual es nulo al intentar guardar.");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(ContraseñaActualInput))
+        {
+            MensajeError = "Debes ingresar tu contraseña actual.";
+            return;
+        }
+
+        if (string.IsNullOrEmpty(NuevaContraseñaInput))
+        {
+            MensajeError = "La nueva contraseña no puede estar vacía.";
+            return;
+        }
+
+        if (NuevaContraseñaInput.Length < 8)
+        {
+            MensajeError = "La nueva contraseña debe tener al menos 8 caracteres.";
+            return;
+        }
+
+        if (NuevaContraseñaInput != ConfirmarNuevaContraseñaInput)
+        {
+            MensajeError = "La nueva contraseña y la confirmación no coinciden.";
+            return;
+        }
+
+        if (NuevaContraseñaInput == ContraseñaActualInput)
+        {
+            MensajeError = "La nueva contraseña no puede ser igual a la contraseña actual.";
+            return;
+        }
+
+       
+        if (!ServicioHashPassword.VerificarContraseña(ContraseñaActualInput, UsuarioActual.Contraseña))
+        {
+            MensajeError = "La contraseña actual ingresada es incorrecta.";
+            return;
+        }
+
+
+        try
+        {
+            CUModificarContraseña.Ejecutar(UsuarioActual, NuevaContraseñaInput);
+
+            // Si llegamos aquí, la modificación fue exitosa.
+            await OnPasswordChanged.InvokeAsync(NuevaContraseñaInput); // Notifica al componente padre.
+            await CerrarModal(); // Cierra el modal y limpia el formulario.
+        }
+        catch (ArgumentException ex)
+        {
+            // Captura errores de validación específicos del caso de uso.
+            MensajeError = ex.Message;
+            Logger.LogWarning(ex, "Error de validación al modificar contraseña para usuario {UserId}: {Message}", UsuarioActual.Id, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            // Captura cualquier otro error inesperado.
+            MensajeError = $"Error inesperado: {ex.Message}";
+            Logger.LogError(ex, "Error crítico al intentar modificar la contraseña para usuario {UserId}.", UsuarioActual.Id);
+        }
+    }
+}

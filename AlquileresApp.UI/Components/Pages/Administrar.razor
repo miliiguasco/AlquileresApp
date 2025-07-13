@@ -6,13 +6,16 @@
 @using AlquileresApp.Core.CasosDeUso.Reserva
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.Interfaces
+@using Microsoft.AspNetCore.Components.Authorization 
+
+@inject AuthenticationStateProvider AuthenticationStateProvider 
 
 @inject CasoDeUsoListarPropiedades CUListarPropiedades
 @inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
 @inject CasoDeUsoModificarPropiedad CUModificarPropiedad
 @inject IJSRuntime JS
 
-@attribute [Authorize(Roles = "Administrador")] 
+@attribute [Authorize(Roles = "Administrador,Encargado")] 
 
 <PageTitle>Administración</PageTitle>
 
@@ -46,7 +49,7 @@
                     @{
                         Console.WriteLine("🔄 Administrar - Renderizando ListaReservasadm");
                     }
-                    <ListaReservasadm />
+                    <ListaReservasadm isEncargado="@isEncargado"/>
                 </div>
             }
             else if (tabActiva == "encargados")
@@ -70,8 +73,11 @@
     private string tabActiva = "reservas";
     private List<Propiedad>? propiedades;
     
+    private bool isEncargado = false;
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isEncargado = authState.User.IsInRole("Encargado"); 
         await CargarPropiedades();
     }
 

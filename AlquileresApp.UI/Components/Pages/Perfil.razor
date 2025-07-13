@@ -7,6 +7,7 @@
 @using AlquileresApp.Core.Interfaces
 @using AlquileresApp.Core.CasosDeUso.Tarjeta
 @using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.CasosDeUso.Usuario
 @using AlquileresApp.UI.Components
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Data
@@ -74,6 +75,9 @@
                         }   
                         <button type="button" class="btn-otro" @onclick="IniciarEdicion">
                             <i class="fas fa-edit"></i> Editar Perfil
+                        </button>
+                        <button type="button" class="btn-otro" @onclick="MostrarModalModificarContraseña">
+                            <i class="fas fa-key"></i> Modificar Contraseña
                         </button>
                     </div>
                 }
@@ -143,6 +147,9 @@
                                         }   
                                         <button type="button" class="btn-otro" @onclick="IniciarEdicion">
                                             <i class="fas fa-edit"></i> Editar Perfil
+                                        </button>
+                                        <button type="button" class="btn-otro" @onclick="MostrarModalModificarContraseña">
+                                            <i class="fas fa-key"></i> Modificar Contraseña
                                         </button>
                                     </div>
                                 }
@@ -278,6 +285,10 @@
     }
 </div>
 
+<ModalModificarContraseña @bind-Mostrar="mostrarModalContraseña"
+                          OnClose="CerrarModalModificarContraseña"
+                          OnPasswordChanged="ManejarCambioContraseña"
+                          UsuarioActual="usuario" />
 
 @code {
 
@@ -300,7 +311,8 @@
     private string mensajeError ;
     private string mensajeExito_misReservas;
 
-
+    private bool mostrarModalContraseña = false;
+    private string MensajeExitoContraseña = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -312,14 +324,14 @@
 
             if (user.Identity?.IsAuthenticated != true)
             {
-                NavigationManager.NavigateTo("/login");
+                NavigationManager.NavigateTo("/login", forceLoad: true);
                 return;
             }
 
             var userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(userEmail))
             {
-                NavigationManager.NavigateTo("/login");
+                NavigationManager.NavigateTo("/login",forceLoad: true);
                 return;
             }
 
@@ -333,7 +345,7 @@
             // Si se proporcionó un userId en la URL, verificar que coincida con el usuario actual
             if (userId.HasValue && userId.Value != usuario.Id)
             {
-                NavigationManager.NavigateTo($"/Perfil/{usuario.Id}");
+                NavigationManager.NavigateTo($"/Perfil/{usuario.Id}", forceLoad: true);
                 return;
             }
 
@@ -400,6 +412,31 @@
         {
             _error = $"Error al actualizar el perfil: {ex.Message}";
         }
+    }
+
+    private void MostrarModalModificarContraseña()
+    {
+        if (usuario == null)
+        {
+            _error = "No se pudo cargar la información del usuario para modificar la contraseña.";
+            Logger.LogError("Perfil: Usuario es nulo al intentar mostrar el modal de contraseña.");
+            return;
+        }
+        MensajeExitoContraseña = string.Empty;
+        mostrarModalContraseña = true;
+        StateHasChanged(); 
+    }
+
+    private void CerrarModalModificarContraseña()
+    {
+        mostrarModalContraseña = false;
+        StateHasChanged(); 
+    }
+
+    private void ManejarCambioContraseña(string nuevaContraseña)
+    {
+        MensajeExitoContraseña = "¡Contraseña modificada con éxito!";
+        CerrarModalModificarContraseña(); 
     }
     private  async Task CargarTarjeta(){
         var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
@@ -483,31 +520,31 @@
         };
     }
     private  async Task CargarmisReservas()
-{
-    var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
-    var user = authState.User;
-
-    if (user.Identity != null && user.Identity.IsAuthenticated)
     {
-        var userId = user.FindFirst(c => c.Type == "sub")?.Value 
-                  ?? user.FindFirst(c => c.Type == "userid")?.Value 
-                  ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-        if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int id))
+        if (user.Identity != null && user.Identity.IsAuthenticated)
         {
-            reservas = casoDeUsoListarMisReservas.Ejecutar(id);
+            var userId = user.FindFirst(c => c.Type == "sub")?.Value 
+                    ?? user.FindFirst(c => c.Type == "userid")?.Value 
+                    ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int id))
+            {
+                reservas = casoDeUsoListarMisReservas.Ejecutar(id);
+            }
+            else
+            {
+                mensajeError = "No se pudo obtener el ID del usuario.";
+            }
         }
         else
         {
-            mensajeError = "No se pudo obtener el ID del usuario.";
+            mensajeError = "Usuario no autenticado.";
         }
+        
     }
-    else
-    {
-        mensajeError = "Usuario no autenticado.";
-    }
-    
-}
 
     private string GetBadgeColor(EstadoReserva estado)
     {
@@ -534,48 +571,48 @@
     }
 
     private void ConfirmarCancelacion()
-{
-    try
     {
-        var resultado = casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
-
-        if (resultado.EsExitosa)
+        try
         {
-            mensajeExito_misReservas = resultado.Mensaje;
+            var resultado = casoDeUsoCancelarReserva.Ejecutar(reservaAEliminarId);
 
-            if (resultado.MontoReembolsado.HasValue)
+            if (resultado.EsExitosa)
             {
-                mensajeExito_misReservas += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
-            }
+                mensajeExito_misReservas = resultado.Mensaje;
 
-            CargarmisReservas();
+                if (resultado.MontoReembolsado.HasValue)
+                {
+                    mensajeExito_misReservas += $" Monto reembolsado: ${resultado.MontoReembolsado.Value:N2}.";
+                }
+
+                CargarmisReservas();
+            }
+            else
+            {
+                mensajeError = resultado.Mensaje;
+            }
         }
-        else
+        catch (Exception ex)
         {
-            mensajeError = resultado.Mensaje;
+            mensajeError = $"Ocurrió un error inesperado: {ex.Message}";
+        }
+        finally
+        {
+            mostrarConfirmacion = false;
         }
     }
-    catch (Exception ex)
-    {
-        mensajeError = $"Ocurrió un error inesperado: {ex.Message}";
-    }
-    finally
-    {
-        mostrarConfirmacion = false;
-    }
-}
 
 
     private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
-{
-    return politica switch
     {
-        PoliticasDeCancelacion.Anticipo20_72hs => "Se puede cancelar con 72 horas de anticipación. Se reembolsa el 20%.",
-        PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No se puede cancelar.",
-        PoliticasDeCancelacion.PagoTotal_48hs_50 => "Se puede cancelar con 48 horas de anticipación. Se reembolsa el 50%.",
-        _ => "Política desconocida"
-    };
-}
+        return politica switch
+        {
+            PoliticasDeCancelacion.Anticipo20_72hs => "Se puede cancelar con 72 horas de anticipación. Se reembolsa el 20%.",
+            PoliticasDeCancelacion.SinAnticipo_NoCancelable => "No se puede cancelar.",
+            PoliticasDeCancelacion.PagoTotal_48hs_50 => "Se puede cancelar con 48 horas de anticipación. Se reembolsa el 50%.",
+            _ => "Política desconocida"
+        };
+    }
 
     private void CancelarConfirmacion()
     {

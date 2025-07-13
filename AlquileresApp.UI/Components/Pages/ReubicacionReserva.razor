@@ -1,7 +1,6 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using Microsoft.AspNetCore.Components
-¡
 @using System.Collections.Generic
 
 <div class="modal @(IsVisible ? "show d-block" : "")" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
@@ -14,8 +13,8 @@
             <div class="modal-body">
                 @if (ReservaAfectada != null)
                 {
-                    <p>La ReservaAfectada.Propiedad.Titulo se ha marcado como no habitable.</p>
-                    <p>La ReservaAfectada.Propiedad.Titulo (del @ReservaAfectada.FechaInicio.ToShortDateString() al @ReservaAfectada.FechaFin.ToShortDateString()) para el cliente **@ReservaAfectada.Cliente.Nombre @ReservaAfectada.Cliente.Apellido** necesita ser reubicada.</p>
+                    <p>La @ReservaAfectada.Propiedad.Titulo se ha marcado como no habitable.</p>
+                    <p>La @ReservaAfectada.Propiedad.Titulo (del @ReservaAfectada.FechaInicio.ToShortDateString() al @ReservaAfectada.FechaFin.ToShortDateString()) para el cliente **@ReservaAfectada.Cliente.Nombre @ReservaAfectada.Cliente.Apellido** necesita ser reubicada.</p>
 
                     @if (AlternativasDisponibles != null && AlternativasDisponibles.Any())
                     {
@@ -88,8 +87,6 @@
 
     private void ConfirmarInhabilitacionSinReubicacion()
     {
-        // Esto se invoca cuando el usuario decide marcar la propiedad como no habitable
-        // A PESAR de que no se encontró una alternativa para la reserva.
         OnConfirmarInhabilitacionSinReubicacion.InvokeAsync();
         IsVisible = false; // Ocultar el modal
     }

@@ -10,7 +10,9 @@ public class CasoDeUsoListarPropiedadesFiltrado(IPropiedadRepositorio propiedade
 
         var propiedades = propiedadesRepositorio.ListarPropiedadesFiltrado(filtros);
 
-        Console.WriteLine($"✅ Se encontraron {propiedades.Count} propiedades con filtros aplicados");
-        return propiedades;
+        var propiedadesHabilitadas = propiedades.Where(p => p.NoHabitable != true).ToList();
+
+        Console.WriteLine($"✅ Se encontraron {propiedadesHabilitadas} propiedades con filtros aplicados");
+        return propiedadesHabilitadas;
     }
 }
