@@ -60,8 +60,13 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
 
     public Usuario? ObtenerUsuarioPorEmail(string email)
     {
-        return dbContext.Usuarios
-            .SingleOrDefault(u => u.Email == email);
+        var usuario = dbContext.Usuarios
+        .SingleOrDefault(u => u.Email == email);
+
+        if (usuario == null)
+            throw new Exception("El correo no se encuentra registrado");
+
+        return usuario;
     }
 
     private void verificarCorreoExistente(String correo)
@@ -85,6 +90,12 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
         if (usuarioExistente == null)
             throw new Exception("Usuario no encontrado");
         dbContext.Usuarios.Remove(usuarioExistente);
+        dbContext.SaveChanges();
+    }
+
+    public void modificarContraseña(Usuario usuario, string nuevaContraseña)
+    {
+        usuario.Contraseña = nuevaContraseña;
         dbContext.SaveChanges();
     }
 }

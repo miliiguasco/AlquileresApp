@@ -146,6 +146,10 @@ builder.Services.AddScoped<CasoDeUsoCrearPreguntaFrecuente>();
 builder.Services.AddScoped<CasoDeUsoModificarPreguntaFrecuente>();
 builder.Services.AddScoped<CasoDeUsoEliminarPreguntaFrecuente>();
 builder.Services.AddScoped<CasoDeUsoContactarAdmin>();
+builder.Services.AddScoped<CasoDeUsoSolicitarRecuperacion>();
+builder.Services.AddScoped<ITokenRecuperacionRepositorio, TokenRecuperacionRepositorio>();
+builder.Services.AddScoped<CasoDeUsoRestablecerContraseña>();
+builder.Services.AddHttpClient();
 builder.Services.AddResponseCompression();
 
 var app = builder.Build();

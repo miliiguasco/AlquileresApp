@@ -1,0 +1,64 @@
+﻿@page "/recuperar"
+@using System.ComponentModel.DataAnnotations;
+@using AlquileresApp.Core.CasosDeUso.Usuario;
+@inject CasoDeUsoSolicitarRecuperacion CUSolicitarRecuperacion; 
+<h3 class="registro-title">Recuperar contraseña</h3>
+@if (!enviado)
+{
+    <div class="registro-container">
+        <EditForm Model="model" OnValidSubmit="HandleSubmit" class="registro-form">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="input-container">
+                <label for="email">Correo electrónico</label>
+                <InputText id="email" class="mi-input" @bind-Value="model.Email" oninput="@OnEmailChanged"/>
+                <ValidationMessage For="@(() => model.Email)" />
+            </div>
+            <Error Mensaje="@error"></Error>
+            <button type="submit" class="registro-button">
+                Enviar enlace
+            </button>
+        </EditForm>
+    </div>
+} 
+else 
+{
+    <div class="registro-container">
+        <span>Hemos enviado un link de recuperación al email ingresado.</span> 
+        <span>Por favor revisa tu casilla de correo.</span>
+    </div>
+}
+
+@code {
+    private ResetPasswordRequest model = new();
+    private Boolean enviado = false; 
+    private String error = "";
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            CUSolicitarRecuperacion.Ejecutar(model.Email);
+            enviado = true; 
+            StateHasChanged(); 
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message; 
+            StateHasChanged(); 
+        }
+
+    }
+    private void OnEmailChanged(ChangeEventArgs e)
+    {
+        model.Email = e.Value?.ToString() ?? "";
+        error = "";
+    }
+
+    public class ResetPasswordRequest
+    {
+        [Required(ErrorMessage = "El correo es obligatorio.")]
+        [EmailAddress(ErrorMessage = "El correo no es válido.")]
+        public string Email { get; set; } = string.Empty;
+    }
+}

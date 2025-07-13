@@ -4,7 +4,6 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    width: 100%;
 }
 
 .registro-title {
@@ -12,7 +11,8 @@
     color: #1F3F48;
     text-align: center;
     font-weight: 500;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    margin-top: 2rem;
 }
 
 .registro-form {
@@ -25,7 +25,6 @@
 }
 
 .registro-form section {
-    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;

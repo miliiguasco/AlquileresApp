@@ -33,6 +33,8 @@ namespace AlquileresApp.Data
         public DbSet<Calificacion> Calificaciones { get; set; }
         public DbSet<Promocion> Promociones { get; set; }
         public DbSet<PreguntaFrecuente> PreguntasFrecuentes { get; set; }
+        public DbSet<TokenRecuperacion> TokensRecuperacion { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

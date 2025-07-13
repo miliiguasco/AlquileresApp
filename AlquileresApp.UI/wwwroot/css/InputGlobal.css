@@ -25,3 +25,18 @@ textarea.mi-input.mi-text-input:focus {
 .input-container label {
     margin-bottom: 0.1rem;
 }
+
+.registro-button {
+    background-color: #1F3F48 !important;
+    border-color: #1F3F48 !important;
+    color: white;
+    width: 100%;
+    padding: 0.75rem !important;
+    margin-top: 1rem; 
+}
+
+.registro-button:hover {
+    background-color: #244e5a !important;
+    border-color: #1F3F48 !important;
+    color: white;
+} 

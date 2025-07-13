@@ -139,4 +139,48 @@ public class NotificadorEmail: INotificadorEmail
         </html>";
         EnviarEmail(destinatario, asunto, cuerpo);
     }
+
+    public void EnviarLinkRecuperacion(string destinatario, string nombreUsuario, string link)
+    {
+        string asunto = "Recuperá tu contraseña";
+        string cuerpo = @$"
+        <!DOCTYPE html>
+        <html lang='es'>
+        <head><meta charset='UTF-8'></head>
+        <body style='margin:0; padding:0; background-color:#fafafa;'>
+            <table width='100%' cellpadding='0' cellspacing='0' border='0' style='font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;'>
+                <tr><td align='center'>
+                    <table width='600' cellpadding='0' cellspacing='0' border='0' style='box-shadow: 0 4px 10px rgba(31, 63, 72, 0.2);'>
+
+                        <!-- Encabezado -->
+                        <tr>
+                            <td style='background-color:#1F3F48; padding:20px; text-align:center; color:#F0F0E1;'>
+                                <h1 style='margin:0; font-size:24px;'>Hola, {nombreUsuario}</h1>
+                            </td>
+                        </tr>
+
+                        <!-- Contenido -->
+                        <tr>
+                            <td style='padding:20px; text-align:center; color:#000000;'>
+                                <p>Solicitaste restablecer tu contraseña.</p>
+                                <p>Hacé clic en el siguiente botón para crear una nueva:</p>
+                                <a href='{link}' style='background-color:#f1771f; color:white; padding:12px 24px; text-decoration:none; border-radius:5px;'>Restablecer contraseña</a>
+                                <p style='margin-top:20px;'>Si no pediste este cambio, ignorá este mensaje.</p>
+                            </td>
+                        </tr>
+
+                        <!-- Footer -->
+                        <tr>
+                            <td style='background-color:#f1771f; color:#F0F0E1; text-align:center; padding:14px; font-size:14px;'>
+                                <p style='margin:0;'>¿Necesitás ayuda? Contactanos en cualquier momento.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td></tr>
+            </table>
+        </body>
+        </html>";
+
+        EnviarEmail(destinatario, asunto, cuerpo);
+    }
 }   

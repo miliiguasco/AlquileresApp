@@ -1,0 +1,117 @@
+﻿@page "/reset-password"
+@using AlquileresApp.Core.CasosDeUso.Usuario
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject CasoDeUsoRestablecerContraseña CURestablecerContraseña
+@inject NavigationManager NavigationManager
+
+<h2 class="registro-title">Restablecer contraseña</h2>
+
+<div class="registro-container">
+    <EditForm EditContext="editContext" OnValidSubmit="HandleSubmit" class="registro-form">
+        <DataAnnotationsValidator />
+        <section>
+            <div class="input-container">
+                <label for="newPassword">Nueva contraseña</label>
+                <InputText type="password" id="newPassword" class="mi-input"
+                @bind-Value="resetModel.NewPassword"
+                @oninput="() => LimpiarErrores()" />
+                <ValidationMessage For="@(() => resetModel.NewPassword)" />
+            </div>
+
+            <div class="input-container" style="margin-top: 1rem;">
+                <label for="confirmPassword">Confirmar contraseña</label>
+                <InputText type="password" id="confirmPassword" class="mi-input"
+                @bind-Value="resetModel.ConfirmPassword"
+                @oninput="() => LimpiarErrores()" />
+                <ValidationMessage For="@(() => resetModel.ConfirmPassword)" />
+            </div>
+
+            <button type="submit" class="registro-button">Guardar nueva contraseña</button>
+        </section>
+
+    </EditForm>
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="@ClaseMensaje">
+            @mensaje
+        </div>
+        @if (esExito)
+        {
+            <span>Serás redirigido en un momento...</span>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "token")]
+    public string? Token { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "email")]
+    public string? Email { get; set; }
+
+    private ResetPasswordModel resetModel = new();
+    private string mensaje = "";
+    private string ClaseMensaje = "";
+    private bool esExito = false; 
+    private EditContext editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(resetModel);
+    }
+
+    // Ejemplo en HandleSubmit()
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            await CURestablecerContraseña.Ejecutar(Email!, Token!, resetModel.NewPassword);
+            esExito = true; 
+            mensaje = "¡Tu contraseña fue restablecida correctamente!";
+            ClaseMensaje = "mensaje-exito";
+            await redirigir(); 
+        }
+        catch (Exception ex)
+        {
+            mensaje = ex.Message;
+            ClaseMensaje = "mensaje-error";
+        }
+    }
+
+    private void LimpiarErrores()
+    {
+        mensaje = "";
+        ClaseMensaje = "";
+    }
+
+    private void IrAlLogin()
+    {
+        Navigation.NavigateTo("/Login");
+    }
+
+    private async Task redirigir() 
+    {
+        await Task.Delay(2500);
+        mensaje = ""; 
+        ClaseMensaje = ""; 
+        esExito = false; 
+        NavigationManager.NavigateTo("/Login");
+    }
+
+
+    public class ResetPasswordModel
+    {
+        [Required(ErrorMessage = "La nueva contraseña es obligatoria.")]
+        [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
+        public string NewPassword { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Debes confirmar la contraseña.")]
+        [Compare("NewPassword", ErrorMessage = "Las contraseñas no coinciden.")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+}
