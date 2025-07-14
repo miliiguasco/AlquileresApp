@@ -78,9 +78,8 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
             throw new Exception("El email ya se encuentra registrado");
         }
     }
-     public bool tieneTarjeta(Usuario cliente)
+    public bool tieneTarjeta(Usuario cliente)
     {
-
         return dbContext.Tarjetas.Any(t => t.ClienteId == cliente.Id);
     }
 
@@ -92,10 +91,17 @@ public class UsuarioRepositorio(AppDbContext dbContext) : IUsuarioRepositorio
         dbContext.Usuarios.Remove(usuarioExistente);
         dbContext.SaveChanges();
     }
-
-    public void modificarContraseña(Usuario usuario, string nuevaContraseña)
+    public void modificarContraseña(int usuarioId, string nuevaContraseña)
     {
-        usuario.Contraseña = nuevaContraseña;
-        dbContext.SaveChanges();
+        var usuario = dbContext.Usuarios.Find(usuarioId); 
+
+    if (usuario == null)
+    {
+        throw new InvalidOperationException($"Usuario con ID {usuarioId} no encontrado.");
     }
+
+    usuario.Contraseña = nuevaContraseña; 
+    dbContext.SaveChanges();
+}
+
 }

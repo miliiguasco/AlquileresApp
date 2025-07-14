@@ -64,17 +64,20 @@
                             <td>
                                 <span class="badge @GetEstadoClass(reserva.Estado)">
                                     @reserva.Estado
-                                </span>
+                                </span> 
                             </td>
                             <td>@reserva.PrecioTotal.ToString("C")</td>
                             <td>@reserva.MontoRestante.ToString("C")</td>
                             <td class="actions-cell">
-                                    <button class="btn btn-success" title="Registrar checkout" @onclick="() => RegistrarCheckout(reserva)">
-                                        <i class="fas fa-check"></i>
-                                    </button>
                                 <button class="btn btn-otro" @onclick="() => AbrirFormularioMensaje(reserva)">
                                   <i class="bi bi-envelope"></i> Enviar mensaje sobre esta reserva
                                 </button>
+                                @if (isEncargado && reserva.Estado == EstadoReserva.Activa)
+                                {
+                                    <button class="btn btn-success" @onclick="() => RegistrarCheckout(reserva)">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                }
                                 @if (reserva.Estado == EstadoReserva.Pendiente)
                                 {
                                     <button class="btn btn-danger" title="Cancelar" @onclick="() => CancelarReserva(reserva)">
@@ -144,10 +147,12 @@
     private bool mostrarConfirmacion = false;
     private Reserva reservaACancelar;
 
-
+    [Parameter]
+    public bool isEncargado { get; set; } 
     protected override async Task OnInitializedAsync()
     {
         Console.WriteLine("🚀 ListaReservasadm - OnInitializedAsync");
+        
         await CargarReservas();
     }
 

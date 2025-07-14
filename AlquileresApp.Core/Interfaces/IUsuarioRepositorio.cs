@@ -13,6 +13,6 @@ public interface IUsuarioRepositorio
     Usuario? AutenticarUsuario(string correo, String hashedContraseña);
     bool tieneTarjeta(Usuario usuario);
     void EliminarEncargado(int id);
-    public void modificarContraseña(Usuario usuario, string nuevaContraseña);
+    public void modificarContraseña(int usuarioId, string nuevaContraseña);
 }
 

@@ -48,13 +48,13 @@ namespace AlquileresApp.Data
                     Contraseña = hashService.HashPassword("password456"),
                     FechaNacimiento = new DateTime(1985, 5, 15),
                 },
-                /* new Encargado
+                new Encargado
                 {
                     Nombre = "Pablo",
                     Apellido = "Gomez",
                     Email = "pablogomez@test.com",
                     Contraseña = hashService.HashPassword("Encargado1"),
-                } */
+                }
             };
             context.Usuarios.AddRange(usuarios);
             context.SaveChanges();
@@ -62,7 +62,7 @@ namespace AlquileresApp.Data
             // Crear propiedades de prueba
             var propiedades = new List<Propiedad>
             {
-                new Propiedad
+                /* new Propiedad
                 {
                     Titulo = "Casa en la playa",
                     Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
@@ -96,7 +96,7 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.Estacionamiento
                     },
                     PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50,
-                    TipoPago = TipoPago.Total
+                    TipoPago = TipoPago.Total,
                 },
                 new Propiedad
                 {
@@ -131,7 +131,7 @@ namespace AlquileresApp.Data
                     },
                     PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable
                     , TipoPago = TipoPago.SinAnticipo
-                },
+                }, */
                 new Propiedad
                 {
                     Titulo = "Casa de campo",
@@ -148,20 +148,21 @@ namespace AlquileresApp.Data
                         ServiciosPropiedad.AireAcondicionado
                     },
                     PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs,
-                    TipoPago = TipoPago.Parcial
+                    TipoPago = TipoPago.Parcial,
+                    Encargado = (Encargado)usuarios[3]
                 }
 
             };
-            propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa1.jpg" });
+            /* propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa1.jpg" });
             propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta1.jpg" });
 
             propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
-            propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta2.jpg" });
+            propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta2.jpg" }); */
 
-             context.Propiedades.AddRange(propiedades);
+            context.Propiedades.AddRange(propiedades);
             context.SaveChanges();
 
-            // Crear reservas de prueba
+           /*  // Crear reservas de prueba
             var reservas = new List<Reserva>
             {
                 new Reserva
@@ -222,7 +223,7 @@ namespace AlquileresApp.Data
                 new Tarjeta
                 {
                     NumeroTarjeta = "1234567890123456",
-                    Titular = "Maria Garcia", 
+                    Titular = "Maria Garcia",
                     FechaVencimiento = "12/25",
                     CVV = "123",
                     Saldo = 99999999999999m,
@@ -237,12 +238,12 @@ namespace AlquileresApp.Data
                     CVV = "456",
                     Saldo = 5000.00m,
                     ClienteId = usuarios[1].Id
-                } 
+                 }
             };
             context.Tarjetas.AddRange(tarjetas);
             context.SaveChanges();
-            
-            
-        }
+        */  
+
+        } 
     }
 }

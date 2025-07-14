@@ -14,4 +14,11 @@ public class ServicioHashPassword : IServicioHashPassword
             return Convert.ToBase64String(bytes);
         }
     }
+
+    public bool VerificarContraseña(string contraseñaIngresada, string contraseñaHasheada)
+    {
+        string hashedRawPassword = HashPassword(contraseñaIngresada);
+
+        return hashedRawPassword == contraseñaHasheada;
+    }
 }

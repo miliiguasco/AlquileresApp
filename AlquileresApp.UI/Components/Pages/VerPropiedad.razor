@@ -36,10 +36,12 @@
                 <button class="btn btn-secondary" @onclick="VolverAtras">
                     <i class="fas fa-arrow-left"></i> Volver
                 </button>
+                @if (propiedad.CalificacionPromedio > 0){
                 <span class="fs-4 fw-semibold text-warning">
                     <i class="fas fa-star"></i>
-                    @($"{propiedad.CalificacionPromedio:0.0}")
+                        @($"{propiedad.CalificacionPromedio:0.0}")
                 </span>
+                }
             </div>  
 
         <h2 class="tituloo">@propiedad.Titulo</h2>

@@ -21,7 +21,7 @@ public class CasoDeUsoRestablecerContraseña (IUsuarioRepositorio usuarioReposit
             }
 
             var hashContraseña = hashPassword.HashPassword(nuevaContraseña); 
-            usuarioRepositorio.modificarContraseña(usuario, hashContraseña);
+            usuarioRepositorio.modificarContraseña(usuario.Id, hashContraseña);
 
             tokenRecuperacionRepositorio.Eliminar(tokenRecuperacion);
         }

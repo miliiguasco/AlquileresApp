@@ -10,6 +10,9 @@
 @using AlquileresApp.Core.Interfaces
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization 
+
+@inject AuthenticationStateProvider AuthenticationStateProvider 
 
 @inject CasoDeUsoListarPropiedades CUListarPropiedades
 @inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
@@ -252,8 +255,11 @@
     private string errorCreacion;
     private string mensajeExito;
     
+    private bool isEncargado = false;
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isEncargado = authState.User.IsInRole("Encargado"); 
         await CargarPropiedades();
         preguntas = CUListarPreguntasFrecuentes.Ejecutar();
     }

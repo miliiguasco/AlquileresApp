@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlquileresApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250711201600_RemoveEncargadoIdFromReservas")]
-    partial class RemoveEncargadoIdFromReservas
+    [Migration("20250714224338_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -218,6 +218,8 @@ namespace AlquileresApp.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EncargadoId");
+
                     b.ToTable("Propiedades");
                 });
 
@@ -305,6 +307,31 @@ namespace AlquileresApp.Data.Migrations
                     b.HasIndex("ClienteId");
 
                     b.ToTable("Tarjetas");
+                });
+
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.TokenRecuperacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaExpiracion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TokensRecuperacion");
                 });
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Usuario", b =>
@@ -432,6 +459,17 @@ namespace AlquileresApp.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Propiedad");
+                });
+
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Propiedad", b =>
+                {
+                    b.HasOne("AlquileresApp.Core.Entidades.Encargado", "Encargado")
+                        .WithMany()
+                        .HasForeignKey("EncargadoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Encargado");
                 });
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Reserva", b =>
