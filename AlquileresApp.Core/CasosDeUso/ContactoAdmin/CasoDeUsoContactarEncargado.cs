@@ -9,7 +9,7 @@ public class CasoDeUsoContactarEncargado(INotificadorEmail notificadorEmail)
     {
         try
         {
-            /*
+            
             string responsable;
 
             if (reserva.FechaInicio < DateTime.Now)
@@ -18,11 +18,10 @@ public class CasoDeUsoContactarEncargado(INotificadorEmail notificadorEmail)
             }
             else
             {
-                responsable = reserva.Encargado.Email ?? "Sin encargado";
-            }*/
+                responsable = reserva.Propiedad.Encargado.Email ?? "Sin encargado";
+            }
             notificadorEmail.EnviarEmail(
-                "destinatario",
-                //responsable,
+                responsable,
                 reserva.Propiedad?.Titulo ?? "Sin título",
                 mensaje,
                 reserva.Cliente?.Email ?? "Sin email"

@@ -9,7 +9,7 @@ public class CasoDeUsoContactarCliente(INotificadorEmail notificadorEmail)
     {
         try
         {
-            /*string replyTo;
+            string replyTo;
 
             if (reserva.FechaInicio < DateTime.Now)
             {
@@ -17,19 +17,18 @@ public class CasoDeUsoContactarCliente(INotificadorEmail notificadorEmail)
             }
             else
             {
-                replyTo = reserva.Encargado.Email ?? "Sin encargado";
-            }*/
+                replyTo = reserva.Propiedad.Encargado.Email ?? "Sin encargado";
+            }
             notificadorEmail.EnviarEmail(
                 reserva.Cliente?.Email ?? "",
                 reserva.Propiedad?.Titulo ?? "Sin título",
                 mensaje,
-                "email replyto"
-                //replyTo
+                replyTo
             );
         }
         catch (Exception ex)
         {
-            throw new Exception("No se pudo enviar el mensaje al encargado", ex);
+            throw new Exception("No se pudo enviar el mensaje al cliente", ex);
         }
     }
 }
