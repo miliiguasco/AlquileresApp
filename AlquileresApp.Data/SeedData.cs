@@ -208,7 +208,7 @@ namespace AlquileresApp.Data
                 new Tarjeta
                 {
                     NumeroTarjeta = "1234567890123456",
-                    Titular = "Maria Garcia", 
+                    Titular = "Maria Garcia",
                     FechaVencimiento = "12/25",
                     CVV = "123",
                     Saldo = 0m,
@@ -223,12 +223,12 @@ namespace AlquileresApp.Data
                     CVV = "456",
                     Saldo = 5000.00m,
                     ClienteId = usuarios[1].Id
-                } 
+                 }
             };
             context.Tarjetas.AddRange(tarjetas);
             context.SaveChanges();
             
-            
+
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AlquileresApp.Core.Enumerativos;
 
-public class CasoDeUsoMarcarPropiedadComoNoHabitable(IPropiedadRepositorio propiedadesRepositorio, IReservaRepositorio reservasRepositorio)
+public class CasoDeUsoMarcarPropiedadComoNoHabitable(IPropiedadRepositorio propiedadesRepositorio, IReservaRepositorio reservasRepositorio, INotificadorEmail notificadorEmail)
 {
     public Dictionary<Reserva, List<Propiedad>> IdentificarReservasYAlternativas(Propiedad propiedad)
     {
@@ -47,7 +47,7 @@ public class CasoDeUsoMarcarPropiedadComoNoHabitable(IPropiedadRepositorio propi
 
     public void ActualizarEstadoNoHabitable(Propiedad propiedad)
     {
-        propiedadesRepositorio.MarcarPropiedadComoNoHabitable(propiedad); // Este método ahora se llama aquí
+        propiedadesRepositorio.MarcarPropiedadComoNoHabitable(propiedad);
     }
     
     public void ReasignarReserva(Reserva reserva, Propiedad nuevaPropiedad)

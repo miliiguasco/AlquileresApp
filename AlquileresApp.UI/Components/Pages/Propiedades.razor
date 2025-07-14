@@ -1,6 +1,7 @@
 @using AlquileresApp.Core.Entidades
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
+@using AlquileresApp.Core.Interfaces
 @using Microsoft.AspNetCore.Components
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
@@ -12,6 +13,7 @@
 @inject CasoDeUsoMarcarPropiedadComoNoHabitable CUMarcarPropiedadComoNoHabitable
 @inject ILogger<Propiedades> Logger
 @inject NavigationManager NavigationManager
+@inject INotificadorEmail NotificadorEmail
 
 <div class="admin-section">
 
@@ -204,6 +206,13 @@
         {
             CUMarcarPropiedadComoNoHabitable.ReasignarReserva(reservaActualParaModal, propiedadSeleccionada);
 
+            NotificadorEmail.EnviarCorreoModificacionReservaPorNoHabitable(
+                reservaActualParaModal.Cliente?.Email ?? "", 
+                reservaActualParaModal.Cliente?.Nombre ?? "", 
+                propiedadQueSeEstaEvaluando.Titulo, 
+                propiedadSeleccionada.Titulo
+            );
+
             propiedadQueSeEstaEvaluando.NoHabitable = !propiedadQueSeEstaEvaluando.NoHabitable;
             CUMarcarPropiedadComoNoHabitable.ActualizarEstadoNoHabitable(propiedadQueSeEstaEvaluando);
 
@@ -217,13 +226,11 @@
             mensajeError = $"Error al reasignar la reserva: {ex.Message}";
             mensajeExito = string.Empty;
         }
-        mostrarModalReubicacion = false; // Ocultar el modal
+        mostrarModalReubicacion = false; 
     }
 
     private async Task HandleCerrarModal()
     {
-        // El usuario cerró el modal o no seleccionó una alternativa.
-        // La reserva queda sin reubicar.
         mensajeError = "La reubicación de la reserva fue cancelada o no se seleccionó una alternativa. La reserva original permanece sin reasignar y la propiedad mantiene su estado.";
         mensajeExito = string.Empty;
         mostrarModalReubicacion = false;
@@ -236,16 +243,22 @@
         CUMarcarPropiedadComoNoHabitable.ActualizarEstadoNoHabitable(propiedadQueSeEstaEvaluando);
         if (reservaActualParaModal != null)
                 {
-                    // Llamamos al nuevo método específico para cancelaciones por inhabitabilidad
-                    // Este método NO envía email y NO aplica reembolsos.
-                    var resultadoCancelacion = CUCancelarReserva.EjecutarParaInhabitabilidad(reservaActualParaModal.Id); 
                     
-                    // Actualiza el mensaje de éxito para reflejar la cancelación sin reembolso
-                    mensajeExito = $"La propiedad '{propiedadQueSeEstaEvaluando.Titulo}' ha sido marcada como no habitable, y las reseras han sido canceladas.";
+                    var resultadoCancelacion = CUCancelarReserva.EjecutarParaInhabitabilidad(reservaActualParaModal.Id); 
+
+                    NotificadorEmail.EnviarCorreoModificacionReservaPorNoHabitable(
+                        reservaActualParaModal.Cliente?.Email ?? "", 
+                        reservaActualParaModal.Cliente?.Nombre ?? "", 
+                        propiedadQueSeEstaEvaluando.Titulo, 
+                        null
+                    );
+                    
+
+                    mensajeExito = $"La propiedad '{propiedadQueSeEstaEvaluando.Titulo}' ha sido marcada como no habitable, y las reservas han sido canceladas.";
                 }
                 else 
                 {
-                    // Si no había una reserva actual en el modal, solo informa que la propiedad fue marcada como no habitable.
+                    
                     mensajeExito = $"La propiedad '{propiedadQueSeEstaEvaluando.Titulo}' ha sido marcada como no habitable (no había reservas o la actual no existe).";
                 }
         mostrarModalReubicacion = false;

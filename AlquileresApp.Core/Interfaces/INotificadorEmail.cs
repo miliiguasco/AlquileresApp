@@ -6,6 +6,9 @@ namespace AlquileresApp.Core.Interfaces
         void EnviarEmail(string destinatario, string asunto, string mensaje);
         public void EnviarCorreoBienvenida(string destinatario, string nombreUsuario);
         public void EnviarConfirmacionReserva(string destinatario, string nombreUsuario, string fechaInicio, string fechaFin, string propiedad);
+
+        public void EnviarCorreoModificacionReservaPorNoHabitable(string destinatario, string nombreUsuario, string propiedadOriginalTitulo, 
+            string? nuevaPropiedadTitulo);
     }
     
 }
