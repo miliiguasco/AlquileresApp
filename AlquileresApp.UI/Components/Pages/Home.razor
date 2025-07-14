@@ -36,11 +36,19 @@
                else if (i % 3 == 1)
                   bgClass = "bg-success text-white";
                else
-                  bgClass = "promo-bg-warning";
+                  bgClass = "bg-warning text-dark";
                 <div class="carousel-item @isActive p-5 rounded shadow-lg @bgClass">
                     <h3 class="mb-3 display-6 fw-bold">@promo.Titulo</h3>
                     <p class="lead">@promo.Descripcion</p>
                     <h4 class="display-6 fw-bold mb-4">@promo.PorcentajeDescuento% OFF</h4>
+                    <p class="mb-4">
+                        <strong>Válida desde:</strong> @promo.FechaInicio.ToString("dd/MM/yyyy")<br />
+                        <strong>Válida hasta:</strong> @promo.FechaFin.ToString("dd/MM/yyyy")
+                    </p>
+                    <p class="mb-4">
+                        <strong>Reservar desde:</strong> @promo.FechaInicioReserva.ToString("dd/MM/yyyy")<br />
+                        <strong>Reservar hasta:</strong> @promo.FechaFinReserva.ToString("dd/MM/yyyy")
+                    </p>
 
                     @{
                        var propiedadesMostrar = promo.Propiedades.Take(3).ToList();
