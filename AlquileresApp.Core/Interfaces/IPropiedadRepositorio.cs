@@ -7,7 +7,7 @@ public interface IPropiedadRepositorio
     void ModificarPropiedad(Propiedad propiedad);
     bool EliminarPropiedad(Propiedad propiedad);
     void MarcarPropiedadComoNoHabitable(Propiedad propiedad);
-    public List<Propiedad> ListarPropiedades();
+    public List<Propiedad>? ListarPropiedades();
     public Propiedad? ObtenerPropiedadPorId(int id);
     List<Propiedad> ListarPropiedadesFiltrado(SearchFilters filtros);
     public void ComprobarDisponibilidad(Propiedad propiedad, DateTime fechaInicio, DateTime fechaFin);

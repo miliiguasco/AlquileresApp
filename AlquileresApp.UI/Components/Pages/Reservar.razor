@@ -241,10 +241,11 @@ protected override async Task OnInitializedAsync()
         if (propiedad == null) return 0;
         var noches = CalcularNoches();
         if (noches <= 0) return 0;
-        var total= CUCalcularPrecioConPromocion.Ejecutar(propiedad, DateTime.Now, fechaInicio, fechaFin ) * noches;
+        var precioPorNoche = CUCalcularPrecioConPromocion.Ejecutar(propiedad, DateTime.Now, fechaInicio, fechaFin );
+        var total= precioPorNoche * noches;
         if (total!= propiedad.PrecioPorNoche * noches)
         {
-            mensajePromocion = "Se aplicó una promoción";
+            mensajePromocion = "Se aplicó una promoción, el precio por noche es  $" + precioPorNoche;
         }
         return total;
     }

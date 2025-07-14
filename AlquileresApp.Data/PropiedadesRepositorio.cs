@@ -32,16 +32,12 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
         return true;
     }
 
-    public List<Propiedad> ListarPropiedades()
+    public List<Propiedad>? ListarPropiedades()
     {
         List<Propiedad> propiedades = dbContext.Propiedades
             .Include(p => p.Imagenes)
             .Include(p => p.Promociones) // 👈 Incluye las promociones asociadas
             .ToList();
-
-        if (propiedades.Count == 0)
-            throw new Exception("No se encontraron propiedades.");
-
         return propiedades;
     }
 
