@@ -11,6 +11,7 @@
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 @inject IJSRuntime JsRuntime
+@inject IUsuarioRepositorio UsuarioRepositorio
 
 
 <link href="css/VerPropiedad.css" rel="stylesheet" />
@@ -53,6 +54,18 @@
                     <InputNumber id="capacidad" class="form-control" @bind-Value="nuevaPropiedad.Capacidad" />
                     <ValidationMessage For="@(() => nuevaPropiedad.Capacidad)" />
                 </div>
+
+                <div class="form-group">
+    <label for="encargado">Seleccionar encargado:</label>
+    <InputSelect id="encargado" class="form-control" @bind-Value="nuevaPropiedad.EncargadoId">
+        <option value="">Seleccione un encargado</option>
+        @foreach (var encargado in ListaEncargados)
+        {
+            <option value="@encargado.Id">@encargado.Nombre @encargado.Apellido</option>
+        }
+    </InputSelect>
+    <ValidationMessage For="@(() => nuevaPropiedad.EncargadoId)" />
+</div>
 
                 <div class="form-group">
                     <label>Servicios disponibles</label>
@@ -129,6 +142,7 @@
     private string? errorMensaje;
     private string? googleMapsApiKey;
     private Dictionary<ServiciosPropiedad, bool> serviciosSeleccionados = new();
+    private List<Encargado> ListaEncargados = new();
     
     protected override void OnInitialized()
     {
@@ -144,6 +158,9 @@
         {
             serviciosSeleccionados[servicio] = false;
         }
+
+        // Cargar encargados
+        ListaEncargados = UsuarioRepositorio.ListarEncargados();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -323,4 +340,5 @@
             return false;
         }
     }
+
 }

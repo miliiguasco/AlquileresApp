@@ -22,6 +22,7 @@
 
 <div class="modal-overlay">
     <div class="reserva-container">
+        <button class="btn-close close-reserva" type="button" title="Cerrar" @onclick="VolverAtras"></button>
         @if (isLoading)
         {
             <div class="loading">
@@ -130,26 +131,40 @@
                         @errorMensaje
                     </div>
                 }
+                @if (!string.IsNullOrEmpty(mensajeExito))
+                {
+                    <div class="alert alert-success">
+                        @mensajeExito
+                    </div>
+                }
 
-                <div class="botones-reserva">
-                    <button class="btn-cancelar" @onclick="CancelarReserva">
-                        <i class="fas fa-times-circle"></i>
-                        <span>Cancelar</span>
-                    </button>
-
-                    <button class="btn-reservar" @onclick="ConfirmarReserva" disabled="@isSubmitting">
-                        @if (isSubmitting)
-                        {
-                            <span class="spinner"></span>
-                            <span>Procesando...</span>
-                        }
-                        else
-                        {
-                            <i class="fas fa-check-circle"></i>
-                            <span>Confirmar Reserva</span>
-                        }
-                    </button>
-                </div>
+                @if (esCliente || !estaAutenticado)
+                {
+                    <div class="botones-reserva">
+                        <button class="btn-cancelar" type="button" @onclick="VolverAtras">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Cancelar</span>
+                        </button>
+                        <button class="btn-reservar" @onclick="ConfirmarReserva" disabled="@isSubmitting">
+                            @if (isSubmitting)
+                            {
+                                <span class="spinner"></span>
+                                <span>Procesando...</span>
+                            }
+                            else
+                            {
+                                <i class="fas fa-check-circle"></i>
+                                <span>Confirmar Reserva</span>
+                            }
+                        </button>
+                    </div>
+                }
+                else if (esAdministrador)
+                {
+                    <div class="alert alert-warning mt-2">
+                        Solo los usuarios con rol <strong>Cliente</strong> pueden realizar reservas.
+                    </div>
+                }
             </div>
         }
     </div>
@@ -158,7 +173,9 @@
 @code {
     [Parameter]
     public int PropiedadId { get; set; }
-
+    private bool esCliente = false;
+    private bool esAdministrador = false;
+    private bool estaAutenticado = false;
     private Propiedad? propiedad;
     private string? error;
     private DateTime fechaInicio = DateTime.Today;
@@ -170,39 +187,48 @@
     private bool isLoading = true;
     private bool isSubmitting = false;
     private string? mensajePromocion;
+    private bool confirmandoReserva = false;
 
-    protected override async Task OnInitializedAsync()
+
+protected override async Task OnInitializedAsync()
+{
+    try
     {
-        try
-        {
-            isLoading = true;
-            errorMensaje = null;
-            var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
-            var email = authState.User.FindFirst(ClaimTypes.Email)?.Value;
-            if (email != null)
-            {
-                var usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(email);
-                if (usuario != null)
-                {
-                    usuarioId = usuario.Id;
-                }
-            }
+        isLoading = true;
+        errorMensaje = null;
 
-            propiedad = CUObtenerPropiedad.Ejecutar(PropiedadId);
-            if (propiedad == null)
+        var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+        var user = authState.User;
+        estaAutenticado = user.Identity != null && user.Identity.IsAuthenticated;
+        var email = user.FindFirst(ClaimTypes.Email)?.Value;
+
+        if (email != null)
+        {
+            var usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(email);
+            if (usuario != null)
             {
-                error = "Propiedad no encontrada";
+                usuarioId = usuario.Id;
             }
         }
-        catch (Exception ex)
+
+        esCliente = user.IsInRole("Cliente");
+        esAdministrador = user.IsInRole("Administrador");
+
+        propiedad = CUObtenerPropiedad.Ejecutar(PropiedadId);
+        if (propiedad == null)
         {
-            error = $"Error al cargar la propiedad: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
+            error = "Propiedad no encontrada";
         }
     }
+    catch (Exception ex)
+    {
+        error = $"Error al cargar la propiedad: {ex.Message}";
+    }
+    finally
+    {
+        isLoading = false;
+    }
+}
 
     private int CalcularNoches()
     {
@@ -240,14 +266,28 @@
 
     private async Task ConfirmarReserva()
     {
+        if (confirmandoReserva) return;
+        confirmandoReserva = true;
+        isSubmitting = true; // Se deshabilita el botón instantáneamente
+        StateHasChanged(); // Fuerza renderizado inmediato
+        await Task.Yield(); // Cede el control al renderizador
         try
         {
-            isSubmitting = true;
             errorMensaje = null;
+
+            if (!estaAutenticado)
+            {
+                NavigationManager.NavigateTo("/Login");
+                isSubmitting = false;
+                confirmandoReserva = false;
+                return;
+            }
 
             if (usuarioId == null)
             {
                 errorMensaje = "No se pudo obtener el ID del usuario";
+                isSubmitting = false;
+                confirmandoReserva = false;
                 return;
             }
 
@@ -258,18 +298,24 @@
             if (fechaInicioFormateada < DateTime.Today)
             {
                 errorMensaje = "La fecha de check-in no puede ser anterior a hoy";
+                isSubmitting = false;
+                confirmandoReserva = false;
                 return;
             }
 
             if (fechaInicioFormateada >= fechaFinFormateada)
             {
                 errorMensaje = "La fecha de check-out debe ser posterior a la fecha de check-in";
+                isSubmitting = false;
+                confirmandoReserva = false;
                 return;
             }
 
             if (cantidadHuespedes < 1 || cantidadHuespedes > propiedad.Capacidad)
             {
                 errorMensaje = $"La cantidad de huéspedes debe estar entre 1 y {propiedad.Capacidad}";
+                isSubmitting = false;
+                confirmandoReserva = false;
                 return;
             }
 
@@ -277,13 +323,19 @@
             if (noches <= 0)
             {
                 errorMensaje = "Debe seleccionar al menos una noche de estadía";
+                isSubmitting = false;
+                confirmandoReserva = false;
                 return;
             }
 
             await CUCrearReserva.Ejecutar(usuarioId.Value, PropiedadId, fechaInicioFormateada, fechaFinFormateada, cantidadHuespedes);
-            mensajeExito = "Reserva creada exitosamente";
-            await Task.Delay(2000);
-            NavigationManager.NavigateTo("/");
+            mensajeExito = "Reserva realizada correctamente";
+            isSubmitting = false;
+            confirmandoReserva = false;
+            StateHasChanged();
+            await Task.Delay(2000); // Espera 2 segundos mostrando el mensaje
+            mensajeExito = null;
+            return;
         }
         catch (Exception ex)
         {
@@ -293,6 +345,7 @@
         finally
         {
             isSubmitting = false;
+            confirmandoReserva = false;
         }
     }
 
@@ -300,36 +353,9 @@
     {
         NavigationManager.NavigateTo($"/propiedad/{PropiedadId}");
     }
+
+    private void VolverAtras()
+    {
+        JS.InvokeVoidAsync("history.back");
+    }
 }
-
-<style>
-    .botones-reserva {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        margin-top: 2rem;
-    }
-
-    .btn-cancelar {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-cancelar:hover {
-        background-color: #c82333;
-    }
-
-    .btn-cancelar i {
-        font-size: 1.1rem;
-    }
-</style>
-

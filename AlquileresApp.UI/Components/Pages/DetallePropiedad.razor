@@ -24,6 +24,7 @@
 @using System.IO
 @using System.ComponentModel.DataAnnotations
 @inject IJSRuntime Js
+@inject IUsuarioRepositorio UsuarioRepositorio
 
 <div class="propiedad-container bg-light p-4 rounded shadow-sm my-5">
     @if (propiedad is null)
@@ -184,6 +185,18 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="encargado">Seleccionar encargado:</label>
+                    <InputSelect id="encargado" class="form-control" @bind-Value="propiedadEditada.EncargadoId">
+                        <option value="">Seleccione un encargado</option>
+                        @foreach (var encargado in ListaEncargados)
+                        {
+                            <option value="@encargado.Id">@encargado.Nombre @encargado.Apellido</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => propiedadEditada.EncargadoId)" />
+                </div>
+
+                <div class="form-group">
                     <label for="pagoAnticipado">Porcentaje de pago anticipado</label>
                     <InputSelect id="pagoAnticipado" class="form-control" @bind-Value="propiedadEditada.TipoPago" @oninput="OnTipoPagoChanged">
                         <option value="SinAnticipo">0% - Sin pago anticipado</option>
@@ -228,6 +241,8 @@
     private bool modoEdicion = false;
     private string carouselId => $"carousel-{Id}";
 
+    private List<Encargado> ListaEncargados = new();
+
     protected override void OnInitialized()
     {
         propiedad = CUObtenerPropiedad.Ejecutar(Id);
@@ -237,6 +252,9 @@
             errorMensaje = "Error: La clave de API de Google Maps no está configurada.";
             Console.WriteLine(errorMensaje);
         }
+
+        // Cargar encargados para el input de selección
+        ListaEncargados = UsuarioRepositorio.ListarEncargados();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -302,7 +320,7 @@
                     PoliticaCancelacion = propiedad.PoliticaCancelacion,
                     PrecioPorNoche = propiedad.PrecioPorNoche,
                     Capacidad = propiedad.Capacidad,
-                    EncargadoId = propiedad.EncargadoId,
+                    Encargado = propiedad.Encargado,
                     TipoPago = propiedad.TipoPago,
                     ServiciosDisponibles = propiedad.ServiciosDisponibles,
                     Imagenes = propiedad.Imagenes,

@@ -7,7 +7,7 @@
 @using AlquileresApp.Core.Interfaces
 @using AlquileresApp.Core.CasosDeUso.Tarjeta
 @using AlquileresApp.Core.CasosDeUso.Reserva
-@using AlquileresApp.Core.CasosDeUso.ContactarAdmin
+@using AlquileresApp.Core.CasosDeUso.ContactarEncargado
 @using AlquileresApp.UI.Components
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Data
@@ -21,7 +21,7 @@
 @inject CasoDeUsoEliminarTarjeta CUEliminarTarjeta
 @inject CasoDeUsoVisualizarReserva CUVisualizarReserva
 @inject IJSRuntime JS
-@inject CasoDeUsoContactarAdmin CasoDeUsoContactarAdmin
+@inject CasoDeUsoContactarEncargado CasoDeUsoContactarEncargado
 @attribute [Authorize]
 
 <PageTitle>Mi Perfil</PageTitle>
@@ -164,14 +164,14 @@
                             <div class="profile-section">
                                  <h2 class="h2 mb-4">Mis Reservas</h2>
 
-    @if (!string.IsNullOrEmpty(mensajeExito_misReservas))
-    {
-        <div class="alert alert-success">@mensajeExito_misReservas</div>
-    }
-    @if (!string.IsNullOrEmpty(mensajeError))
-    {
-        <div class="alert alert-danger">@mensajeError</div>
-    }
+                                    @if (!string.IsNullOrEmpty(mensajeExito_misReservas))
+                                    {
+                                        <div class="alert alert-success">@mensajeExito_misReservas</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(mensajeError))
+                                    {
+                                        <div class="alert alert-danger">@mensajeError</div>
+                                    }
 
     @if (!reservas.Any())
     {
@@ -228,6 +228,66 @@
         </table>  
     }
 </div>
+                                    @if (!reservas.Any())
+                                    {
+                                        <div class="alert alert-info">No se encontraron reservas registradas.</div>
+                                    }
+                                    else
+                                    {
+                                        <table class="table_misreservas table-hover table-bordered shadow-sm">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>Propiedad</th>
+                                                    <th>Politica De Cancelacion</th>
+                                                    <th>Fecha inicio</th>
+                                                    <th>Fecha fin</th>
+                                                    <th>Estado</th>
+                                                    <th>Total</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var reserva in reservas)
+                                                {
+                                                    <tr>
+                                                        <td>@reserva.Propiedad?.Titulo</td>
+                                                    <td>@ObtenerDescripcionPolitica(reserva.Propiedad.PoliticaCancelacion)</td>
+                                                        <td>@reserva.FechaInicio.ToShortDateString()</td>
+                                                        <td>@reserva.FechaFin.ToShortDateString()</td>
+                                                        <td>
+                                                            <span class="badge bg-@GetBadgeColor(reserva.Estado)">
+                                                                @reserva.Estado
+                                                            </span>
+                                                        </td>
+                                                        <td>$@reserva.PrecioTotal.ToString("N2")</td>
+                                                        <td>
+                                                            @if (reserva.Estado == EstadoReserva.Pendiente)
+                                                            {
+                                                                <div class="btn-container">
+                                                                <button class=" btn btn-primary " @onclick="@(() => ModificarReserva(reserva.Id))">
+                                                                    <i class="bi bi-pencil  "></i> 
+                                                                </button>
+                                                                <button class="btn btn-danger" @onclick="@(() => CancelarReserva(reserva.Id))">
+                                                                    <i class="bi bi-x-circle "></i> 
+                                                                </button>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                
+                                                            }
+                                                        </td>
+                                                        <td> 
+                                                            <button class="btn btn-otro" @onclick="() => AbrirFormularioMensaje(reserva)">
+                                                                <i class="bi bi-envelope"></i> Enviar mensaje sobre esta reserva
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>  
+                                    }
+                                </div>
 
 @if (mostrarConfirmacion)
 {
@@ -249,8 +309,7 @@
         </div>
     </div>
 }
-                                
-                            </div>
+                            
                     }
                 </div>
         }
@@ -627,10 +686,10 @@ private async Task EnviarMensajeEmail()
 
         await Task.Run(() =>
         {
-            CasoDeUsoContactarAdmin.Ejecutar(reservaSeleccionada, cuerpo);
+            CasoDeUsoContactarEncargado.Ejecutar(reservaSeleccionada, cuerpo);
         });
 
-        mensajeExito_misReservas = "Mensaje enviado exitosamente al administrador.";
+        mensajeExito_misReservas = "El mensaje fue enviado exitosamente al Encargado. Recibirá una respuesta en su correo electrónico." ;
         reservaSeleccionada = null;
     }
     catch (Exception ex)

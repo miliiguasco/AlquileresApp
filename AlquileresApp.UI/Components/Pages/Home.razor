@@ -1,4 +1,3 @@
-
 @page "/"
 @rendermode InteractiveServer
 @using AlquileresApp.Core.Entidades
@@ -158,7 +157,7 @@
 
             <div>
                 <label>Cantidad de personas:</label>
-                <InputNumber @bind-Value="Filtros.CantidadHuespedes" class="mi-input input-custom" />
+                <InputNumber @bind-Value="Filtros.CantidadHuespedes" class="mi-input input-custom" min="1"/>
             </div>
 
             <div>

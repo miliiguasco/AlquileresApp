@@ -17,6 +17,7 @@ public class Propiedad
 
     public bool NoHabitable { get; set; } = false;
     public int EncargadoId { get; set; }
+    public Encargado Encargado { get; set; } = new();
     public List<ServiciosPropiedad> ServiciosDisponibles { get; set; } = new();
     public List<Imagen> Imagenes { get; set; } = new();
     public List<Reserva> Reservas { get; set; } = new();

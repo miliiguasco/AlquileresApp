@@ -175,7 +175,7 @@ namespace AlquileresApp.Data
                     MontoAPagar = 3750,
                     MontoRestante = 0,
                     TipoPago = TipoPago.Total,
-                    CantidadHuespedes = 4
+                    CantidadHuespedes = 4,
                 },
                 new Reserva
                 {
@@ -225,7 +225,7 @@ namespace AlquileresApp.Data
                     Titular = "Maria Garcia", 
                     FechaVencimiento = "12/25",
                     CVV = "123",
-                    Saldo = 0m,
+                    Saldo = 99999999999999m,
                     ClienteId = usuarios[0].Id
                 }
                 ,

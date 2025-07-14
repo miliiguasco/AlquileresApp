@@ -17,6 +17,64 @@ namespace AlquileresApp.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
 
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Calificacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("FechaCalificacion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PropiedadId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Puntuacion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropiedadId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("Calificaciones");
+                });
+
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Comentario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PropiedadId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Visible")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropiedadId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("Comentarios");
+                });
+
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Imagen", b =>
                 {
                     b.Property<int>("Id")
@@ -35,6 +93,25 @@ namespace AlquileresApp.Data.Migrations
                     b.HasIndex("PropiedadId");
 
                     b.ToTable("Imagenes");
+                });
+
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.PreguntaFrecuente", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Pregunta")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Respuesta")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PreguntasFrecuentes");
                 });
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Promocion", b =>
@@ -79,6 +156,9 @@ namespace AlquileresApp.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<double>("CalificacionPromedio")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("Capacidad")
                         .HasColumnType("INTEGER");
@@ -303,6 +383,43 @@ namespace AlquileresApp.Data.Migrations
                     b.HasDiscriminator().HasValue(2);
                 });
 
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Calificacion", b =>
+                {
+                    b.HasOne("AlquileresApp.Core.Entidades.Propiedad", "Propiedad")
+                        .WithMany("Calificaciones")
+                        .HasForeignKey("PropiedadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AlquileresApp.Core.Entidades.Usuario", "Usuario")
+                        .WithMany("CalificacionesRealizadas")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("Propiedad");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Comentario", b =>
+                {
+                    b.HasOne("AlquileresApp.Core.Entidades.Propiedad", "Propiedad")
+                        .WithMany("Comentarios")
+                        .HasForeignKey("PropiedadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AlquileresApp.Core.Entidades.Usuario", "Usuario")
+                        .WithMany("ComentariosRealizados")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Propiedad");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Imagen", b =>
                 {
                     b.HasOne("AlquileresApp.Core.Entidades.Propiedad", "Propiedad")
@@ -319,7 +436,7 @@ namespace AlquileresApp.Data.Migrations
                     b.HasOne("AlquileresApp.Core.Entidades.Cliente", "Cliente")
                         .WithMany("Reservas")
                         .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AlquileresApp.Core.Entidades.Propiedad", "Propiedad")
@@ -359,9 +476,20 @@ namespace AlquileresApp.Data.Migrations
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Propiedad", b =>
                 {
+                    b.Navigation("Calificaciones");
+
+                    b.Navigation("Comentarios");
+
                     b.Navigation("Imagenes");
 
                     b.Navigation("Reservas");
+                });
+
+            modelBuilder.Entity("AlquileresApp.Core.Entidades.Usuario", b =>
+                {
+                    b.Navigation("CalificacionesRealizadas");
+
+                    b.Navigation("ComentariosRealizados");
                 });
 
             modelBuilder.Entity("AlquileresApp.Core.Entidades.Cliente", b =>

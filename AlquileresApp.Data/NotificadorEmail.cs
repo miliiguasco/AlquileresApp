@@ -71,9 +71,8 @@ public class NotificadorEmail: INotificadorEmail
                                 <td style='padding:20px; text-align:center; color:#000000;'>
                                     <p style='margin-bottom:8px;'>
                                         Gracias por registrarte en <strong>Alquilando</strong>.</p>
-                                    <p> Ahora sos parte de una comunidad que facilita el alquiler temporal de propiedades de forma segura y simple.</p>
+                                    <p> Ahora sos parte de una comunidad que facilita el alquiler de propiedades de forma segura y simple.</p>
                                     <p style='margin-bottom:22px;'>🏠 ¡Comenzá a explorar propiedades para encontrar tu lugar ideal!</p>
-                                    <p style='margin-bottom:8px;'>Si no creaste una cuenta en Alquilando, podés ignorar este correo.</p>
                                 </td>
                             </tr>
 
