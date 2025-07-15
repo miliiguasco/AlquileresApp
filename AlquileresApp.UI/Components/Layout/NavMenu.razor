@@ -40,13 +40,13 @@
                         @if (isDropdownOpen)
                         {
                             <div class="dropdown-menu show" @onclick:stopPropagation>
-                                <a class="dropdown-item" href="/Perfil/@context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value">
+                                <a class="dropdown-item" href="/Perfil/@context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value "@onclick="CerrarDropdown" >
                                     <i class="bi bi-person"></i> Ver perfil
                                 </a>
                                 @if (context.User.IsInRole("Administrador") || context.User.IsInRole("Encargado"))
                                 {
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="/Administrar">
+                                    <a class="dropdown-item" href="/Administrar" @onclick="CerrarDropdown">
                                         <i class="bi bi-gear"></i> Administrar
                                     </a>
                                 }
@@ -84,6 +84,7 @@
 
     private async Task CerrarSesion()
     {
+        isDropdownOpen = false;
         await CUCerrarSesion.Ejecutar();
         NavigationManager.NavigateTo("/", true);
     }
