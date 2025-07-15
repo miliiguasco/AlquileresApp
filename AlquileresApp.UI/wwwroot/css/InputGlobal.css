@@ -3,7 +3,6 @@ textarea.mi-input.mi-text-input {
     display: block;
     outline: none !important;
     box-shadow: none !important;
-    padding: 0.5rem 0.75rem !important;
     width: 100%;
     border: 1px solid #ced4da;
     border-radius: 4px;
@@ -40,3 +39,12 @@ textarea.mi-input.mi-text-input:focus {
     border-color: #1F3F48 !important;
     color: white;
 } 
+
+.form-floating > .form-control,
+.form-floating > .mi-input {
+  padding-top: 1.625rem !important;   /* espacio para el label flotando */
+  padding-bottom: 0.625rem !important;
+  height: auto !important;            /* por si el height estaba forzado */
+  line-height: 1.25 !important;       /* mejora la legibilidad */
+}
+

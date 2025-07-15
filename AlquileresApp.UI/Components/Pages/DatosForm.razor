@@ -6,12 +6,12 @@
 <EditForm Model="Input" OnValidSubmit="OnSubmit" OnInvalidSubmit="ManejarInvalidSubmit" FormName="@FormName">
     <DataAnnotationsValidator />
     <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.Nombre" class="form-control mi-input" aria-required="true" @oninput="@(() => { errorNombre = null; StateHasChanged(); })" />
+        <InputText @bind-Value="Input.Nombre" class="form-control mi-input" aria-required="true" placeholder="" @oninput="@(() => { errorNombre = null; StateHasChanged(); })" />
         <label for="nombre" class="form-label">Nombre</label>
         <Error Mensaje="@errorNombre" />
     </div>
     <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.Apellido" class="form-control mi-input" aria-required="true" @oninput="@(() => { errorApellido = null; StateHasChanged(); })" />
+        <InputText @bind-Value="Input.Apellido" class="form-control mi-input" aria-required="true" placeholder="" @oninput="@(() => { errorApellido = null; StateHasChanged(); })" />
         <label for="apellido" class="form-label">Apellido</label>
         <Error Mensaje="@errorApellido" />
     </div>
@@ -19,6 +19,7 @@
         <InputText @bind-Value="Input.Email" 
                   class="form-control mi-input" 
                   aria-required="true" 
+                  placeholder=""
                   @oninput="@(() => { 
                       errorEmail = null; 
                       OnEmailChange.InvokeAsync();
@@ -31,6 +32,7 @@
         <InputText @bind-Value="Input.Telefono" 
                   class="form-control mi-input" 
                   aria-required="true" 
+                  placeholder=""
                   @oninput="@(() => { errorTelefono = null; StateHasChanged(); })"
                   type="tel"
                   pattern="[0-9]*"
@@ -54,7 +56,7 @@
     </div>
 
     <div class="form-floating mb-3">
-        <InputText type="password" @bind-Value="Input.Password" class="form-control mi-input" aria-required="true" @oninput="@(() => { errorPassword = null; StateHasChanged(); })" />
+        <InputText type="password" @bind-Value="Input.Password" placeholder="" class="form-control mi-input" aria-required="true" @oninput="@(() => { errorPassword = null; StateHasChanged(); })" />
         <label for="password" class="form-label">Contraseña</label>
         <Error Mensaje="@errorPassword" />
     </div>
