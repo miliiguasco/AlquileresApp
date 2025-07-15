@@ -203,7 +203,7 @@ namespace AlquileresApp.Data
                         PropiedadId = propiedadesDb[2].Id, // Cabaña en la montaña
                         FechaInicio = DateTime.Now.AddDays(5),
                         FechaFin = DateTime.Now.AddDays(7),
-                        Estado = EstadoReserva.Confirmada,
+                        Estado = EstadoReserva.Pendiente,
                         PrecioTotal = 240,
                         MontoAPagar = 240,
                         MontoRestante = 0,
