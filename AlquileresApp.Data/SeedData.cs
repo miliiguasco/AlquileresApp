@@ -180,85 +180,94 @@ namespace AlquileresApp.Data
             var propiedadesDb = context.Propiedades.ToList();
 
             // Crear reservas de prueba
-            var reservas = new List<Reserva>
+            if (!context.Reservas.Any())
             {
-                new Reserva
+                var reservas = new List<Reserva>
                 {
-                    ClienteId = usuarios[1].Id,
-                    PropiedadId = propiedadesDb[0].Id, // <-- Ahora sí existe
-                    FechaInicio = DateTime.Now,
-                    FechaFin = DateTime.Now.AddDays(15),
-                    Estado = EstadoReserva.Activa,
-                    PrecioTotal = 3750,
-                    MontoAPagar = 3750,
-                    MontoRestante = 0,
-                    TipoPago = TipoPago.Total,
-                    CantidadHuespedes = 4,
-                },
-                new Reserva
-                {
-                    ClienteId = usuarios[2].Id, // María García
-                    PropiedadId = propiedadesDb[2].Id, // Cabaña en la montaña
-                    FechaInicio = DateTime.Now.AddDays(5),
-                    FechaFin = DateTime.Now.AddDays(7),
-                    Estado = EstadoReserva.Confirmada,
-                    PrecioTotal = 240,
-                    MontoAPagar = 240,
-                    MontoRestante = 0,
-                    TipoPago = TipoPago.Total,
-                    CantidadHuespedes = 2
-                },
-                new Reserva
-                {
-                    ClienteId = usuarios[1].Id, // Milagros Guasco
-                    PropiedadId = propiedadesDb[3].Id, // Departamento céntrico
-                    FechaInicio = DateTime.Now.AddDays(20),
-                    FechaFin = DateTime.Now.AddDays(25),
-                    Estado = EstadoReserva.Pendiente,
-                    PrecioTotal = 400,
-                    MontoAPagar = 400,
-                    MontoRestante = 0,
-                    TipoPago = TipoPago.Total,
-                    CantidadHuespedes = 2
-                }
-            };
-            context.Reservas.AddRange(reservas);
-            context.SaveChanges();
+                    new Reserva
+                    {
+                        ClienteId = usuarios[1].Id,
+                        PropiedadId = propiedadesDb[0].Id, // <-- Ahora sí existe
+                        FechaInicio = DateTime.Now,
+                        FechaFin = DateTime.Now.AddDays(15),
+                        Estado = EstadoReserva.Activa,
+                        PrecioTotal = 3750,
+                        MontoAPagar = 3750,
+                        MontoRestante = 0,
+                        TipoPago = TipoPago.Total,
+                        CantidadHuespedes = 4,
+                    },
+                    new Reserva
+                    {
+                        ClienteId = usuarios[2].Id, // María García
+                        PropiedadId = propiedadesDb[2].Id, // Cabaña en la montaña
+                        FechaInicio = DateTime.Now.AddDays(5),
+                        FechaFin = DateTime.Now.AddDays(7),
+                        Estado = EstadoReserva.Confirmada,
+                        PrecioTotal = 240,
+                        MontoAPagar = 240,
+                        MontoRestante = 0,
+                        TipoPago = TipoPago.Total,
+                        CantidadHuespedes = 2
+                    },
+                    new Reserva
+                    {
+                        ClienteId = usuarios[1].Id, // Milagros Guasco
+                        PropiedadId = propiedadesDb[3].Id, // Departamento céntrico
+                        FechaInicio = DateTime.Now.AddDays(20),
+                        FechaFin = DateTime.Now.AddDays(25),
+                        Estado = EstadoReserva.Pendiente,
+                        PrecioTotal = 400,
+                        MontoAPagar = 400,
+                        MontoRestante = 0,
+                        TipoPago = TipoPago.Total,
+                        CantidadHuespedes = 2
+                    }
+                };
+                context.Reservas.AddRange(reservas);
+                context.SaveChanges();
+            }
 
             //Crear preguntas frecuentes de prueba
-            var preguntasFrecuentes = new List<PreguntaFrecuente>
+            if (!context.PreguntasFrecuentes.Any())
             {
-                new PreguntaFrecuente { Pregunta = "¿Cómo puedo reservar una propiedad?", Respuesta = "Para reservar una propiedad, debes iniciar sesión y seleccionar la propiedad que deseas alquilar. Luego, completa los datos de contacto y confirma la reserva." },
-                new PreguntaFrecuente { Pregunta = "¿Cuáles son los métodos de pago disponibles?", Respuesta = "Disponemos de varios métodos de pago, como tarjeta de crédito, transferencia bancaria y pago en efectivo. Puedes seleccionar el método que prefieras al momento de realizar la reserva." },
-            };
-            context.PreguntasFrecuentes.AddRange(preguntasFrecuentes);
-            context.SaveChanges();
+                var preguntasFrecuentes = new List<PreguntaFrecuente>
+                {
+                    new PreguntaFrecuente { Pregunta = "¿Cómo puedo reservar una propiedad?", Respuesta = "Para reservar una propiedad, debes iniciar sesión y seleccionar la propiedad que deseas alquilar. Luego, completa los datos de contacto y confirma la reserva." },
+                    new PreguntaFrecuente { Pregunta = "¿Cuáles son los métodos de pago disponibles?", Respuesta = "Disponemos de varios métodos de pago, como tarjeta de crédito, transferencia bancaria y pago en efectivo. Puedes seleccionar el método que prefieras al momento de realizar la reserva." },
+                };
+                context.PreguntasFrecuentes.AddRange(preguntasFrecuentes);
+                context.SaveChanges();
+            }
             
             //Tarjetas de prueba
-            var tarjetas = new List<Tarjeta>
+            if (!context.Tarjetas.Any())
             {
-                new Tarjeta
+                var tarjetas = new List<Tarjeta>
                 {
-                    NumeroTarjeta = "1234567890123456",
-                    Titular = "Maria Garcia",
-                    FechaVencimiento = "12/25",
-                    CVV = "123",
-                    Saldo = 99999999999999m,
-                    ClienteId = usuarios[0].Id
-                }
-                ,
-                 new Tarjeta
-                {
-                    NumeroTarjeta = "9876543210987654",
-                    Titular = "Milagros Guasco",
-                    FechaVencimiento = "12/25",
-                    CVV = "456",
-                    Saldo = 5000.00m,
-                    ClienteId = usuarios[1].Id
-                 }
-            };
-            context.Tarjetas.AddRange(tarjetas);
-            context.SaveChanges();
+                    new Tarjeta
+                    {
+                        NumeroTarjeta = "1234567890123456",
+                        Titular = "Maria Garcia",
+                        FechaVencimiento = "12/25",
+                        CVV = "123",
+                        Saldo = 99999999999999m,
+                        ClienteId = usuarios[0].Id
+                    }
+                    ,
+                     new Tarjeta
+                    {
+                        NumeroTarjeta = "9876543210987654",
+                        Titular = "Milagros Guasco",
+                        FechaVencimiento = "12/25",
+                        CVV = "456",
+                        Saldo = 5000.00m,
+                        ClienteId = usuarios[1].Id
+                     }
+                };
+                context.Tarjetas.AddRange(tarjetas);
+                context.SaveChanges();
+            }
         
 
         } 
