@@ -55,7 +55,7 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
     }
     public IEnumerable<Reserva> ObtenerReservasPorUsuarioYPropiedad(int? usuarioId, int propiedadId)
     {
-       
+
         return dbContext.Reservas
                        .Include(r => r.Cliente)
                        .Include(r => r.Propiedad)
@@ -70,10 +70,10 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         if (existingReserva != null)
         {
             // Actualizar las propiedades necesarias
-            existingReserva.PropiedadId = reserva.Propiedad.Id; 
-            existingReserva.Propiedad = reserva.Propiedad;    
+            existingReserva.PropiedadId = reserva.Propiedad.Id;
+            existingReserva.Propiedad = reserva.Propiedad;
 
-            dbContext.Reservas.Update(existingReserva); 
+            dbContext.Reservas.Update(existingReserva);
             dbContext.SaveChanges();
         }
         else
@@ -125,6 +125,13 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         reserva.FechaCheckOut = DateTime.Now;
         dbContext.SaveChanges();
     }
+    
+    public bool TieneReservasActivas(int propiedadId)
+    {
+        return dbContext.Reservas
+            .Any(r => r.PropiedadId == propiedadId && r.FechaFin >= DateTime.Today);
+    }
+
 }
 
 
