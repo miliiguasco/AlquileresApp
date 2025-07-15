@@ -10,7 +10,6 @@
 @using AlquileresApp.Core.Interfaces
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
-@using Microsoft.AspNetCore.Components.Authorization 
 
 @inject AuthenticationStateProvider AuthenticationStateProvider 
 
@@ -26,6 +25,8 @@
 @inject CasoDeUsoModificarPreguntaFrecuente CUModificarPreguntaFrecuente
 @inject CasoDeUsoEliminarPreguntaFrecuente CUEliminarPreguntaFrecuente
 @inject CasoDeUsoMostrarPreguntasFrecuentes CUListarPreguntasFrecuentes
+
+@inject CasoDeUsoRegistrarCheckout CURegistrarCheckout
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @attribute [Authorize(Roles = "Administrador,Encargado")] 
@@ -226,7 +227,7 @@
                 @if (tabActiva == "reservas")
                 {
                     <div class="tab-pane active">
-                        <ListaReservasadm />
+                        <ListaReservasadm isEncargado="@isEncargado"/>
                     </div>
                 }
                 else if (tabActiva == "propiedades")
@@ -255,6 +256,7 @@
     private string errorCreacion;
     private string mensajeExito;
     
+    private string mensajeError;
     private bool isEncargado = false;
     protected override async Task OnInitializedAsync()
     {
