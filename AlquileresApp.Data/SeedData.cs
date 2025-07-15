@@ -11,164 +11,181 @@ namespace AlquileresApp.Data
     {
         public static void Initialize(AppDbContext context)
         {
-            // Verificar si ya existen datos
-            if (context.Usuarios.Any())
-            {
-                return; // La base de datos ya está inicializada
-            }
 
             var hashService = new ServicioHashPassword();
 
-            // Crear usuarios registrados
-            var usuarios = new List<Usuario>
+            // Crear usuarios registrados solo si no existen
+            if (!context.Usuarios.Any())
             {
-                new Administrador
+                var usuariosSeed = new List<Usuario>
                 {
-                    Nombre = "Fran",
-                    Apellido = "Admin",
-                    Email = "admi@gmail.com",
-                    Contraseña = hashService.HashPassword("password123"),
-                },
-                new Cliente
-                {
+                    new Administrador
+                    {
+                        Nombre = "Fran",
+                        Apellido = "Admin",
+                        Email = "admi@gmail.com",
+                        Contraseña = hashService.HashPassword("password123"),
+                    },
+                    new Cliente
+                    {
+                        Nombre = "Milagros",
+                        Apellido = "Guasco",
+                        Email = "milagrosguasco11@gmail.com",
+                        Telefono = "123456789",
+                        Contraseña = hashService.HashPassword("password123"),
+                        FechaNacimiento = new DateTime(1990, 1, 1),
+                    },
+                    new Cliente
+                    {
+                        Nombre = "María",
+                        Apellido = "García",
+                        Email = "maria.garcia@test.com",
+                        Telefono = "987654321",
+                        Contraseña = hashService.HashPassword("password456"),
+                        FechaNacimiento = new DateTime(1985, 5, 15),
+                    },
+                    new Encargado
+                    {
+                        Nombre = "Pablo",
+                        Apellido = "Gomez",
+                        Email = "pablogomez@test.com",
+                        Contraseña = hashService.HashPassword("Encargado1"),
+                    }
+                };
+                context.Usuarios.AddRange(usuariosSeed);
+                context.SaveChanges();
+            }
 
-                    Nombre = "Milagros",
-                    Apellido = "Guasco",
-                    Email = "milagrosguasco11@gmail.com",
-                    Telefono = "123456789",
-                    Contraseña = hashService.HashPassword("password123"),
-                    FechaNacimiento = new DateTime(1990, 1, 1),
-                },
-                new Cliente
-                {
-                    Nombre = "María",
-                    Apellido = "García",
-                    Email = "maria.garcia@test.com",
-                    Telefono = "987654321",
-                    Contraseña = hashService.HashPassword("password456"),
-                    FechaNacimiento = new DateTime(1985, 5, 15),
-                },
-                new Encargado
-                {
-                    Nombre = "Pablo",
-                    Apellido = "Gomez",
-                    Email = "pablogomez@test.com",
-                    Contraseña = hashService.HashPassword("Encargado1"),
-                }
-            };
-            context.Usuarios.AddRange(usuarios);
-            context.SaveChanges();
-
-            // Crear propiedades de prueba
-            var propiedades = new List<Propiedad>
+            // Obtener usuarios actualizados
+            var usuarios = context.Usuarios.ToList();
+            var encargado = context.Usuarios.OfType<Encargado>().FirstOrDefault();
+            if (encargado == null)
             {
-                /* new Propiedad
-                {
-                    Titulo = "Casa en la playa",
-                    Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
-                    Direccion = "Av. Costanera 123",
-                    Localidad = "Mar del Plata",
-                    PrecioPorNoche = 750.00m,
-                    Capacidad = 6,
-                    ServiciosDisponibles = new List<ServiciosPropiedad>
-                    {
-                        ServiciosPropiedad.Wifi,
-                        ServiciosPropiedad.AireAcondicionado,
-                        ServiciosPropiedad.Piscina,
-                        ServiciosPropiedad.Estacionamiento
-                    },
-                    PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50,
-                    TipoPago = TipoPago.Total
-                },
-                new Propiedad
-                {
-                    Titulo = "Casa en la playa 2",
-                    Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
-                    Direccion = "Av. Costanera 123",
-                    Localidad = "Mar del Plata",
-                    PrecioPorNoche = 750.00m,
-                    Capacidad = 6,
-                    ServiciosDisponibles = new List<ServiciosPropiedad>
-                    {
-                        ServiciosPropiedad.Wifi,
-                        ServiciosPropiedad.AireAcondicionado,
-                        ServiciosPropiedad.Piscina,
-                        ServiciosPropiedad.Estacionamiento
-                    },
-                    PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50,
-                    TipoPago = TipoPago.Total,
-                },
-                new Propiedad
-                {
-                    Titulo = "Cabaña en la montaña",
-                    Descripcion = "Acogedora cabaña con vista a la montaña y chimenea",
-                    Direccion = "Cerro Catedral 456",
-                    Localidad = "Bariloche",
-                    PrecioPorNoche = 120.00m,
-                    Capacidad = 4,
-                    ServiciosDisponibles = new List<ServiciosPropiedad>
-                    {
-                        ServiciosPropiedad.Calefaccion,
-                        ServiciosPropiedad.Estacionamiento,
-                        ServiciosPropiedad.Wifi
-                    },
-                    PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs,
-                    TipoPago = TipoPago.Parcial
-                },
-                new Propiedad
-                {
-                    Titulo = "Departamento céntrico",
-                    Descripcion = "Moderno departamento en el centro de la ciudad",
-                    Direccion = "Av. Corrientes 789",
-                    Localidad = "Buenos Aires",
-                    PrecioPorNoche = 80.00m,
-                    Capacidad = 2,
-                    ServiciosDisponibles = new List<ServiciosPropiedad>
-                    {
-                        ServiciosPropiedad.Wifi,
-                        ServiciosPropiedad.AireAcondicionado,
-                        ServiciosPropiedad.Estacionamiento
-                    },
-                    PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable
-                    , TipoPago = TipoPago.SinAnticipo
-                }, */
-                new Propiedad
-                {
-                    Titulo = "Casa de campo",
-                    Descripcion = "Espaciosa casa de campo con jardín y parrilla",
-                    Direccion = "Ruta 8 Km 45",
-                    Localidad = "Pilar",
-                    PrecioPorNoche = 200.00m,
-                    Capacidad = 8,
-                    ServiciosDisponibles = new List<ServiciosPropiedad>
-                    {
-                        ServiciosPropiedad.Wifi,
-                        ServiciosPropiedad.Piscina,
-                        ServiciosPropiedad.Estacionamiento,
-                        ServiciosPropiedad.AireAcondicionado
-                    },
-                    PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs,
-                    TipoPago = TipoPago.Parcial,
-                    Encargado = (Encargado)usuarios[3]
-                }
+                // Si no hay encargado, no se puede continuar con el seed
+                throw new Exception("No hay encargado registrado en la base de datos para asignar a las propiedades.");
+            }
 
-            };
-            /* propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa1.jpg" });
-            propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta1.jpg" });
 
-            propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
-            propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta2.jpg" }); */
+            // Crear propiedades de prueba solo si no existen
+            if (!context.Propiedades.Any())
+            {
+                var propiedades = new List<Propiedad>
+                {
+                     new Propiedad
+                    {
+                        Titulo = "Casa en la playa",
+                        Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
+                        Direccion = "Av. Costanera 123",
+                        Localidad = "Mar del Plata",
+                        PrecioPorNoche = 750.00m,
+                        Capacidad = 6,
+                        ServiciosDisponibles = new List<ServiciosPropiedad>
+                        {
+                            ServiciosPropiedad.Wifi,
+                            ServiciosPropiedad.AireAcondicionado,
+                            ServiciosPropiedad.Piscina,
+                            ServiciosPropiedad.Estacionamiento
+                        },
+                        PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50,
+                        TipoPago = TipoPago.Total,
+                        Encargado = encargado
+                    },
+                    new Propiedad
+                    {
+                        Titulo = "Casa en la playa 2",
+                        Descripcion = "Hermosa casa frente al mar con vista panorámica y acceso directo a la playa",
+                        Direccion = "Av. Costanera 123",
+                        Localidad = "Mar del Plata",
+                        PrecioPorNoche = 750.00m,
+                        Capacidad = 6,
+                        ServiciosDisponibles = new List<ServiciosPropiedad>
+                        {
+                            ServiciosPropiedad.Wifi,
+                            ServiciosPropiedad.AireAcondicionado,
+                            ServiciosPropiedad.Piscina,
+                            ServiciosPropiedad.Estacionamiento
+                        },
+                        PoliticaCancelacion = PoliticasDeCancelacion.PagoTotal_48hs_50,
+                        TipoPago = TipoPago.Total,
+                        Encargado = encargado
+                    },
+                    new Propiedad
+                    {
+                        Titulo = "Cabaña en la montaña",
+                        Descripcion = "Acogedora cabaña con vista a la montaña y chimenea",
+                        Direccion = "Cerro Catedral 456",
+                        Localidad = "Bariloche",
+                        PrecioPorNoche = 120.00m,
+                        Capacidad = 4,
+                        ServiciosDisponibles = new List<ServiciosPropiedad>
+                        {
+                            ServiciosPropiedad.Calefaccion,
+                            ServiciosPropiedad.Estacionamiento,
+                            ServiciosPropiedad.Wifi
+                        },
+                        PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs,
+                        TipoPago = TipoPago.Parcial,
+                        Encargado = encargado
+                    },
+                    new Propiedad
+                    {
+                        Titulo = "Departamento céntrico",
+                        Descripcion = "Moderno departamento en el centro de la ciudad",
+                        Direccion = "Av. Corrientes 789",
+                        Localidad = "Buenos Aires",
+                        PrecioPorNoche = 80.00m,
+                        Capacidad = 2,
+                        ServiciosDisponibles = new List<ServiciosPropiedad>
+                        {
+                            ServiciosPropiedad.Wifi,
+                            ServiciosPropiedad.AireAcondicionado,
+                            ServiciosPropiedad.Estacionamiento
+                        },
+                        PoliticaCancelacion = PoliticasDeCancelacion.SinAnticipo_NoCancelable
+                        , TipoPago = TipoPago.SinAnticipo,
+                        Encargado = encargado
+                    }, 
+                    new Propiedad
+                    {
+                        Titulo = "Casa de campo",
+                        Descripcion = "Espaciosa casa de campo con jardín y parrilla",
+                        Direccion = "Ruta 8 Km 45",
+                        Localidad = "Pilar",
+                        PrecioPorNoche = 200.00m,
+                        Capacidad = 8,
+                        ServiciosDisponibles = new List<ServiciosPropiedad>
+                        {
+                            ServiciosPropiedad.Wifi,
+                            ServiciosPropiedad.Piscina,
+                            ServiciosPropiedad.Estacionamiento,
+                            ServiciosPropiedad.AireAcondicionado
+                        },
+                        PoliticaCancelacion = PoliticasDeCancelacion.Anticipo20_72hs,
+                        TipoPago = TipoPago.Parcial,
+                        Encargado = encargado
+                    }
 
-            context.Propiedades.AddRange(propiedades);
-            context.SaveChanges();
+                };
+                propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa1.jpg" });
+                propiedades[0].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta1.jpg" });
 
-           /*  // Crear reservas de prueba
+                propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/casa2.jpg" });
+                propiedades[1].Imagenes.Add(new Imagen { Url = "/Imagenes/Propiedades/pileta2.jpg" }); 
+
+                context.Propiedades.AddRange(propiedades);
+                context.SaveChanges();
+            }
+
+             // Obtener propiedades actualizadas desde la base de datos
+            var propiedadesDb = context.Propiedades.ToList();
+
+            // Crear reservas de prueba
             var reservas = new List<Reserva>
             {
                 new Reserva
                 {
-                    ClienteId = usuarios[1].Id, // Milagros Guasco
-                    PropiedadId = propiedades[0].Id, // Casa en la playa
+                    ClienteId = usuarios[1].Id,
+                    PropiedadId = propiedadesDb[0].Id, // <-- Ahora sí existe
                     FechaInicio = DateTime.Now,
                     FechaFin = DateTime.Now.AddDays(15),
                     Estado = EstadoReserva.Activa,
@@ -181,7 +198,7 @@ namespace AlquileresApp.Data
                 new Reserva
                 {
                     ClienteId = usuarios[2].Id, // María García
-                    PropiedadId = propiedades[2].Id, // Cabaña en la montaña
+                    PropiedadId = propiedadesDb[2].Id, // Cabaña en la montaña
                     FechaInicio = DateTime.Now.AddDays(5),
                     FechaFin = DateTime.Now.AddDays(7),
                     Estado = EstadoReserva.Confirmada,
@@ -194,7 +211,7 @@ namespace AlquileresApp.Data
                 new Reserva
                 {
                     ClienteId = usuarios[1].Id, // Milagros Guasco
-                    PropiedadId = propiedades[3].Id, // Departamento céntrico
+                    PropiedadId = propiedadesDb[3].Id, // Departamento céntrico
                     FechaInicio = DateTime.Now.AddDays(20),
                     FechaFin = DateTime.Now.AddDays(25),
                     Estado = EstadoReserva.Pendiente,
@@ -242,7 +259,7 @@ namespace AlquileresApp.Data
             };
             context.Tarjetas.AddRange(tarjetas);
             context.SaveChanges();
-        */  
+        
 
         } 
     }
