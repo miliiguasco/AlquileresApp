@@ -159,9 +159,8 @@
         return estado.ToLower() switch
         {
             "pendiente" => "bg-warning",
-            "confirmada" => "bg-success",
             "cancelada" => "bg-danger",
-            "activa" => "bg-info",
+            "activa" => "bg-success",
             "finalizada" => "bg-secondary",
             _ => "bg-secondary"
         };

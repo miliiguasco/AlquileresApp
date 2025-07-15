@@ -582,9 +582,8 @@
         return estado.ToLower() switch
         {
             "pendiente" => "bg-warning",
-            "confirmada" => "bg-success",
             "cancelada" => "bg-danger",
-            "activa" => "bg-info",
+            "activa" => "bg-success",
             "finalizada" => "bg-secondary",
             _ => "bg-secondary"
         };
@@ -621,7 +620,7 @@
         return estado switch
         {
             EstadoReserva.Pendiente => "warning",
-            EstadoReserva.Confirmada => "success",
+            EstadoReserva.Activa => "success",
             EstadoReserva.Cancelada => "secondary",
             _ => "light"
         };
@@ -932,7 +931,7 @@ private async Task EnviarMensajeEmail()
         color: #000;
     }
 
-    .estado-badge.confirmada {
+    .estado-badge.activa {
         background-color: #28a745;
         color: white;
     }
