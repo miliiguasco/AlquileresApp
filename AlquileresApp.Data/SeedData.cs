@@ -28,9 +28,9 @@ namespace AlquileresApp.Data
                     },
                     new Cliente
                     {
-                        Nombre = "Milagros",
-                        Apellido = "Guasco",
-                        Email = "milagrosguasco11@gmail.com",
+                        Nombre = "prueba",
+                        Apellido = "test",
+                        Email = "prueba@test.com",
                         Telefono = "123456789",
                         Contraseña = hashService.HashPassword("password123"),
                         FechaNacimiento = new DateTime(1990, 1, 1),

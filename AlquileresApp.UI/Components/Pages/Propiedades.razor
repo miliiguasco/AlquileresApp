@@ -4,6 +4,7 @@
 @using AlquileresApp.Core.Interfaces
 @using Microsoft.AspNetCore.Components
 @using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IJSRuntime JSRuntime
 @inject CasoDeUsoListarPropiedades CUListarPropiedades
 @inject CasoDeUsoEliminarPropiedad CUEliminarPropiedad
@@ -14,6 +15,7 @@
 @inject ILogger<Propiedades> Logger
 @inject NavigationManager NavigationManager
 @inject INotificadorEmail NotificadorEmail
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="admin-section">
 
@@ -60,32 +62,40 @@
                             <td>@prop.Titulo</td>
                             <td>@prop.Localidad</td>
                             <td class="actions-cell">
-                                <div class="actions-wrapper">
-                                    <button class="btn btn-primary" title="Editar" @onclick="() => EditarPropiedad(prop)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger" title="Eliminar" @onclick="() => EliminarPropiedad(prop)">
+                            <div class="actions-wrapper">
+                                <button class="btn btn-primary" title="Editar" @onclick="() => EditarPropiedad(prop)"
+                                        disabled="@EsPropiedadBorrada(prop)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                @if (isAdmin){
+                                    <button class="btn btn-danger" title="Eliminar" @onclick="() => EliminarPropiedad(prop)"
+                                            disabled="@(EsPropiedadBorrada(prop))">
                                         <i class="fas fa-trash"></i>
                                     </button>
-                                    <button title="Destacar" style="background-color: @(prop.Destacada ? "#ffc107" : "gray"); color: white"
-            class="@GetClaseBotonDestacar(prop)"
-            @onclick="() => DestacarPropiedad(prop)"
-            disabled="@prop.NoHabitable">
-        <i class="@GetIconoBotonDestacar(prop)"></i>
-    </button>
+                                }
+                                <button title="Destacar" style="background-color: @(prop.Destacada ? "#ffc107" : "gray"); color: white"
+                                        class="@GetClaseBotonDestacar(prop)"
+                                        @onclick="() => DestacarPropiedad(prop)"
+                                        disabled="@(prop.NoHabitable || EsPropiedadBorrada(prop))">
+                                    <i class="@GetIconoBotonDestacar(prop)"></i>
+                                </button>
 
-                                    <button title="@(prop.NoHabitable ? "Habilitar" : "Inhabilitar")" style="background-color: @(prop.NoHabitable ? "green" : "#dc3545"); color: white" class="btn btn-warning" @onclick="() => IniciarCambioEstadoHabitabilidad(prop)">
+                                @if (isEncargado)
+                                {
+                                    <button title="@(prop.NoHabitable ? "Habilitar" : "Inhabilitar")" style="background-color: @(prop.NoHabitable ? "green" : "#dc3545"); color: white" class="btn btn-warning" @onclick="() => IniciarCambioEstadoHabitabilidad(prop)"
+                                            disabled="@EsPropiedadBorrada(prop)">
                                         @if (prop.NoHabitable)
                                         {
-                                            <i class="fas fa-check-circle"></i> @* Icono para "Marcar como Habitable" *@
+                                            <i class="fas fa-check-circle"></i>
                                         }
                                         else
                                         {
-                                            <i class="fas fa-ban"></i> @* Icono para "Marcar como No Habitable" *@
+                                            <i class="fas fa-ban"></i>
                                         }
                                     </button>
-                                </div>
-                            </td>
+                                }
+                            </div>
+                        </td>
                         </tr>
                     }
                 </tbody>
@@ -150,13 +160,20 @@
     private bool mostrarModalReubicacion = false;
     private Reserva reservaActualParaModal;
     private List<Propiedad> alternativasActualesParaModal;
-    private Propiedad propiedadQueSeEstaEvaluando; // Nueva variable para guardar la propiedad original temporalmente
+    private Propiedad propiedadQueSeEstaEvaluando; 
+
+    [Parameter]
+    public bool isEncargado { get; set; }
+
+    [Parameter]
+    public bool isAdmin { get; set; }
 
     protected override async Task OnInitializedAsync()
 
     {
         try
         {
+            
             propiedades = CUListarPropiedades.Ejecutar();
         }
         finally
@@ -179,8 +196,7 @@
 
             Dictionary<Reserva, List<Propiedad>> opcionesDeReubicacion = CUMarcarPropiedadComoNoHabitable.IdentificarReservasYAlternativas(propiedadQueSeEstaEvaluando);
 
-            // Si hay reservas afectadas, preparamos y mostramos el modal para la primera.
-            // Para un manejo de múltiples reservas, considera una cola o un diseño de modal que las gestione todas.
+            
             if (opcionesDeReubicacion.Any())
             {
                 var firstEntry = opcionesDeReubicacion.First();
@@ -233,7 +249,7 @@
             CUMarcarPropiedadComoNoHabitable.ActualizarEstadoNoHabitable(propiedadQueSeEstaEvaluando);
 
             mensajeExito = $"Reubicación exitosa de '{propiedadSeleccionada.Titulo}'.";
-            mensajeError = string.Empty; // Limpiar cualquier error anterior
+            mensajeError = string.Empty;
             propiedades = CUListarPropiedades.Ejecutar();
         }
         catch (Exception ex)
@@ -282,7 +298,11 @@
     }
 
 
-    
+   
+    private bool EsPropiedadBorrada(Propiedad prop)
+    {
+        return prop.Borrada;
+    }
 
     private void EliminarPropiedad(Propiedad propiedad)
     {
@@ -297,7 +317,7 @@
         try
         {   
             if (CUEliminarPropiedad.Ejecutar(propiedadAEliminar)){
-                mensajeExito = $" Propiedad eliminada: ${propiedadAEliminar.Titulo}.";
+                mensajeExito = $" Propiedad eliminada: {propiedadAEliminar.Titulo}.";
             }
             else
             {

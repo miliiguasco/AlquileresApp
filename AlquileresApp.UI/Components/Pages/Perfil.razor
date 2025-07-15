@@ -180,60 +180,6 @@
                                         <div class="alert alert-danger">@mensajeError</div>
                                     }
 
-    @if (!reservas.Any())
-    {
-        <div class="alert alert-info">No se encontraron reservas registradas.</div>
-    }
-    else
-    {
-        <table class="table_misreservas table-hover shadow-sm">
-            <thead class="table-dark">
-                <tr>
-                    <th>Propiedad</th>
-                    <th>Politica De Cancelacion</th>
-                    <th>Fecha inicio</th>
-                    <th>Fecha fin</th>
-                    <th>Estado</th>
-                    <th>Total</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var reserva in reservas)
-                {
-                    <tr>
-                        <td>@reserva.Propiedad?.Titulo</td>
-                       <td>@ObtenerDescripcionPolitica(reserva.Propiedad.PoliticaCancelacion)</td>
-                        <td>@reserva.FechaInicio.ToShortDateString()</td>
-                        <td>@reserva.FechaFin.ToShortDateString()</td>
-                        <td>
-                            <span class="badge bg-@GetBadgeColor(reserva.Estado)">
-                                @reserva.Estado
-                            </span>
-                        </td>
-                        <td>$@reserva.PrecioTotal.ToString("N2")</td>
-                        <td>
-                            @if (reserva.Estado == EstadoReserva.Pendiente)
-                            {
-                                <div class="btn-container">
-                                <button class=" btn btn-primary " @onclick="@(() => ModificarReserva(reserva.Id))">
-                                    <i class="bi bi-pencil  "></i> 
-                                </button>
-                                <button class="btn btn-danger" @onclick="@(() => CancelarReserva(reserva.Id))">
-                                    <i class="bi bi-x-circle "></i> 
-                                </button>
-                                </div>
-                            }
-                            else
-                            {
-                                <span class="text-muted">Sin acciones</span>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>  
-    }
 </div>
                                     @if (!reservas.Any())
                                     {

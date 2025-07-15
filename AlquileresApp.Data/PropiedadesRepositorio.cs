@@ -27,7 +27,9 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             return false;
         }
 
-        dbContext.Propiedades.Remove(propiedadExistente);
+        propiedadExistente.Borrada = true;
+
+        dbContext.Propiedades.Update(propiedadExistente);
         dbContext.SaveChanges();
         return true;
     }

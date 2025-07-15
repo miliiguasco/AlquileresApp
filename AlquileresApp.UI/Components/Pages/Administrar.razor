@@ -78,7 +78,7 @@
                 else if (tabActiva == "propiedades")
                 {
                     <div class="tab-pane active">
-                        <Propiedades />
+                        <Propiedades isAdmin="@isAdmin"/>
                     </div>
                 }
                 else if (tabActiva == "promociones")
@@ -233,7 +233,7 @@
                 else if (tabActiva == "propiedades")
                 {
                     <div class="tab-pane active">
-                        <Propiedades />
+                        <Propiedades  isEncargado="@isEncargado" />
                     </div>
                 }
         </div>
@@ -258,10 +258,13 @@
     
     private string mensajeError;
     private bool isEncargado = false;
+
+    private bool isAdmin = false;
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        isEncargado = authState.User.IsInRole("Encargado"); 
+        isEncargado = authState.User.IsInRole("Encargado");
+        isAdmin = authState.User.IsInRole("Administrador"); 
         await CargarPropiedades();
         preguntas = CUListarPreguntasFrecuentes.Ejecutar();
     }

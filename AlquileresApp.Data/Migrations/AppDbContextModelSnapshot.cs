@@ -157,6 +157,9 @@ namespace AlquileresApp.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Borrada")
+                        .HasColumnType("INTEGER");
+
                     b.Property<double>("CalificacionPromedio")
                         .HasColumnType("REAL");
 
