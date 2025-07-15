@@ -62,40 +62,51 @@
                             <td>@prop.Titulo</td>
                             <td>@prop.Localidad</td>
                             <td class="actions-cell">
-                            <div class="actions-wrapper">
-                                <button class="btn btn-primary" title="Editar" @onclick="() => EditarPropiedad(prop)"
-                                        disabled="@EsPropiedadBorrada(prop)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                @if (isAdmin){
-                                    <button class="btn btn-danger" title="Eliminar" @onclick="() => EliminarPropiedad(prop)"
-                                            disabled="@(EsPropiedadBorrada(prop))">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                }
-                                <button title="Destacar" style="background-color: @(prop.Destacada ? "#ffc107" : "gray"); color: white"
-                                        class="@GetClaseBotonDestacar(prop)"
-                                        @onclick="() => DestacarPropiedad(prop)"
-                                        disabled="@(prop.NoHabitable || EsPropiedadBorrada(prop))">
-                                    <i class="@GetIconoBotonDestacar(prop)"></i>
-                                </button>
-
-                                @if (isEncargado)
-                                {
-                                    <button title="@(prop.NoHabitable ? "Habilitar" : "Inhabilitar")" style="background-color: @(prop.NoHabitable ? "green" : "#dc3545"); color: white" class="btn btn-warning" @onclick="() => IniciarCambioEstadoHabitabilidad(prop)"
+                                <div class="actions-wrapper">
+                                    <button class="btn btn-primary" title="Editar" @onclick="() => EditarPropiedad(prop)"
                                             disabled="@EsPropiedadBorrada(prop)">
-                                        @if (prop.NoHabitable)
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
+                                    @if (isAdmin)
+                                    {
+                                        @if (!EsPropiedadBorrada(prop)) 
                                         {
-                                            <i class="fas fa-check-circle"></i>
+                                            <button class="btn btn-danger" title="Eliminar" @onclick="() => EliminarPropiedad(prop)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         }
                                         else
                                         {
-                                            <i class="fas fa-ban"></i>
+                                            <button class="btn btn-success" title="Activar" @onclick="() => ActivarPropiedad(prop)">
+                                                <i class="fas fa-check-circle"></i>
+                                            </button>
                                         }
+                                    }
+
+                                    <button title="Destacar" style="background-color: @(prop.Destacada ? "#ffc107" : "gray"); color: white"
+                                            class="@GetClaseBotonDestacar(prop)"
+                                            @onclick="() => DestacarPropiedad(prop)"
+                                            disabled="@(prop.NoHabitable || EsPropiedadBorrada(prop))">
+                                        <i class="@GetIconoBotonDestacar(prop)"></i>
                                     </button>
-                                }
-                            </div>
-                        </td>
+
+                                    @if (isEncargado)
+                                    {
+                                        <button title="@(prop.NoHabitable ? "Habilitar" : "Inhabilitar")" style="background-color: @(prop.NoHabitable ? "green" : "#dc3545"); color: white" class="btn btn-warning" @onclick="() => IniciarCambioEstadoHabitabilidad(prop)"
+                                                disabled="@EsPropiedadBorrada(prop)">
+                                            @if (prop.NoHabitable)
+                                            {
+                                                <i class="fas fa-check-circle"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-ban"></i>
+                                            }
+                                        </button>
+                                    }
+                                </div>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -311,7 +322,26 @@
         mensajeError = null;
         mensajeExito = null;
     }
-
+    private async Task ActivarPropiedad(Propiedad propiedad)
+    {
+        try
+        {
+            propiedad.Borrada = false; // Marcamos la propiedad como NO borrada
+            CUModificarPropiedad.Ejecutar(propiedad); // Persistimos el cambio
+            mensajeExito = $"La propiedad '{propiedad.Titulo}' ha sido activada correctamente.";
+            mensajeError = null;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error al activar la propiedad.");
+            mensajeError = $"Error al activar la propiedad: {ex.Message}";
+            mensajeExito = null;
+        }
+        finally
+        {
+           propiedades = CUListarPropiedades.Ejecutar();
+        }
+    }
     private async Task ConfirmarCancelacion()
     {
         try
