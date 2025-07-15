@@ -200,9 +200,11 @@
                 // Recargar las propiedades para reflejar el cambio persistido en la DB
                 propiedades = CUListarPropiedades.Ejecutar();
             }
-             if (propiedad.NoHabitable)
+             if (propiedad.NoHabitable )
     {
         propiedad.Destacada = false; // Quitar el destacado si no es habitable
+        CUModificarPropiedad.Ejecutar(propiedad); // Guardar el cambio en la base de datos
+
     }
         }
         catch (Exception ex)
