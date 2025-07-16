@@ -67,18 +67,7 @@
                                             disabled="@EsPropiedadBorrada(prop)">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-danger" title="Eliminar" @onclick="() => EliminarPropiedad(prop)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <button title="@(prop.Destacada ? "Destacar" : "Desmarcar")" style="background-color: @(prop.Destacada ? "#ffc107" : "gray"); color: white"
-            class="@GetClaseBotonDestacar(prop)"
-            @onclick="() => DestacarPropiedad(prop)"
-            disabled="@prop.NoHabitable">
-        <i class="@GetIconoBotonDestacar(prop)"></i>
-    </button>
 
-                                    <button title="@(prop.NoHabitable ? "Habitable" : "No habitable")" style="background-color: @(prop.NoHabitable ? "green" : "#dc3545"); color: white" class="btn btn-warning" @onclick="() => IniciarCambioEstadoHabitabilidad(prop)"/>
-                                        @if (prop.NoHabitable)
 
                                     @if (isAdmin)
                                     {
@@ -94,14 +83,13 @@
                                                 <i class="fas fa-check-circle"></i>
                                             </button>
                                         }
-                                    }
-
-                                    <button title="Destacar" style="background-color: @(prop.Destacada ? "#ffc107" : "gray"); color: white"
+                                        <button title="@(prop.Destacada ? "Destacar" : "Desmarcar")" style="background-color: @(prop.Destacada ? "#ffc107" : "gray"); color: white"
                                             class="@GetClaseBotonDestacar(prop)"
                                             @onclick="() => DestacarPropiedad(prop)"
                                             disabled="@(prop.NoHabitable || EsPropiedadBorrada(prop))">
-                                        <i class="@GetIconoBotonDestacar(prop)"></i>
-                                    </button>
+                                            <i class="@GetIconoBotonDestacar(prop)"></i>
+                                        </button>
+                                    }
 
                                     @if (isEncargado)
                                     {

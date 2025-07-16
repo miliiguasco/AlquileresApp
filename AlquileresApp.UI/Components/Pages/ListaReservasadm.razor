@@ -78,12 +78,6 @@
                                         <i class="fas fa-check"></i>
                                     </button>
                                 }
-                                @if (reserva.Estado == EstadoReserva.Pendiente)
-                                {
-                                    <button class="btn btn-danger" title="Cancelar" @onclick="() => CancelarReserva(reserva)">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                }
                             </td>
                         </tr>
                     }
@@ -117,26 +111,6 @@
         </div>
     </div>
 }
-@if (mostrarConfirmacion)
-{
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirmar Cancelación</h5>
-                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
-                </div>
-                <div class="modal-body">
-                    <p>¿Estás seguro de que querés cancelar esta reserva?</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-naranja" @onclick="CancelarConfirmacion">No</button>
-                    <button class="btn-naranja" @onclick="@(async () => await ConfirmarCancelacion())">Sí, cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
 
 @code {
     private string? error;
@@ -145,7 +119,6 @@
     private string mensajeError;
     private string mensajeExito;
     private bool mostrarConfirmacion = false;
-    private Reserva reservaACancelar;
 
     [Parameter]
     public bool isEncargado { get; set; } 
@@ -200,43 +173,7 @@
             _ => "bg-secondary"
         };
     }
-
-    private void VerDetallesReserva(int reservaId)
-    {
-        NavigationManager.NavigateTo($"/DetallesReserva/{reservaId}");
-    }
-
-    private void CancelarReserva(Reserva reserva)
-    {
-        reservaACancelar = reserva;
-        mostrarConfirmacion = true;
-        mensajeError = null;
-        mensajeExito = null;
-    }
-
-    private async Task ConfirmarCancelacion()
-    {
-        try
-        {
-            // TODO: Implementar lógica de cancelación
-            mensajeExito = "Reserva cancelada exitosamente.";
-            await CargarReservas();
-        }
-        catch (Exception ex)
-        {
-            mensajeError = $"Error al cancelar la reserva: {ex.Message}";
-        }
-        finally
-        {
-            mostrarConfirmacion = false;
-        }
-    }
-
-    private void CancelarConfirmacion()
-    {
-        mostrarConfirmacion = false;
-    }
-
+  
     private async Task RegistrarCheckout(Reserva reserva)
     {
         try
@@ -244,6 +181,7 @@
             CURegistrarCheckout.Ejecutar(reserva.Id);
             mensajeExito = "Checkout registrado exitosamente.";
             await CargarReservas();
+            StateHasChanged(); 
         }
         catch (Exception ex)
         {

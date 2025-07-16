@@ -52,7 +52,7 @@
 
         <div class="input-container">
             <label for="descuento">Porcentaje de Descuento</label>
-            <InputNumber id="descuento" class="mi-input" @bind-Value="nuevaPromocion.PorcentajeDescuento" />
+            <InputNumber id="descuento" min="1" class="mi-input" @bind-Value="nuevaPromocion.PorcentajeDescuento" />
             <ValidationMessage For="@(() => nuevaPromocion.PorcentajeDescuento)" />
         </div>
 
