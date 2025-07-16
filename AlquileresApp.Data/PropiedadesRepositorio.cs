@@ -99,6 +99,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             .Include(p => p.Imagenes)
             .Include(p => p.Reservas)
             .Include(p => p.Promociones)
+            .Where(p => !p.Borrada)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(filtros.Localidad))

@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="CasosDeUso\Encargado\" />
-    <Folder Include="CasosDeUso\Propiedad\" />
     <Folder Include="CasosDeUso\Reserva\" />
   </ItemGroup>
 

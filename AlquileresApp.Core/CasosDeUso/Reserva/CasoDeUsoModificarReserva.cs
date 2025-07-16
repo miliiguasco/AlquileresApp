@@ -146,26 +146,25 @@ public class ResultadoModificacionReserva
         return new ResultadoVistaPreviaModificacion { EsPosible = false, Mensaje = "Fechas no disponibles." };
 
     var dias = (nuevaFechaFin.Date - nuevaFechaInicio.Date).Days;
-    var nuevoMontoBase = propiedad.PrecioPorNoche * dias;
+    var nuevoMontoBase = propiedad.PrecioPorNoche * dias; // 4000
 
 
-     var nuevoMonto = propiedad.TipoPago switch
+    var nuevoMonto = propiedad.TipoPago switch
     {
         TipoPago.SinAnticipo => 0,
-        TipoPago.Parcial => nuevoMontoBase * 0.20m,
+        TipoPago.Parcial => nuevoMontoBase * 0.20m, // 4000 * 0.20 = 800 --> anticipo despues de extender reserva
         TipoPago.Total => nuevoMontoBase,
         _ => throw new Exception("Tipo de pago inválido")
     };
 
-    var diferencia = nuevoMonto - reserva.MontoAPagar;
-     var diasAnticipacion = (reserva.FechaInicio.Date - DateTime.Now.Date).Days;
+    var diferencia = nuevoMonto - reserva.MontoAPagar; // 800 - 80 = 720 
+    var diasAnticipacion = (reserva.FechaInicio.Date - DateTime.Now.Date).Days;
+    nuevoMontoBase = nuevoMontoBase - diferencia; 
     string mensaje;
-        if (diasAnticipacion < 10)
+        if (diasAnticipacion < 10 && diferencia < 0)
         {
             mensaje = "No se reembolsará porque la reserva se encuentra a menos de 10 días de su inicio.";
             diferencia = 0;
-            nuevoMonto = reserva.MontoAPagar;
-            nuevoMontoBase = reserva.PrecioTotal;
         }
         else
         {
@@ -189,4 +188,4 @@ public class ResultadoModificacionReserva
 }
 
 
-    }
+}
