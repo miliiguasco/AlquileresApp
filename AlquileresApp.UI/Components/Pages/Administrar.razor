@@ -10,7 +10,6 @@
 @using AlquileresApp.Core.Interfaces
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
-@using Microsoft.AspNetCore.Components.Authorization 
 
 @inject AuthenticationStateProvider AuthenticationStateProvider 
 
@@ -26,6 +25,8 @@
 @inject CasoDeUsoModificarPreguntaFrecuente CUModificarPreguntaFrecuente
 @inject CasoDeUsoEliminarPreguntaFrecuente CUEliminarPreguntaFrecuente
 @inject CasoDeUsoMostrarPreguntasFrecuentes CUListarPreguntasFrecuentes
+
+@inject CasoDeUsoRegistrarCheckout CURegistrarCheckout
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @attribute [Authorize(Roles = "Administrador,Encargado")] 
@@ -77,7 +78,7 @@
                 else if (tabActiva == "propiedades")
                 {
                     <div class="tab-pane active">
-                        <Propiedades />
+                        <Propiedades isAdmin="@isAdmin"/>
                     </div>
                 }
                 else if (tabActiva == "promociones")
@@ -226,13 +227,13 @@
                 @if (tabActiva == "reservas")
                 {
                     <div class="tab-pane active">
-                        <ListaReservasadm />
+                        <ListaReservasadm isEncargado="@isEncargado"/>
                     </div>
                 }
                 else if (tabActiva == "propiedades")
                 {
                     <div class="tab-pane active">
-                        <Propiedades />
+                        <Propiedades  isEncargado="@isEncargado" />
                     </div>
                 }
         </div>
@@ -255,11 +256,15 @@
     private string errorCreacion;
     private string mensajeExito;
     
+    private string mensajeError;
     private bool isEncargado = false;
+
+    private bool isAdmin = false;
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        isEncargado = authState.User.IsInRole("Encargado"); 
+        isEncargado = authState.User.IsInRole("Encargado");
+        isAdmin = authState.User.IsInRole("Administrador"); 
         await CargarPropiedades();
         preguntas = CUListarPreguntasFrecuentes.Ejecutar();
     }

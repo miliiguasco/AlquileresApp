@@ -6,6 +6,7 @@
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.Interfaces
 @using GoogleMaps.LocationServices
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.JSInterop
 @inject IPropiedadRepositorio PropiedadesRepo
 @inject IImagenesRepositorio ImagenesRepo
@@ -17,6 +18,10 @@
 @inject CasoDeUsoMostrarImagenes CUMostrarImagenes
 @inject CasoDeUsoCrearReserva CUCrearReserva
 @inject CasoDeUsoObtenerPropiedad CUObtenerPropiedad
+
+@inject CasoDeUsoTieneReserva CUTieneReserva
+
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
 @inject IWebHostEnvironment Environment
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
@@ -96,8 +101,9 @@
                 <h4 class="mt-5 mb-3">Política de cancelación</h4>
                 <p class="fst-italic">@ObtenerDescripcionPolitica(propiedad.PoliticaCancelacion)</p>
             </div>
-
-            <div class="button-group">
+             <div class="button-group">
+            @if (esAdministrativo)
+            {
                 <button class="btn btn-primary" @onclick="IniciarEdicion">
                     <i class="fas fa-edit"></i> Editar Propiedad
                 </button>
@@ -106,7 +112,7 @@
                     <i class="fas fa-edit"></i> Cargar Imagen
                 </button>
                 <InputFile OnChange="CargarImagen" accept=".jpg,.jpeg,.png" style="display:none" />
-
+            }
                 <button class="btn-naranja" @onclick="VolverAInicio">Volver al Inicio</button>
             </div>
         }
@@ -172,11 +178,6 @@
                 
                  <p id="map" style="width: 100%; height: 300px; margin: 10px 0;"></p>
 
-                <div class="form-group">
-                    <label for="direccion">Dirección</label>
-                    <div id="direccion-autocomplete-container"></div>
-                    <ValidationMessage For="@(() => propiedadEditada.Direccion)" />
-                </div>
 
                 <div class="form-group">
                     <label for="capacidad">Capacidad de personas</label>
@@ -227,6 +228,27 @@
         <div class="alert alert-danger mt-2">@errorMensaje</div>
     }
 </div>
+
+<div class="modal @(mostrarModalAdvertencia ? "show d-block" : "fade")" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-warning"><i class="fas fa-exclamation-triangle"></i> Advertencia de Capacidad</h5>
+                <button type="button" class="btn-close" @onclick="() => ManejarRespuestaModal(false)" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¡Atención! Hay reservas activas o futuras para esta propiedad.</p>
+                <p>Cambiar la capacidad de personas de @capacidadOriginal a @propiedadEditada.Capacidad podría afectar la validez de las reservas existentes y causar problemas a los inquilinos.</p>
+                <p>¿Está seguro de que desea continuar con esta modificación?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="() => ManejarRespuestaModal(false)">Cancelar</button>
+                <button type="button" class="btn btn-warning" @onclick="() => ManejarRespuestaModal(true)">Confirmar y Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @code {
     [Parameter]
     public int Id { get; set; }
@@ -241,9 +263,18 @@
     private bool modoEdicion = false;
     private string carouselId => $"carousel-{Id}";
 
+    private int capacidadOriginal;
+
+    private bool mostrarModalAdvertencia = false;
     private List<Encargado> ListaEncargados = new();
 
-    protected override void OnInitialized()
+    private TaskCompletionSource<bool> modalResponseTcs = new TaskCompletionSource<bool>(); // Para esperar la respuesta de la modal
+
+    private AuthenticationState? authState;
+    private bool esAdministrativo = false;
+
+
+    protected override async Task OnInitializedAsync()
     {
         propiedad = CUObtenerPropiedad.Ejecutar(Id);
         googleMapsApiKey = Configuration["GoogleMaps:ApiKey"];
@@ -255,6 +286,13 @@
 
         // Cargar encargados para el input de selección
         ListaEncargados = UsuarioRepositorio.ListarEncargados();
+
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState != null && authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
+        {
+            esAdministrativo = authState.User.IsInRole("Administrador");
+        }
+        StateHasChanged(); // Forzar renderizado inicial
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -327,6 +365,7 @@
                     NoHabitable = propiedad.NoHabitable
                     
                 };
+                capacidadOriginal = propiedad.Capacidad; 
                 modoEdicion = true;
                 await InvokeAsync(StateHasChanged); // Forzar renderizado inmediato
             }
@@ -362,65 +401,91 @@
     private async Task HandleSubmitWithGeocoding()
     {
         errorMensaje = null;
-        // Asegúrate de que la dirección esté actualizada
         if (string.IsNullOrWhiteSpace(propiedadEditada.Direccion))
         {
             errorMensaje = "Por favor, ingresa una dirección.";
             return;
         }
 
-        // Primero, intenta obtener las coordenadas de la dirección seleccionada
         bool geocodingSuccessful = await GetCoordinatesForAddressAsync();
 
         if (geocodingSuccessful)
         {
-            await GuardarCambios();
+            if (propiedadEditada.Capacidad != capacidadOriginal)
+            {
+                bool hasActiveReservations = CUTieneReserva.Ejecutar(propiedadEditada.Id);
+
+                if (hasActiveReservations)
+                {
+                    // Mostrar la modal de advertencia
+                    mostrarModalAdvertencia = true;
+                    StateHasChanged(); // Forzar la renderización para mostrar la modal
+
+                    // Esperar la respuesta del usuario desde la modal
+                    bool confirm = await modalResponseTcs.Task;
+
+                    if (!confirm)
+                    {
+                        modalResponseTcs = new TaskCompletionSource<bool>(); // Resetear para futuros usos
+                        return; // Usuario canceló, no guardar cambios
+                    }
+                    modalResponseTcs = new TaskCompletionSource<bool>(); // Resetear
+                }
+            }
+            await GuardarCambios(); // Procede a guardar
         }
     }
+    private void ManejarRespuestaModal(bool confirmar)
+    {
+        mostrarModalAdvertencia = false; // Ocultar la modal
+        modalResponseTcs.SetResult(confirmar); // Establecer el resultado de la tarea
+        StateHasChanged(); // Forzar renderización para ocultar la modal
+    }
+
 
    private async Task<bool> GetCoordinatesForAddressAsync()
-{
-    errorMensaje = string.Empty;
-    propiedadEditada.Latitud = 0;
-    propiedadEditada.Longitud = 0;
-
-    if (string.IsNullOrEmpty(googleMapsApiKey))
     {
-        errorMensaje = "Error: La clave de API de Google Maps no está configurada.";
-        return false;
-    }
+        errorMensaje = string.Empty;
+        propiedadEditada.Latitud = 0;
+        propiedadEditada.Longitud = 0;
 
-    if (string.IsNullOrWhiteSpace(propiedadEditada.Direccion))
-    {
-        errorMensaje = "Por favor, ingresa una dirección.";
-        return false;
-    }
-
-    try
-    {
-        var locationService = new GoogleLocationService(googleMapsApiKey);
-        var coordenadas = locationService.GetLatLongFromAddress(propiedadEditada.Direccion);
-        Console.WriteLine($"Coordenadas obtenidas: Latitud={coordenadas.Latitude}, Longitud={coordenadas.Longitude}");
-        // Verificar si las coordenadas son válidas
-        if (coordenadas != null)
+        if (string.IsNullOrEmpty(googleMapsApiKey))
         {
-            propiedadEditada.Latitud = coordenadas.Latitude;
-            propiedadEditada.Longitud = coordenadas.Longitude;
-            return true;
+            errorMensaje = "Error: La clave de API de Google Maps no está configurada.";
+            return false;
         }
-        else
+
+        if (string.IsNullOrWhiteSpace(propiedadEditada.Direccion))
         {
-            errorMensaje = "No se encontraron coordenadas para la dirección ingresada. Intenta ser más específico.";
+            errorMensaje = "Por favor, ingresa una dirección.";
+            return false;
+        }
+
+        try
+        {
+            var locationService = new GoogleLocationService(googleMapsApiKey);
+            var coordenadas = locationService.GetLatLongFromAddress(propiedadEditada.Direccion);
+            Console.WriteLine($"Coordenadas obtenidas: Latitud={coordenadas.Latitude}, Longitud={coordenadas.Longitude}");
+            // Verificar si las coordenadas son válidas
+            if (coordenadas != null)
+            {
+                propiedadEditada.Latitud = coordenadas.Latitude;
+                propiedadEditada.Longitud = coordenadas.Longitude;
+                return true;
+            }
+            else
+            {
+                errorMensaje = "No se encontraron coordenadas para la dirección ingresada. Intenta ser más específico.";
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = $"Ocurrió un error al buscar la dirección: {ex.Message}. Asegúrate de que tu clave de API sea válida.";
+            Console.WriteLine($"Error de geocificación: {ex}");
             return false;
         }
     }
-    catch (Exception ex)
-    {
-        errorMensaje = $"Ocurrió un error al buscar la dirección: {ex.Message}. Asegúrate de que tu clave de API sea válida.";
-        Console.WriteLine($"Error de geocificación: {ex}");
-        return false;
-    }
-}
 
 private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
 {

@@ -152,6 +152,7 @@ builder.Services.AddScoped<ITokenRecuperacionRepositorio, TokenRecuperacionRepos
 builder.Services.AddScoped<CasoDeUsoRestablecerContraseña>();
 builder.Services.AddScoped<CasoDeUsoContactarEncargado>();
 builder.Services.AddScoped<CasoDeUsoContactarCliente>();
+builder.Services.AddScoped<CasoDeUsoTieneReserva>();
 builder.Services.AddHttpClient();
 builder.Services.AddResponseCompression();
 

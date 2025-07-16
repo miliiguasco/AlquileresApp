@@ -27,7 +27,9 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             return false;
         }
 
-        dbContext.Propiedades.Remove(propiedadExistente);
+        propiedadExistente.Borrada = true;
+
+        dbContext.Propiedades.Update(propiedadExistente);
         dbContext.SaveChanges();
         return true;
     }
@@ -211,7 +213,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
        .Include(p => p.Imagenes)
        .Include(p => p.Promociones)
        .Include(p => p.Reservas)
-       .Where(p => !p.NoHabitable && !p.borrada) // Filtrar propiedades no habitables y borradas
+       .Where(p => !p.NoHabitable && !p.Borrada) // Filtrar propiedades no habitables y borradas
        .ToList();
 
 
@@ -221,7 +223,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
 {
     return dbContext.Propiedades
         .Include(p => p.Imagenes)
-        .Where(p => p.Destacada && !p.NoHabitable && !p.borrada) 
+        .Where(p => p.Destacada && !p.NoHabitable && !p.Borrada) 
         .ToList();
 }
 }

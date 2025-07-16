@@ -40,7 +40,7 @@
 
                 <div class="form-group">
                     <label for="precio">Precio por día</label>
-                    <InputNumber id="precio" class="form-control" @bind-Value="nuevaPropiedad.PrecioPorNoche" />
+                    <InputNumber id="precio" class="form-control" @bind-Value="nuevaPropiedad.PrecioPorNoche" min="1" />
                     <ValidationMessage For="@(() => nuevaPropiedad.PrecioPorNoche)" />
                 </div>
 
@@ -51,7 +51,7 @@
 
                 <div class="form-group">
                     <label for="capacidad">Capacidad de personas</label>
-                    <InputNumber id="capacidad" class="form-control" @bind-Value="nuevaPropiedad.Capacidad" />
+                    <InputNumber id="capacidad" class="form-control" @bind-Value="nuevaPropiedad.Capacidad" min="1" />
                     <ValidationMessage For="@(() => nuevaPropiedad.Capacidad)" />
                 </div>
 

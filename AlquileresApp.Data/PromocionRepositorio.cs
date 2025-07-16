@@ -15,7 +15,7 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
     foreach (var promo in promociones)
     {
         promo.Propiedades = promo.Propiedades
-            .Where(prop => !prop.borrada && !prop.NoHabitable)
+            .Where(prop => !prop.Borrada && !prop.NoHabitable)
             .ToList();
     }
 
@@ -117,7 +117,7 @@ public List<Promocion> ObtenerTodasActivas()
     foreach (var promo in promociones)
     {
         promo.Propiedades = promo.Propiedades
-            .Where(prop => !prop.borrada && !prop.NoHabitable)
+            .Where(prop => !prop.Borrada && !prop.NoHabitable)
             .ToList();
     }
      promociones = promociones

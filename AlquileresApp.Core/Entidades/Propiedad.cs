@@ -29,7 +29,6 @@ public class Propiedad
     public ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
     public double CalificacionPromedio { get; set; } = 0;
     public ICollection<Calificacion> Calificaciones { get; set; } = new List<Calificacion>();
-    
-    public bool borrada { get; set; } = false;
+    public bool Borrada { get; set; } = false;
 }
 

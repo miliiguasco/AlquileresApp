@@ -18,6 +18,7 @@ public interface IReservaRepositorio{
     void Actualizar(Reserva reserva);
     public void RegistrarCheckout(Reserva reserva);
 
+    public bool TieneReservasActivas(int propiedadId);
     IEnumerable<Reserva> ObtenerReservasPorUsuarioYPropiedad(int? usuarioId, int propiedadId);
     public void ModificarReserva2(Reserva reserva);
 }
