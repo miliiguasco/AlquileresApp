@@ -579,16 +579,13 @@
         NavigationManager.NavigateTo($"/modificarreserva/{id}");
     }
 
-   private async Task CancelarReserva(int id)
-{
-    reservaAEliminarId = id;
-    var resultadoPreliminar = await casoDeUsoCancelarReserva.calcularCancelacion(id);
-    mensajeCancelacion = resultadoPreliminar.Mensaje;
-    mostrarConfirmacion = true;
-    mensajeError = null;
-    mensajeExito = null;
-    await InvokeAsync(StateHasChanged); 
-}
+    private void CancelarReserva(int id)
+    {
+        reservaAEliminarId = id;
+        mostrarConfirmacion = true; 
+        mensajeError = null;
+        mensajeExito = null;
+    }
 
     private async Task ConfirmarCancelacion()
 {
@@ -598,25 +595,21 @@
 
         if (resultado.EsExitosa)
         {
-            mensajeExito_misReservas = resultado.Mensaje;
-
+            if (resultado.EsExitosa)
+                mensajeExito_misReservas = resultado.Mensaje;
 
             await CargarmisReservas();
         }
-        else
-        {
-            mensajeError = resultado.Mensaje;
-        }
     }
     catch (Exception ex)
-    {
-        mensajeError = $"Ocurrió un error inesperado: {ex.Message}";
+        {
+            mensajeError = $"Ocurrió un error inesperado: {ex.Message}";
+        }
+        finally
+        {
+            mostrarConfirmacion = false;
+        }
     }
-    finally
-    {
-        mostrarConfirmacion = false;
-    }
-}
 
 
     private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)

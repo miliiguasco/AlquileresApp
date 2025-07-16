@@ -90,6 +90,7 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
         var reservas = dbContext.Reservas
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
+            .OrderBy(r => r.Estado)
             .ToList();
         Console.WriteLine($"✅ Se encontraron {reservas.Count} reservas");
         foreach (var reserva in reservas)
@@ -105,7 +106,7 @@ public class ReservaRepositorio(AppDbContext dbContext) : IReservaRepositorio
             .Include(r => r.Cliente)
             .Include(r => r.Propiedad)
             .Where(r => r.Cliente.Id == usuario)
-            .OrderBy(r => r.FechaInicio)
+            .OrderBy(r => r.Estado)
             .ToList();
         return reservas;
     }
