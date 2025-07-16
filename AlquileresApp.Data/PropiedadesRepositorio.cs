@@ -148,7 +148,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
             .First();
 
         var descuento = propiedad.PrecioPorNoche * (mejorPromocion.PorcentajeDescuento / 100);
-        return propiedad.PrecioPorNoche - descuento;
+        return descuento;
     }
     public bool ComprobarDisponibilidadModificacion(int propiedadId, DateTime fechaInicio, DateTime fechaFin, int reservaId)
     {
