@@ -30,7 +30,7 @@
         <div class="alert alert-danger">@mensajeError</div>
     }
         <div class="table-container">
-            <table class="property-table">
+            <table class="property-table">  
                 <thead>
                     <tr>
                         <th>Imagen</th>
@@ -111,17 +111,14 @@
                     }
                 </tbody>
             </table>
-            <button class="btn-naranja btn-agregar" @onclick="() => NuevaPropiedad()">
-                Nueva propiedad
-            </button>
+        <button class="btn-naranja btn-agregar" @onclick="() => NuevaPropiedad()">
+            Nueva propiedad
+        </button>
         </div>
     }
     else
     {
         <p>No hay propiedades disponibles.</p>
-        <button class="btn-naranja btn-agregar" @onclick="() => NuevaPropiedad()">
-            Nueva propiedad
-        </button>
     }
 </div>
 @if (mostrarConfirmacion)
@@ -171,7 +168,10 @@
     private bool mostrarModalReubicacion = false;
     private Reserva reservaActualParaModal;
     private List<Propiedad> alternativasActualesParaModal;
-    private Propiedad propiedadQueSeEstaEvaluando; 
+    private Propiedad propiedadQueSeEstaEvaluando;
+
+    private List<KeyValuePair<Reserva, List<Propiedad>>>? reservasPendientesDeReubicacion; // Nueva variable para controlar el flujo
+    private int indiceReservaActual = 0; 
 
     [Parameter]
     public bool isEncargado { get; set; }
@@ -203,36 +203,35 @@
     {
         try
         {
-            propiedadQueSeEstaEvaluando = propiedad;
+            propiedadQueSeEstaEvaluando = propiedad; // Se asigna la propiedad que inició el proceso
 
             Dictionary<Reserva, List<Propiedad>> opcionesDeReubicacion = CUMarcarPropiedadComoNoHabitable.IdentificarReservasYAlternativas(propiedadQueSeEstaEvaluando);
 
-            
             if (opcionesDeReubicacion.Any())
             {
-                var firstEntry = opcionesDeReubicacion.First();
-                reservaActualParaModal = firstEntry.Key;
-                alternativasActualesParaModal = firstEntry.Value;
-                mostrarModalReubicacion = true; // Hace visible el modal
-                mensajeError = string.Empty; // Limpiar mensajes de error previos
-                mensajeExito = string.Empty; // Limpiar mensajes de éxito previos
-                StateHasChanged(); // Forzar renderizado para mostrar el modal
+                reservasPendientesDeReubicacion = opcionesDeReubicacion.ToList();
+                indiceReservaActual = 0; // Siempre empezar desde la primera reserva
+
+                PrepararYMostrarModalParaSiguienteReserva();
             }
             else
             {
-                 propiedadQueSeEstaEvaluando.NoHabitable = !propiedadQueSeEstaEvaluando.NoHabitable; // Volvemos a togglar para que coincida con el estado deseado
+                // Si no hay reservas que reubicar, se invierte el estado de habitabilidad directamente.
+                // Y se actualiza la propiedad en la base de datos.
+                propiedadQueSeEstaEvaluando.NoHabitable = !propiedadQueSeEstaEvaluando.NoHabitable;
                 CUMarcarPropiedadComoNoHabitable.ActualizarEstadoNoHabitable(propiedadQueSeEstaEvaluando);
+                propiedades = CUListarPropiedades.Ejecutar(); // Refrescar la lista
+
                 mensajeError = string.Empty;
                 mensajeExito = "El estado de la propiedad se ha actualizado correctamente (no había reservas que reubicar).";
-                // Recargar las propiedades para reflejar el cambio persistido en la DB
-                propiedades = CUListarPropiedades.Ejecutar();
             }
-             if (propiedad.NoHabitable )
-    {
-        propiedad.Destacada = false; // Quitar el destacado si no es habitable
-        CUModificarPropiedad.Ejecutar(propiedad); // Guardar el cambio en la base de datos
 
-    }
+            // Esta lógica para quitar el destacado SOLO se aplica si la propiedad TERMINA en NoHabitable
+            if (propiedadQueSeEstaEvaluando.NoHabitable)
+            {
+                propiedadQueSeEstaEvaluando.Destacada = false;
+                CUModificarPropiedad.Ejecutar(propiedadQueSeEstaEvaluando);
+            }
         }
         catch (Exception ex)
         {
@@ -240,76 +239,129 @@
             mensajeError = $"Error al marcar la propiedad como no habitable: {ex.Message}";
             mensajeExito = string.Empty;
             mostrarModalReubicacion = false;
-
-            propiedades = CUListarPropiedades.Ejecutar();
+            propiedades = CUListarPropiedades.Ejecutar(); // Refrescar en caso de error
         }
+        StateHasChanged();
+    }
+
+    private void PrepararYMostrarModalParaSiguienteReserva()
+    {
+        if (reservasPendientesDeReubicacion != null && indiceReservaActual < reservasPendientesDeReubicacion.Count)
+        {
+            // Todavía hay reservas por procesar, mostrar el modal
+            var currentEntry = reservasPendientesDeReubicacion[indiceReservaActual];
+            reservaActualParaModal = currentEntry.Key;
+            alternativasActualesParaModal = currentEntry.Value;
+
+            mostrarModalReubicacion = true;
+            mensajeError = string.Empty;
+            mensajeExito = string.Empty;
+        }
+        else
+        {
+            mostrarModalReubicacion = false; 
+            // Todas las reservas han sido procesadas. Ahora sí, se invierte el estado final
+            // de habitabilidad de la propiedad original y se guarda en la base de datos.
+            if (propiedadQueSeEstaEvaluando != null)
+            {
+                propiedadQueSeEstaEvaluando.NoHabitable = !propiedadQueSeEstaEvaluando.NoHabitable;
+                CUMarcarPropiedadComoNoHabitable.ActualizarEstadoNoHabitable(propiedadQueSeEstaEvaluando);
+
+                // Si la propiedad termina como NoHabitable, se le quita el destacado
+                if (propiedadQueSeEstaEvaluando.NoHabitable)
+                {
+                    propiedadQueSeEstaEvaluando.Destacada = false;
+                    CUModificarPropiedad.Ejecutar(propiedadQueSeEstaEvaluando);
+                }
+            }
+
+            mensajeError = string.Empty;
+            mensajeExito = "Se han procesado todas las reservas. El estado de la propiedad se ha actualizado correctamente.";
+            propiedades = CUListarPropiedades.Ejecutar(); // Refrescar la lista principal de propiedades
+        }
+        StateHasChanged(); // Forzar el renderizado para mostrar/ocultar el modal o actualizar mensajes
     }
 
     private async Task HandlePropiedadSeleccionada(Propiedad propiedadSeleccionada)
     {
         try
         {
-            CUMarcarPropiedadComoNoHabitable.ReasignarReserva(reservaActualParaModal, propiedadSeleccionada);
+            // Reasignar la reserva
+            if (reservaActualParaModal != null)
+            {
+                CUMarcarPropiedadComoNoHabitable.ReasignarReserva(reservaActualParaModal, propiedadSeleccionada);
 
-            NotificadorEmail.EnviarCorreoModificacionReservaPorNoHabitable(
-                reservaActualParaModal.Cliente?.Email ?? "", 
-                reservaActualParaModal.Cliente?.Nombre ?? "", 
-                propiedadQueSeEstaEvaluando.Titulo, 
-                propiedadSeleccionada.Titulo
-            );
+                NotificadorEmail.EnviarCorreoModificacionReservaPorNoHabitable(
+                    reservaActualParaModal.Cliente?.Email ?? "",
+                    reservaActualParaModal.Cliente?.Nombre ?? "",
+                    propiedadQueSeEstaEvaluando?.Titulo ?? "", // Usar propiedadQueSeEstaEvaluando
+                    propiedadSeleccionada.Titulo
+                );
 
-            propiedadQueSeEstaEvaluando.NoHabitable = !propiedadQueSeEstaEvaluando.NoHabitable;
-            CUMarcarPropiedadComoNoHabitable.ActualizarEstadoNoHabitable(propiedadQueSeEstaEvaluando);
-
-            mensajeExito = $"Reubicación exitosa de '{propiedadSeleccionada.Titulo}'.";
+                mensajeExito = $"Reubicación exitosa de la reserva del cliente '{reservaActualParaModal.Cliente?.Nombre}' a '{propiedadSeleccionada.Titulo}'.";
+            }
             mensajeError = string.Empty;
-            propiedades = CUListarPropiedades.Ejecutar();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error al reasignar la reserva.");
+            Logger.LogError(ex, $"Error al reasignar la reserva {reservaActualParaModal?.Id}.");
             mensajeError = $"Error al reasignar la reserva: {ex.Message}";
             mensajeExito = string.Empty;
         }
-        mostrarModalReubicacion = false; 
+        finally
+        {
+            indiceReservaActual++; // Avanzamos a la siguiente reserva
+            PrepararYMostrarModalParaSiguienteReserva(); // Prepara y muestra el siguiente modal o finaliza
+        }
     }
 
     private async Task HandleCerrarModal()
     {
-        mensajeError = "La reubicación de la reserva fue cancelada o no se seleccionó una alternativa. La reserva original permanece sin reasignar y la propiedad mantiene su estado.";
+        // El usuario canceló la reubicación para la reserva actual.
+        // La política es que la reserva original permanece sin reasignar.
+        mensajeError = "La reubicación de la reserva fue cancelada por el usuario. La reserva original permanece sin reasignar.";
         mensajeExito = string.Empty;
-        mostrarModalReubicacion = false;
-        propiedades = CUListarPropiedades.Ejecutar();
+
+        indiceReservaActual++; // Avanzamos a la siguiente reserva sin reubicar la actual
+        PrepararYMostrarModalParaSiguienteReserva(); // Prepara y muestra el siguiente modal o finaliza
     }
 
     private async Task HandleConfirmarInhabilitacionSinReubicacion()
     {
-        propiedadQueSeEstaEvaluando.NoHabitable = !propiedadQueSeEstaEvaluando.NoHabitable; 
-        CUMarcarPropiedadComoNoHabitable.ActualizarEstadoNoHabitable(propiedadQueSeEstaEvaluando);
-        if (reservaActualParaModal != null)
-                {
-                    
-                    var resultadoCancelacion = CUCancelarReserva.EjecutarParaInhabitabilidad(reservaActualParaModal.Id); 
+        try
+        {
+            if (reservaActualParaModal != null)
+            {
+                // Se cancela la reserva actual
+                var resultadoCancelacion = CUCancelarReserva.EjecutarParaInhabitabilidad(reservaActualParaModal.Id);
 
-                    NotificadorEmail.EnviarCorreoModificacionReservaPorNoHabitable(
-                        reservaActualParaModal.Cliente?.Email ?? "", 
-                        reservaActualParaModal.Cliente?.Nombre ?? "", 
-                        propiedadQueSeEstaEvaluando.Titulo, 
-                        null
-                    );
-                    
+                NotificadorEmail.EnviarCorreoModificacionReservaPorNoHabitable(
+                    reservaActualParaModal.Cliente?.Email ?? "",
+                    reservaActualParaModal.Cliente?.Nombre ?? "",
+                    propiedadQueSeEstaEvaluando?.Titulo ?? "", // Usar propiedadQueSeEstaEvaluando
+                    null // No hay propiedad de reubicación porque se canceló
+                );
 
-                    mensajeExito = $"La propiedad '{propiedadQueSeEstaEvaluando.Titulo}' ha sido marcada como no habitable, y las reservas han sido canceladas.";
-                }
-                else 
-                {
-                    
-                    mensajeExito = $"La propiedad '{propiedadQueSeEstaEvaluando.Titulo}' ha sido marcada como no habitable (no había reservas o la actual no existe).";
-                }
-        mostrarModalReubicacion = false;
-        propiedades = CUListarPropiedades.Ejecutar();
+                mensajeExito = $"La reserva para el cliente '{reservaActualParaModal.Cliente?.Nombre}' en la propiedad '{propiedadQueSeEstaEvaluando?.Titulo}' ha sido cancelada exitosamente.";
+            }
+            else
+            {
+                mensajeExito = $"La propiedad '{propiedadQueSeEstaEvaluando?.Titulo}' ha sido marcada como no habitable (no había reservas o la actual no se encontró).";
+            }
+            mensajeError = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error al confirmar inhabilitación sin reubicación para la reserva {reservaActualParaModal?.Id}.");
+            mensajeError = $"Error al confirmar la inhabilitación sin reubicación: {ex.Message}";
+            mensajeExito = string.Empty;
+        }
+        finally
+        {
+            indiceReservaActual++; // Avanzamos a la siguiente reserva
+            PrepararYMostrarModalParaSiguienteReserva(); // Prepara y muestra el siguiente modal o finaliza
+        }
     }
-
 
    
     private bool EsPropiedadBorrada(Propiedad prop)
