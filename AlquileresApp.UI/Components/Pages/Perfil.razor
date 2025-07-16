@@ -180,60 +180,6 @@
                                         <div class="alert alert-danger">@mensajeError</div>
                                     }
 
-    @if (!reservas.Any())
-    {
-        <div class="alert alert-info">No se encontraron reservas registradas.</div>
-    }
-    else
-    {
-        <table class="table_misreservas table-hover shadow-sm">
-            <thead class="table-dark">
-                <tr>
-                    <th>Propiedad</th>
-                    <th>Politica De Cancelacion</th>
-                    <th>Fecha inicio</th>
-                    <th>Fecha fin</th>
-                    <th>Estado</th>
-                    <th>Total</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var reserva in reservas)
-                {
-                    <tr>
-                        <td>@reserva.Propiedad?.Titulo</td>
-                       <td>@ObtenerDescripcionPolitica(reserva.Propiedad.PoliticaCancelacion)</td>
-                        <td>@reserva.FechaInicio.ToShortDateString()</td>
-                        <td>@reserva.FechaFin.ToShortDateString()</td>
-                        <td>
-                            <span class="badge bg-@GetBadgeColor(reserva.Estado)">
-                                @reserva.Estado
-                            </span>
-                        </td>
-                        <td>$@reserva.PrecioTotal.ToString("N2")</td>
-                        <td>
-                            @if (reserva.Estado == EstadoReserva.Pendiente)
-                            {
-                                <div class="btn-container">
-                                <button class=" btn btn-primary " @onclick="@(() => ModificarReserva(reserva.Id))">
-                                    <i class="bi bi-pencil  "></i> 
-                                </button>
-                                <button class="btn btn-danger" @onclick="@(() => CancelarReserva(reserva.Id))">
-                                    <i class="bi bi-x-circle "></i> 
-                                </button>
-                                </div>
-                            }
-                            else
-                            {
-                                <span class="text-muted">Sin acciones</span>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>  
-    }
 </div>
                                     @if (!reservas.Any())
                                     {
@@ -306,11 +252,13 @@
                     <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CancelarConfirmacion"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Estás seguro de que querés cancelar esta reserva?</p>
+                    <p>@(mensajeCancelacion ?? "¿No se encontró mensaje de cancelación?")</p>
+                    <p>¿Estás seguro de que deseas cancelar esta reserva?</p>
+                    <p>Esta acción no se puede deshacer.</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-naranja" @onclick="CancelarConfirmacion">No</button>
-                    <button class="btn-naranja" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
+                    <button class="btn btn-secondary" @onclick="CancelarConfirmacion">No</button>
+                    <button class="btn btn-danger" @onclick="ConfirmarCancelacion">Sí, Cancelar</button>
                 </div>
             </div>
         </div>
@@ -631,13 +579,16 @@
         NavigationManager.NavigateTo($"/modificarreserva/{id}");
     }
 
-    private void CancelarReserva(int id)
-    {
-        reservaAEliminarId = id;
-        mostrarConfirmacion = true; 
-        mensajeError = null;
-        mensajeExito = null;
-    }
+   private async Task CancelarReserva(int id)
+{
+    reservaAEliminarId = id;
+    var resultadoPreliminar = await casoDeUsoCancelarReserva.calcularCancelacion(id);
+    mensajeCancelacion = resultadoPreliminar.Mensaje;
+    mostrarConfirmacion = true;
+    mensajeError = null;
+    mensajeExito = null;
+    await InvokeAsync(StateHasChanged); 
+}
 
     private async Task ConfirmarCancelacion()
 {
@@ -647,21 +598,25 @@
 
         if (resultado.EsExitosa)
         {
-            if (resultado.EsExitosa)
-                mensajeExito_misReservas = resultado.Mensaje;
+            mensajeExito_misReservas = resultado.Mensaje;
+
 
             await CargarmisReservas();
         }
+        else
+        {
+            mensajeError = resultado.Mensaje;
+        }
     }
     catch (Exception ex)
-        {
-            mensajeError = $"Ocurrió un error inesperado: {ex.Message}";
-        }
-        finally
-        {
-            mostrarConfirmacion = false;
-        }
+    {
+        mensajeError = $"Ocurrió un error inesperado: {ex.Message}";
     }
+    finally
+    {
+        mostrarConfirmacion = false;
+    }
+}
 
 
     private string ObtenerDescripcionPolitica(PoliticasDeCancelacion politica)
@@ -942,7 +897,7 @@ private async Task EnviarMensajeEmail()
     }
 
     .estado-badge.finalizada {
-        background-color: #6c757d;
+        background-color: #393a3b;
         color: white;
     }
 

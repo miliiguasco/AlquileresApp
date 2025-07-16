@@ -6,11 +6,20 @@ using System;
 
 public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositorio
 {
-    public List<Promocion> ObtenerTodas()
+ public List<Promocion> ObtenerTodas()
 {
-    return dbContext.Promociones
-        .Include(p => p.Propiedades) // 👈 Incluye la relación con Propiedades
+    var promociones = dbContext.Promociones
+        .Include(p => p.Propiedades)
         .ToList();
+
+    foreach (var promo in promociones)
+    {
+        promo.Propiedades = promo.Propiedades
+            .Where(prop => !prop.borrada && !prop.NoHabitable)
+            .ToList();
+    }
+
+    return promociones;
 }
 
     public void Guardar(Promocion promocion, List<int> propiedadesSeleccionadas)
@@ -24,11 +33,11 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
         if (promocion.PorcentajeDescuento <= 0 || promocion.PorcentajeDescuento > 100)
             throw new ArgumentException("El porcentaje de descuento debe ser mayor a 0 y menor o igual a 100.");
         var existe = dbContext.Promociones
-            .Any(p => p.Titulo.ToLower() == promocion.Titulo.ToLower() && !p.borrada);
+            .Any(p => p.Titulo.ToLower() == promocion.Titulo.ToLower());
 
         if (existe)
         {
-            throw new Exception("Ya existe una promoción activa con el mismo título.");
+            throw new Exception("Ya existe una promoción con el mismo título.");
         }
          var propiedades = dbContext.Propiedades
         .Where(p => propiedadesSeleccionadas.Contains(p.Id))
@@ -51,8 +60,7 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
 
     var conflicto = dbContext.Promociones.Any(p =>
         p.Id != id &&
-        p.Titulo.ToLower() == titulo.ToLower() &&
-        !p.borrada);
+        p.Titulo.ToLower() == titulo.ToLower());
 
     if (conflicto)
         throw new Exception("Ya existe otra promoción activa con el mismo título.");
@@ -98,11 +106,25 @@ foreach (var propiedad in promocion.Propiedades)
         .Include(p => p.Propiedades) // 👈 Incluye las propiedades asociadas
         .FirstOrDefault(p => p.Id == id && !p.borrada);
 }
-  public List<Promocion> ObtenerTodasActivas()
+public List<Promocion> ObtenerTodasActivas()
 {
-    return dbContext.Promociones
-        .Include(p => p.Propiedades) // 👈 Incluye las propiedades asociadas
+    var promociones = dbContext.Promociones
+        .Include(p => p.Propiedades)
         .Where(p => !p.borrada && p.FechaInicio <= DateTime.Today && p.FechaFin >= DateTime.Today)
+        .ToList(); // ← EF hace tracking
+
+    // Filtrás las propiedades válidas manualmente
+    foreach (var promo in promociones)
+    {
+        promo.Propiedades = promo.Propiedades
+            .Where(prop => !prop.borrada && !prop.NoHabitable)
+            .ToList();
+    }
+     promociones = promociones
+        .Where(p => p.Propiedades.Any())
         .ToList();
+
+    return promociones;
 }
+
 }

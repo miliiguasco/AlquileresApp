@@ -17,7 +17,7 @@ public class Propiedad
 
     public bool NoHabitable { get; set; } = false;
     public int EncargadoId { get; set; }
-    public Encargado Encargado { get; set; } 
+    public Encargado Encargado { get; set; }
     public List<ServiciosPropiedad> ServiciosDisponibles { get; set; } = new();
     public List<Imagen> Imagenes { get; set; } = new();
     public List<Reserva> Reservas { get; set; } = new();
@@ -27,7 +27,9 @@ public class Propiedad
     public List<Promocion> Promociones { get; set; } = new();
     public bool Destacada { get; set; } = false;
     public ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
-    public double CalificacionPromedio { get; set; } = 0; 
+    public double CalificacionPromedio { get; set; } = 0;
     public ICollection<Calificacion> Calificaciones { get; set; } = new List<Calificacion>();
+    
+    public bool borrada { get; set; } = false;
 }
 

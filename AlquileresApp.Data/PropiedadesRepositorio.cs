@@ -211,7 +211,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
        .Include(p => p.Imagenes)
        .Include(p => p.Promociones)
        .Include(p => p.Reservas)
-       .Where(p => !p.NoHabitable)
+       .Where(p => !p.NoHabitable && !p.borrada) // Filtrar propiedades no habitables y borradas
        .ToList();
 
 
@@ -221,7 +221,7 @@ public class PropiedadesRepositorio(AppDbContext dbContext) : IPropiedadReposito
 {
     return dbContext.Propiedades
         .Include(p => p.Imagenes)
-        .Where(p => p.Destacada) 
+        .Where(p => p.Destacada && !p.NoHabitable && !p.borrada) 
         .ToList();
 }
 }
