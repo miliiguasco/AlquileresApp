@@ -8,6 +8,11 @@ public class PreguntaFrecuenteRepositorio(AppDbContext dbContext) : IPreguntasFr
 {
     public PreguntaFrecuente CrearPreguntaFrecuente(string pregunta, string respuesta)
     {
+        // Validar que no exista una pregunta igual (ignorando mayúsculas/minúsculas y espacios)
+        if (dbContext.PreguntasFrecuentes.Any(p => p.Pregunta.Trim().ToLower() == pregunta.Trim().ToLower()))
+        {
+            throw new InvalidOperationException("Error, ya existe esa pregunta frecuente.");
+        }
         var preguntaFrecuente = new PreguntaFrecuente { Pregunta = pregunta, Respuesta = respuesta };
         dbContext.PreguntasFrecuentes.Add(preguntaFrecuente);
         dbContext.SaveChanges();    

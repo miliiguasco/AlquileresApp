@@ -90,9 +90,7 @@
                 else if (tabActiva == "preguntas-frecuentes")
                 {
                     <div class="tab-pane active">
-                            <button class="btn-naranja" @onclick="NuevaPregunta">
-                                <i class="fas fa-plus"></i> Nueva pregunta frecuente
-                            </button>
+                            
                         <div class="preg-frec-table-container">
                             @if (!string.IsNullOrEmpty(mensajeExito))
                             {
@@ -122,6 +120,9 @@
                                     }
                                 </tbody>
                             </table>
+                            <button class="btn-naranja" @onclick="NuevaPregunta">
+                                <i class="fas fa-plus"></i> Nueva pregunta frecuente
+                            </button>
                         </div>
                         @if (mostrarModalEdicion)
                         {
@@ -353,10 +354,18 @@
             errorCreacion = "La pregunta y la respuesta no pueden estar vacías.";
             return;
         }
-        CUCrearPreguntaFrecuente.Ejecutar(nuevaPregunta.Pregunta, nuevaPregunta.Respuesta);
-        preguntas = CUListarPreguntasFrecuentes.Ejecutar();
-        mostrarModalCreacion = false;
-        mensajeExito = "Pregunta agregada con éxito";
+        try
+        {
+            CUCrearPreguntaFrecuente.Ejecutar(nuevaPregunta.Pregunta, nuevaPregunta.Respuesta);
+            preguntas = CUListarPreguntasFrecuentes.Ejecutar();
+            mostrarModalCreacion = false;
+            mensajeExito = "Pregunta agregada con éxito";
+        }
+        catch (InvalidOperationException ex)
+        {
+            mostrarModalCreacion = false;
+            mensajeExito = ex.Message; // "Error, ya existe esa pregunta frecuente."
+        }
         StateHasChanged();
     }
 

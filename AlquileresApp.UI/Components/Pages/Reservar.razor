@@ -1,7 +1,7 @@
 @page "/Reservar/{PropiedadId:int}"
 @rendermode InteractiveServer
-@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
 @using System.Security.Claims
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
@@ -10,12 +10,12 @@
 @inject CasoDeUsoObtenerPropiedad CUObtenerPropiedad
 @inject CasoDeUsoCalcularPrecioConPromocion CUCalcularPrecioConPromocion
 @inject CasoDeUsoCrearReserva CUCrearReserva
-@inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider ServicioAutenticacion
 @inject IUsuarioRepositorio UsuarioRepositorio
 @inject IJSRuntime JS
 @inject ILogger<Reservar> Logger
 @attribute [Authorize]
+@inject NavigationManager NavigationManager
 
 
 <link href="css/Reservar.css" rel="stylesheet" />
@@ -173,9 +173,9 @@
 @code {
     [Parameter]
     public int PropiedadId { get; set; }
+    private bool estaAutenticado = false;
     private bool esCliente = false;
     private bool esAdministrador = false;
-    private bool estaAutenticado = false;
     private Propiedad? propiedad;
     private string? error;
     private DateTime fechaInicio = DateTime.Today;
