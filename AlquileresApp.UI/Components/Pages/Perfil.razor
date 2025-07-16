@@ -289,6 +289,30 @@
                           OnPasswordChanged="ManejarCambioContraseña"
                           UsuarioActual="usuario" />
 
+@if (reservaSeleccionada != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Enviar mensaje al encargado</h5>
+                    <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CerrarFormularioMensaje"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Propiedad: <b>@reservaSeleccionada.Propiedad?.Titulo</b></p>
+                    <textarea class="form-control" @bind="mensajeAEnviar" rows="4" placeholder="Escribe tu mensaje aquí..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CerrarFormularioMensaje">Cancelar</button>
+                    <button class="btn btn-primary" @onclick="EnviarMensajeEmail" disabled="@enviandoMensaje">
+                        @(enviandoMensaje ? "Enviando..." : "Enviar")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
 
     [Parameter]

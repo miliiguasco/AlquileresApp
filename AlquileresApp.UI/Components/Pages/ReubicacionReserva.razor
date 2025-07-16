@@ -14,7 +14,7 @@
                 @if (ReservaAfectada != null)
                 {
                     <p>La @ReservaAfectada.Propiedad.Titulo se ha marcado como no habitable.</p>
-                    <p>La @ReservaAfectada.Propiedad.Titulo (del @ReservaAfectada.FechaInicio.ToShortDateString() al @ReservaAfectada.FechaFin.ToShortDateString()) para el cliente **@ReservaAfectada.Cliente.Nombre @ReservaAfectada.Cliente.Apellido** necesita ser reubicada.</p>
+                    <p>La @ReservaAfectada.Propiedad.Titulo (del @ReservaAfectada.FechaInicio.ToShortDateString() al @ReservaAfectada.FechaFin.ToShortDateString()) para el cliente @ReservaAfectada.Cliente.Nombre @ReservaAfectada.Cliente.Apellido necesita ser reubicada.</p>
 
                     @if (AlternativasDisponibles != null && AlternativasDisponibles.Any())
                     {
@@ -35,7 +35,7 @@
                     {
                         <p class="alert alert-warning">
                             No se encontraron propiedades alternativas disponibles para esta reserva en la misma localidad y fechas.
-                            <br/>**Esta reserva no podrá ser reubicada.**
+                            <br/>Esta reserva no podrá ser reubicada.
                         </p>
                     }
                 }
