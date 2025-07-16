@@ -108,11 +108,15 @@
             <h4 class="mt-5 mb-3">Política de cancelación</h4>
             <p class="fst-italic">@ObtenerDescripcionPolitica(propiedad.PoliticaCancelacion)</p>
         </div>
-       <div class="info-grupo">
-                            <button class="btn-naranja" @onclick="IrAReservar">
-                                <i class="fas fa-calendar-check"></i> Reservar esta propiedad
-                            </button>
-        </div>
+
+        @if (currentUser != null && currentUser.Identity.IsAuthenticated && currentUser.IsInRole("Cliente"))
+        {
+            <div class="info-grupo">
+                <button class="btn-naranja" @onclick="IrAReservar">
+                    <i class="fas fa-calendar-check"></i> Reservar esta propiedad
+                </button>
+            </div>
+        }
          
         <div class="comments-section mt-5 px-3">
     <h2 class="mb-4">Comentarios y Calificaciones</h2>

@@ -1,22 +1,28 @@
 @page "/"
 @rendermode InteractiveServer
 @using AlquileresApp.Core.Entidades
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
 @using AlquileresApp.Core.CasosDeUso.Propiedad
 @using AlquileresApp.Core.CasosDeUso.Reserva
 @using AlquileresApp.Core.CasosDeUso.Calificacion
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.CasosDeUso.Promocion
+@using AlquileresApp.Core.Interfaces
+@using System.Security.Claims
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components.Forms
 @using System.IO
 @inject IJSRuntime JS
+@inject AuthenticationStateProvider ServicioAutenticacion
 @inject IWebHostEnvironment Environment
 @inject CasoDeUsoListarPropiedadesFiltrado CUListarPropiedadesFiltrado
 @inject CasoDeUsoCrearReserva CUReservarPropiedad
 @inject CasoDeUsoListarPromocionesActivas CUListarPromocionesActivas
 @inject CasoDeUsoListarPropiedadesDestacadas CUListarPropiedadesDestacadas
-
+@inject IUsuarioRepositorio UsuarioRepositorio
 @inject CasoDeUsoMostrarCalificacion CUMostrarCalificacion
+
 
 @if (Promociones != null && Promociones.Any())
 {
@@ -339,11 +345,19 @@
                         </div>
                     }
 
-                    <div class="info-grupo">
+
+                     @if (esCliente || !estaAutenticado)
+                    {
+                        <div class="info-grupo">
                             <button class="btn btn-primary" @onclick="() => IrAReservar(propiedad.Id)">
                                 <i class="fas fa-calendar-check"></i> Reservar esta propiedad
                             </button>
                         </div>
+                    }
+
+
+
+                        
 
                 </li>
             }
@@ -352,7 +366,9 @@
 </div>
 
 @code {
-private List<Promocion> Promociones = new();
+    private bool estaAutenticado = false;
+    private bool esCliente = false;
+    private List<Promocion> Promociones = new();
     private List<Propiedad> PropiedadesDestacadas = new();
     private SearchFilters Filtros = new()
 {
@@ -360,20 +376,31 @@ private List<Promocion> Promociones = new();
     FechaFin = DateTime.Today.AddDays(1)
 };
     private List<Propiedad>? Propiedades;
-    private Usuario UsuarioActual = new Cliente
-    {
-        Nombre = "María",
-        Apellido = "Gómez",
-        Email = "maria@demo.com",
-        Telefono = "1234567890",
-        Contraseña = "123456",
-        FechaNacimiento = new DateTime(1990, 1, 1)
-    };
     private HashSet<int> PropiedadesExpandida = new();
-protected override void OnInitialized()
+    private int? usuarioId;
+    
+    
+    protected override async Task OnInitializedAsync ()
     {
+        var authState = await ServicioAutenticacion.GetAuthenticationStateAsync();
+        var user = authState.User;
+        estaAutenticado = user.Identity != null && user.Identity.IsAuthenticated;
+        var email = user.FindFirst(ClaimTypes.Email)?.Value;
+
+        if (email != null)
+        {
+            var usuario = UsuarioRepositorio.ObtenerUsuarioPorEmail(email);
+            if (usuario != null)
+            {
+                usuarioId = usuario.Id;
+            }
+        }
+
+        esCliente = user.IsInRole("Cliente");
+
         Promociones = CUListarPromocionesActivas.Ejecutar();
         PropiedadesDestacadas = CUListarPropiedadesDestacadas.Ejecutar();
+        
     }
     private void Buscar()
     {
