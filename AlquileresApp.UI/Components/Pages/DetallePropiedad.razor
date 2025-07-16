@@ -6,6 +6,7 @@
 @using AlquileresApp.Core.Enumerativos
 @using AlquileresApp.Core.Interfaces
 @using GoogleMaps.LocationServices
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.JSInterop
 @inject IPropiedadRepositorio PropiedadesRepo
 @inject IImagenesRepositorio ImagenesRepo
@@ -19,6 +20,8 @@
 @inject CasoDeUsoObtenerPropiedad CUObtenerPropiedad
 
 @inject CasoDeUsoTieneReserva CUTieneReserva
+
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
 @inject IWebHostEnvironment Environment
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
@@ -98,8 +101,9 @@
                 <h4 class="mt-5 mb-3">Política de cancelación</h4>
                 <p class="fst-italic">@ObtenerDescripcionPolitica(propiedad.PoliticaCancelacion)</p>
             </div>
-
-            <div class="button-group">
+             <div class="button-group">
+            @if (esAdministrativo)
+            {
                 <button class="btn btn-primary" @onclick="IniciarEdicion">
                     <i class="fas fa-edit"></i> Editar Propiedad
                 </button>
@@ -108,7 +112,7 @@
                     <i class="fas fa-edit"></i> Cargar Imagen
                 </button>
                 <InputFile OnChange="CargarImagen" accept=".jpg,.jpeg,.png" style="display:none" />
-
+            }
                 <button class="btn-naranja" @onclick="VolverAInicio">Volver al Inicio</button>
             </div>
         }
@@ -233,8 +237,8 @@
                 <button type="button" class="btn-close" @onclick="() => ManejarRespuestaModal(false)" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>¡Atención! Hay **reservas activas o futuras** para esta propiedad.</p>
-                <p>Cambiar la **capacidad de personas** de @capacidadOriginal a @propiedadEditada.Capacidad podría afectar la validez de las reservas existentes y causar problemas a los inquilinos.</p>
+                <p>¡Atención! Hay reservas activas o futuras para esta propiedad.</p>
+                <p>Cambiar la capacidad de personas de @capacidadOriginal a @propiedadEditada.Capacidad podría afectar la validez de las reservas existentes y causar problemas a los inquilinos.</p>
                 <p>¿Está seguro de que desea continuar con esta modificación?</p>
             </div>
             <div class="modal-footer">
@@ -266,9 +270,11 @@
 
     private TaskCompletionSource<bool> modalResponseTcs = new TaskCompletionSource<bool>(); // Para esperar la respuesta de la modal
 
+    private AuthenticationState? authState;
+    private bool esAdministrativo = false;
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         propiedad = CUObtenerPropiedad.Ejecutar(Id);
         googleMapsApiKey = Configuration["GoogleMaps:ApiKey"];
@@ -280,6 +286,13 @@
 
         // Cargar encargados para el input de selección
         ListaEncargados = UsuarioRepositorio.ListarEncargados();
+
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState != null && authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
+        {
+            esAdministrativo = authState.User.IsInRole("Administrador");
+        }
+        StateHasChanged(); // Forzar renderizado inicial
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
