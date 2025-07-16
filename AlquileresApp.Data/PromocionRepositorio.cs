@@ -70,6 +70,8 @@ public class PromocionRepositorio(AppDbContext dbContext) : IPromocionRepositori
     promocion.Descripcion = descripcion;
     promocion.FechaInicio = fechaInicio;
     promocion.FechaFin = fechaFin;
+    promocion.FechaInicioReserva = fechaInicioReserva;
+    promocion.FechaFinReserva = fechaFinReserva;
     promocion.PorcentajeDescuento = porcentajeDescuento;
 
     promocion.Propiedades.Clear(); 

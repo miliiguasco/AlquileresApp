@@ -118,7 +118,7 @@
                                         @{
                                             var precioOriginal = prop.PrecioPorNoche;
                                             var descuento = promo.PorcentajeDescuento;
-                                            var precioConDescuento = precioOriginal * (1 - descuento / 100.0m);
+                                            var precioConDescuento = precioOriginal * (descuento / 100.0m);
                                         }
                                         <p class="card-text text-muted">
                                             <del>@($"{precioOriginal:C}")</del>

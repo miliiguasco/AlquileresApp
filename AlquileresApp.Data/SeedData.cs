@@ -30,7 +30,7 @@ namespace AlquileresApp.Data
                     {
                         Nombre = "prueba",
                         Apellido = "test",
-                        Email = "prueba@test.com",
+                        Email = "manupedrob@gmail.com",
                         Telefono = "123456789",
                         Contraseña = hashService.HashPassword("password123"),
                         FechaNacimiento = new DateTime(1990, 1, 1),
